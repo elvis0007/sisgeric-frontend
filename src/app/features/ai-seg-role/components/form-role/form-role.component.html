@@ -1,0 +1,28 @@
+<form [formGroup]="formRole" (ngSubmit)="toSend()" class="space-y-4">
+  <div class="form-control">
+    <label class="label">
+      <span class="label-text">Descripción</span>
+    </label>
+    <input 
+      type="text" 
+      class="input input-bordered input-primary w-full" 
+      [ngClass]="{
+        'input-error': formRole.get('asero_descripcion')?.invalid && 
+                       (formRole.get('asero_descripcion')?.dirty || formRole.get('asero_descripcion')?.touched)
+      }"
+      formControlName="asero_descripcion">
+    <!-- Mensaje de error -->
+    <label class="label" *ngIf="formRole.get('asero_descripcion')?.invalid && 
+                                (formRole.get('asero_descripcion')?.dirty || formRole.get('asero_descripcion')?.touched)">
+      <span class="label-text-alt text-error">Este campo es requerido</span>
+    </label>
+  </div>
+
+  <div class="flex justiafy-center space-x-4 items-center mt-4">
+    <button type="button" class="btn btn-error btn-wide text-white" (click)="closeModal($event)">CANCELAR</button>
+    <button class="btn btn-primary btn-wide text-white" [disabled]="formRole.invalid || isLoading">
+      <span *ngIf="isLoading" class="loading loading-spinner text-secondary"></span>
+      <span *ngIf="!isLoading">GUARDAR</span>
+    </button>
+  </div>
+</form>

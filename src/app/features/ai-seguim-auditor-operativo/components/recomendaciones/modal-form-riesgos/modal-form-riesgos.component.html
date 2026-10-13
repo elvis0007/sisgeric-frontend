@@ -1,0 +1,64 @@
+<dialog #modalEdicion class="modal text-secondary" aria-labelledby="titulo-editar-riesgo"
+  (cancel)="$event.preventDefault(); cancelar()">
+  <div class="modal-box w-11/12 max-w-[600px] rounded-lg shadow-lg relative">
+    <div class="flex items-start justify-between gap-4 mb-4">
+      <h2 id="titulo-editar-riesgo" class="text-xl font-bold">{{ campo === 'riesgo' ? 'Editar riesgo' : campo === 'evidencia' ? 'Editar evidencia requerida' : 'Editar riesgo y evidencia' }}</h2>
+      <button type="button" class="btn btn-sm btn-circle btn-ghost text-lg" (click)="cancelar()"
+        [disabled]="guardando" aria-label="Cerrar modal" title="Cerrar">&times;</button>
+    </div>
+    <form (ngSubmit)="guardar()" class="flex flex-col gap-4">
+      <div *ngIf="campo !== 'evidencia'">
+        <label for="nivel-riesgo" class="block font-semibold mb-2">Riesgo</label>
+        <select id="nivel-riesgo" name="riesgo" [(ngModel)]="riesgo" [disabled]="guardando" required
+          class="select select-bordered select-primary w-full">
+          <option value="" disabled>Seleccione</option>
+          <option value="ALTO">Alto</option>
+          <option value="MODERADO">Moderado</option>
+          <option value="BAJO">Bajo</option>
+        </select>
+      </div>
+      <div *ngIf="campo !== 'riesgo'">
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <span class="font-semibold">Evidencias requeridas</span>
+          <button type="button" class="btn btn-circle btn-sm btn-primary" (click)="agregarEvidencia()"
+            [disabled]="guardando" title="Agregar evidencia" aria-label="Agregar evidencia">
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+        </div>
+        <ol #listaEvidencias class="space-y-3 max-h-[7.25rem] overflow-y-auto overscroll-contain p-1 pr-2" style="scrollbar-gutter: stable" aria-label="Lista de evidencias requeridas">
+          <li *ngFor="let item of evidencias; let i = index" class="flex items-start gap-2">
+            <label class="pt-3 text-sm font-semibold shrink-0" [for]="'editar-evidencia-' + i">{{ i + 1 }}.</label>
+            <input type="text" [id]="'editar-evidencia-' + i" [name]="'evidencia-' + i"
+              [(ngModel)]="item.texto" [disabled]="guardando" required maxlength="500"
+              class="input input-bordered input-primary flex-1 min-w-0"
+              [attr.aria-label]="'Evidencia requerida ' + (i + 1)"
+              placeholder="Ingrese un documento o respaldo requerido" />
+            <button type="button" class="btn btn-circle btn-sm btn-ghost text-error mt-2 shrink-0"
+              (click)="quitarEvidencia(i)" [disabled]="guardando || evidencias.length === 1"
+              title="Eliminar evidencia" [attr.aria-label]="'Eliminar evidencia ' + (i + 1)">
+              <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="m6 6 12 12M6 18 18 6" />
+              </svg>
+            </button>
+          </li>
+        </ol>
+        <p class="text-xs mt-2" [class.text-error]="evidencia.length > 2000">{{ evidencia.length }}/2000 caracteres</p>
+      </div>
+      <p *ngIf="errorMessage" class="text-sm text-error" role="alert">{{ errorMessage }}</p>
+      <div class="mt-6 flex flex-wrap items-center justify-center gap-2">
+        <button type="button" (click)="cancelar()" [disabled]="guardando" class="btn btn-error text-white">Cancelar</button>
+        <button type="submit" [disabled]="guardando" class="btn btn-primary text-white">
+          <span *ngIf="guardando" class="loading loading-spinner loading-xs"></span>
+          {{ guardando ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
+    </form>
+  </div>
+  <div class="modal-backdrop">
+    <button type="button" (click)="cancelar()" [disabled]="guardando" aria-label="Cerrar modal">Cerrar</button>
+  </div>
+</dialog>

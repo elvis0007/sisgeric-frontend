@@ -1,0 +1,39 @@
+<div class="w-full">
+  <app-breadcrumbs />
+
+  <app-modal-asign-audit-ag (resetSelected)="resetSelected()"
+    [reloadTable]="reloadTable.bind(this)" />
+
+  <div [hidden]="rutaHijaActiva">
+    <h1 class="text-2xl font-bold pb-5 pt-3">Informes</h1>
+
+    <div class="flex flex-col w-full mb-5">
+  
+      <app-search-filter-ag class="w-full"
+        (filterChange)="onFilterChange($event)" (loadingChange)="onLoadingChange($event)"></app-search-filter-ag>
+  
+      <button class="btn btn-primary w-full lg:w-36 mt-4 flex items-center justify-center gap-2 self-end" [disabled]="selectedInformes.length === 0" (click)="openModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+          <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M10.5 22H6.59c-1.545 0-2.774-.752-3.877-1.803c-2.26-2.153 1.45-3.873 2.865-4.715c2.55-1.52 5.628-1.87 8.422-1.054M16.5 6.5a4.5 4.5 0 1 1-9 0a4.5 4.5 0 0 1 9 0m1.933 7.349c.335-.364.503-.546.681-.652a1.4 1.4 0 0 1 1.397-.02c.18.1.354.277.7.63c.345.353.518.53.616.714c.238.447.23.988-.02 1.427c-.104.182-.282.353-.638.696l-4.231 4.075c-.674.65-1.011.974-1.432 1.139c-.421.164-.885.152-1.81.128l-.127-.003c-.282-.008-.422-.012-.504-.105s-.071-.236-.049-.523l.012-.156c.063-.808.095-1.213.253-1.576c.157-.363.43-.658.974-1.248z"
+            color="currentColor" />
+        </svg>
+        <span class="text-center">
+          CAMBIAR<span class="hidden lg:inline"><br /></span> AUDITOR
+        </span>
+      </button>
+  
+    </div>
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center my-8">
+      <span class="loading loading-spinner loading-lg text-secondary"></span>
+    </div>
+  
+    <app-table-informes-ag *ngIf="!isLoading" [informes]="informes"
+      (selectionChange)="onSelectionChange($event)" [reloadTable]="reloadTable.bind(this)" />
+  </div>
+
+  <router-outlet (activate)="this.enActivacionRutaHija()"
+    (deactivate)="this.enDesactivacionRutaHija()"></router-outlet>
+
+</div>

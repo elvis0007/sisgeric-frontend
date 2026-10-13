@@ -1,0 +1,46 @@
+/* Estilos para las tarjetas del plan de acción */
+.rec-card-title {
+  color: #111827 !important;
+}
+
+.rec-card-body {
+  color: #374151 !important;
+}
+
+.badge,
+.badge span {
+  color: #ffffff !important;
+}
+
+.rec-card-container {
+  background-color: #F7F7F7 !important;
+}
+
+.rec-card-block {
+  background-color: #e8e8e8 !important;
+}
+
+.collapse.rec-card-block:hover {
+  background-color: #dfdfdf !important;
+}
+
+:host-context([data-theme="dark"]) .rec-card-container {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+:host-context([data-theme="dark"]) .rec-card-block {
+  background-color: #2a2f3d !important;
+}
+
+:host-context([data-theme="dark"]) .collapse.rec-card-block:hover {
+  background-color: #333849 !important;
+}
+
+:host-context([data-theme="dark"]) .rec-card-title {
+  color: #ffffff !important;
+}
+
+:host-context([data-theme="dark"]) .rec-card-body {
+  color: #e5e7eb !important;
+}

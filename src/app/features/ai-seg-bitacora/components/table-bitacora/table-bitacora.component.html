@@ -1,0 +1,52 @@
+<div class="w-full space-y-4">
+  <!-- Table wrapper with horizontal scroll -->
+  <div class="overflow-x-auto rounded-lg shadow-sm border border-base-200">
+    <table class="table table-sm md:table-md w-full min-w-[800px]">
+      <!-- Table Header -->
+      <thead>
+        <tr class="bg-primary text-primary-content">
+          <th class="text-sm w-12">N</th>
+          <th class="text-sm w-24">Código</th>
+          <th class="text-sm">Tabla</th>
+          <th class="text-sm">Host</th>
+          <th class="text-sm">Usuario</th>
+          <th class="text-sm whitespace-nowrap">Fecha y Hora</th>
+          <th class="text-sm">Detalle</th>
+        </tr>
+      </thead>
+      
+      <!-- Table Body -->
+      <tbody class="bg-base-200">
+        <tr class="hover" *ngFor="let bitac of displayedBitacora; let i = index">
+          <th class="text-sm">{{ (currentPage - 1) * itemsPerPage + i + 1 }}</th>
+          <td class="text-sm">{{ bitac.codigo }}</td>
+          <td class="text-sm">{{ bitac.tabla }}</td>
+          <td class="text-sm">{{ bitac.host }}</td>
+          <td class="text-sm">{{ bitac.usuario }}</td>
+          <td class="text-sm whitespace-nowrap">
+            {{ bitac.fecha | date : "dd/MM/yyyy HH:mm" }}
+          </td>
+          <td class="text-sm truncate">{{ bitac.detalle }}</td>
+        </tr>
+        
+        <!-- Empty State -->
+        <tr *ngIf="!displayedBitacora?.length">
+          <td colspan="8" class="text-center py-4">
+            <div class="flex flex-col items-center gap-2">
+              <span class="text-base-content/70">No se encontraron registros</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación reutilizable -->
+  <app-pagination 
+    [totalItems]="bitacora.length"
+    [itemsPerPage]="itemsPerPage"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)"
+    (itemsPerPageChange)="onItemsPerPageChange($event)">
+  </app-pagination>
+</div>

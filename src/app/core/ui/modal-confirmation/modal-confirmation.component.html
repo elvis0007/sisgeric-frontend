@@ -1,0 +1,85 @@
+<dialog #modal class="modal w-full h-full z-[9999]" id="modal_confirm" (cancel)="onCancel()">
+  <div class="modal-box max-w-md p-6 rounded-2xl shadow-2xl border border-base-300 bg-base-100">
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-3 top-3 text-base-content/70 hover:bg-base-200" (click)="onCancel()">
+        ✕
+      </button>
+    </form>
+
+    <div class="flex items-start gap-3.5 mb-3">
+      <!-- Icono contextual según el tipo de advertencia/pregunta -->
+      <div *ngIf="iconType !== 'none'" class="p-2.5 rounded-xl shrink-0 mt-0.5"
+           [ngClass]="{
+             'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300': iconType === 'warning',
+             'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300': iconType === 'error',
+             'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300': iconType === 'success',
+             'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300': iconType === 'info',
+             'bg-[#20315F]/15 text-[#20315F] dark:bg-indigo-950/60 dark:text-indigo-300': iconType === 'question'
+           }">
+        <!-- Advertencia -->
+        <svg *ngIf="iconType === 'warning'" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <!-- Error -->
+        <svg *ngIf="iconType === 'error'" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <!-- Info -->
+        <svg *ngIf="iconType === 'info'" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <!-- Success -->
+        <svg *ngIf="iconType === 'success'" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <!-- Pregunta / Confirmación estándar -->
+        <svg *ngIf="iconType === 'question'" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+
+      <div class="flex-1 min-w-0 pt-0.5">
+        <h3 class="text-base sm:text-lg font-bold text-base-content leading-snug" [ngClass]="titleClass">{{ title }}</h3>
+      </div>
+    </div>
+
+    <div class="py-2 leading-relaxed text-sm text-base-content/85" [innerHTML]="message"></div>
+
+    <!-- Casilla 'No volver a mostrar esta advertencia' -->
+    <div *ngIf="showDonotShowAgain" 
+         class="my-3 p-3 bg-base-200/60 border border-base-300 rounded-xl flex items-center gap-3 cursor-pointer hover:bg-base-200 transition-colors select-none"
+         (click)="toggleDonotShowAgain()">
+      <input 
+        type="checkbox" 
+        [checked]="donotShowAgainChecked" 
+        (change)="onCheckboxChange($event)"
+        (click)="$event.stopPropagation()"
+        class="checkbox checkbox-sm checkbox-primary" 
+      />
+      <span class="text-xs font-semibold text-base-content/80 cursor-pointer">
+        No volver a mostrar esta advertencia
+      </span>
+    </div>
+
+    <div class="modal-action mt-5 pt-3 border-t border-base-200 flex items-center justify-end gap-2">
+      <button 
+        *ngIf="cancelText" 
+        type="button" 
+        class="btn btn-sm sm:btn-md" 
+        [ngClass]="cancelButtonClass" 
+        (click)="onCancel()"
+      >
+        {{ cancelText }}
+      </button>
+      <button 
+        *ngIf="confirmText" 
+        type="button" 
+        class="btn btn-sm sm:btn-md font-bold shadow-sm" 
+        [ngClass]="confirmButtonClass" 
+        (click)="onConfirm()"
+      >
+        {{ confirmText }}
+      </button>
+    </div>
+  </div>
+</dialog>

@@ -1,0 +1,439 @@
+<div class="w-full space-y-6">
+
+  <!-- Estado vacío si no hay registros -->
+  <div *ngIf="responsablesGroups.length === 0" class="flex flex-col items-center justify-center p-8 bg-base-200/60 rounded-2xl border border-dashed border-base-300">
+    <svg class="w-10 h-10 text-base-content/40 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+    <span class="text-sm font-semibold text-base-content/70">No se encontraron responsables ni verificables asignados.</span>
+  </div>
+
+  <!-- TARJETA POR CADA RESPONSABLE -->
+  <div *ngFor="let group of displayedResponsablesGroups; let gIdx = index"
+       class="rounded-2xl border border-base-300 bg-base-100 shadow-md overflow-hidden transition-all">
+
+    <!-- ENCABEZADO DE LA TARJETA DEL RESPONSABLE -->
+    <div class="p-4 sm:p-5 bg-gradient-to-r from-[#20315F] via-[#263b73] to-[#2d437d] text-white flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <!-- LADO IZQUIERDO: Identidad del Responsable + Fecha Máxima y Plazo -->
+      <div class="flex items-start gap-3.5 min-w-0">
+        <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-white border border-white/20 shadow-inner shrink-0 mt-0.5">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </div>
+
+        <div class="min-w-0 flex-1">
+          <!-- Etiquetas superiores: Número de Responsable y Verificables -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="badge badge-sm bg-white/20 border-none text-white font-bold uppercase tracking-wider text-[10px]">
+              Responsable #{{ (currentPage - 1) * itemsPerPage + gIdx + 1 }}
+            </span>
+            <span class="badge badge-sm bg-primary border-none text-white font-semibold text-[11px]">
+              {{ group.verificables.length }} verificable(s)
+            </span>
+          </div>
+
+          <!-- Nombre del Responsable -->
+          <h3 class="text-base sm:text-lg font-bold text-white tracking-tight mt-1 truncate">
+            {{ group.responsable?.nombre_completo || 'Responsable Asignado' }}
+          </h3>
+
+          <!-- Cargo y Departamento -->
+          <p *ngIf="group.responsable?.cargo || group.responsable?.departamento" class="text-xs text-white/80 truncate">
+            {{ group.responsable?.cargo || group.responsable?.departamento }}
+          </p>
+
+          <!-- DISTRIBUCIÓN CLARA Y DESTACADA: Fecha Máxima Individual y Plazo Individual -->
+          <div class="flex items-center gap-2.5 mt-2.5 flex-wrap">
+            <!-- Píldora: Fecha Máxima Individual -->
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-black/25 backdrop-blur-xs border border-white/20 shadow-xs">
+              <svg class="w-3.5 h-3.5 text-amber-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <span class="text-[11px] text-white/80 font-medium">Fecha Máxima:</span>
+              <span class="text-xs font-bold text-white tracking-wide">
+                {{ getFechaMaxima(group) || 'Sin fecha' }}
+              </span>
+            </div>
+
+            <!-- Píldora: Plazo Individual -->
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-black/25 backdrop-blur-xs border border-white/20 shadow-xs">
+              <svg class="w-3.5 h-3.5 text-sky-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span class="text-[11px] text-white/80 font-medium">Plazo Individual:</span>
+              
+              <!-- Badge Dinámico de Estado / Días -->
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-bold text-xs text-white shadow-xs"
+                    [ngClass]="getEstadoPlazo(group) === 'CUMPLIDO' ? 'bg-emerald-500' : ((getPlazoDias(group) || 0) < 0 ? 'bg-rose-500' : 'bg-emerald-600')">
+                <svg *ngIf="getEstadoPlazo(group) === 'CUMPLIDO'" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                </svg>
+                {{ getPlazoTexto(group) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LADO DERECHO: Resumen de Cumplimiento de Evidencias (Espacioso y Despejado) -->
+      <div class="flex flex-col sm:items-end gap-1.5 bg-black/25 p-3 rounded-xl border border-white/15 shrink-0 self-start lg:self-center">
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-white/90 font-medium">Cumplimiento Evidencias:</span>
+          <span class="badge badge-sm font-bold text-white shadow-xs border-none"
+                [ngClass]="getPorcentajeCumplimiento(group) === 100 ? 'bg-emerald-500' : (getPorcentajeCumplimiento(group) > 0 ? 'bg-amber-500' : 'bg-slate-500')">
+            {{ getEvidenciasCumplidas(group) }} / {{ getTotalEvidencias(group) }} ({{ getPorcentajeCumplimiento(group) }}%)
+          </span>
+        </div>
+        <div class="w-full sm:w-44 bg-white/20 rounded-full h-1.5 overflow-hidden">
+          <div class="h-1.5 rounded-full transition-all duration-300"
+               [ngClass]="getPorcentajeCumplimiento(group) === 100 ? 'bg-emerald-400' : (getPorcentajeCumplimiento(group) > 0 ? 'bg-amber-400' : 'bg-slate-300')"
+               [style.width.%]="getPorcentajeCumplimiento(group)">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUERPO DE LA TARJETA -->
+    <div class="p-4 sm:p-5 space-y-5">
+
+      <!-- 1. PLAN DE ACCIÓN DEL RESPONSABLE -->
+      <details class="rounded-xl border border-base-300 bg-base-200/40 p-3.5 space-y-2.5 group"
+               [open]="group.isPlanExpanded"
+               (toggle)="group.isPlanExpanded = $any($event.target).open">
+        <summary class="flex items-center justify-between cursor-pointer list-none select-none">
+          <div class="flex items-center gap-2">
+            <div class="p-1.5 bg-[#20315F] text-white rounded-lg">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-xs sm:text-sm font-bold text-secondary">
+                Plan de Acción del Responsable
+              </h4>
+              <p class="text-[11px] text-base-content/70">Cronograma de actividades y entregables esperados</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2" (click)="$event.stopPropagation()">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#20315F]/10 text-[#20315F] border border-[#20315F]/20">
+              {{ group.plan && group.plan.length > 0 ? (group.plan.length + ' actividad(es)') : 'Sin plan registrado' }}
+            </span>
+            <button *ngIf="group.plan && group.plan.length > 0"
+                    type="button"
+                    class="btn btn-xs btn-outline btn-success gap-1 font-bold shadow-xs hover:text-white"
+                    (click)="descargarPlanExcel(group, $event)"
+                    title="Descargar Plan de Acción en Excel para este responsable">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm1.8 14.5l-1.4-2.3l-1.4 2.3h-1.6l2.2-3.3l-2.1-3.2h1.6l1.3 2.2l1.3-2.2h1.6l-2.1 3.2l2.2 3.3h-1.7zM13 9V3.5L18.5 9H13z"/>
+              </svg>
+              <span>Descargar Excel</span>
+            </button>
+            <svg class="w-4 h-4 text-base-content/70 transition-transform group-open:rotate-180 ml-1 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </summary>
+
+        <div *ngIf="group.plan && group.plan.length > 0; else noPlanTpl" class="overflow-x-auto rounded-xl border border-base-200 shadow-xs bg-base-100 mt-2">
+          <table class="table table-sm w-full border-collapse">
+            <thead class="bg-[#20315F] text-white text-xs font-semibold">
+              <tr>
+                <th class="w-14 text-center font-bold py-2.5 px-2">N°</th>
+                <th class="w-[48%] min-w-[260px] font-bold py-2.5 px-3.5">Actividad Planificada</th>
+                <th class="w-[22%] min-w-[140px] text-center font-bold py-2.5 px-2">Fecha Ejecución</th>
+                <th class="w-[26%] min-w-[180px] font-bold py-2.5 px-3.5">Entregable Esperado</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-base-200 text-xs">
+              <tr *ngFor="let act of group.plan" class="hover:bg-base-200/50 transition-colors">
+                <td class="text-center align-middle py-2.5 px-2">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#20315F] text-white text-[11px] font-bold shadow-xs">
+                    {{ act.num_actividad }}
+                  </span>
+                </td>
+                <td class="align-middle py-2.5 px-3.5 text-xs text-base-content font-medium leading-relaxed">
+                  {{ act.actividad || 'Sin detalle' }}
+                </td>
+                <td class="align-middle py-2.5 px-2 text-center">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-base-200 text-base-content/85 border border-base-300 font-mono shadow-xs">
+                    <svg class="w-3.5 h-3.5 text-base-content/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    {{ (act.fecha_ejecucion | date:'dd/MM/yyyy') || 'Sin fecha' }}
+                  </span>
+                </td>
+                <td class="align-middle py-2.5 px-3.5">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-primary/10 text-primary border border-primary/20 max-w-full">
+                    <svg class="w-3.5 h-3.5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <span class="truncate" [title]="act.entregable_esperado">
+                      {{ act.entregable_esperado || 'Sin entregable' }}
+                    </span>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-template #noPlanTpl>
+          <div class="p-3 bg-base-100 rounded-lg border border-dashed border-base-300 text-center text-xs text-base-content/60 mt-2">
+            No se han registrado actividades en el plan de acción para este responsable.
+          </div>
+        </ng-template>
+      </details>
+
+      <!-- 2. CHECKLIST DE EVIDENCIAS REQUERIDAS -->
+      <details class="rounded-xl border border-primary/30 bg-primary/5 p-3.5 space-y-3 group"
+               [open]="group.isChecklistExpanded"
+               (toggle)="group.isChecklistExpanded = $any($event.target).open">
+        <summary class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 cursor-pointer list-none select-none">
+          <div class="flex items-center gap-2">
+            <div class="p-1.5 bg-[#20315F] text-white rounded-lg">
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-xs sm:text-sm font-bold text-primary">Lista de Evidencias Requeridas</h4>
+              <p class="text-[11px] text-base-content/70">
+                Evidencias requeridas a justificar con los verificables
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5 flex-wrap" (click)="$event.stopPropagation()">
+            <button type="button" class="btn btn-xs btn-outline btn-success gap-1 font-bold"
+                    (click)="marcarTodasEvidencias(true, group)">✓ Marcar Todas</button>
+            <button type="button" class="btn btn-xs btn-outline btn-ghost gap-1"
+                    (click)="marcarTodasEvidencias(false, group)">✕ Limpiar</button>
+            <button type="button" class="btn btn-xs !bg-[#20315F] hover:!bg-[#172548] !text-white gap-1 font-semibold shadow-xs"
+                    (click)="guardarCotejoEvidencias(group)">
+              <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Guardar</span>
+            </button>
+            <svg class="w-4 h-4 text-base-content/70 transition-transform group-open:rotate-180 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </summary>
+
+        <div *ngIf="group.listaEvidencias && group.listaEvidencias.length > 0; else noEvidenciasTpl"
+             class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-2">
+          <div *ngFor="let ev of group.listaEvidencias"
+               class="flex items-center justify-between p-2.5 rounded-xl border transition-all cursor-pointer select-none"
+               [ngClass]="group.checklist[ev] ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-400 ring-1 ring-emerald-400/40' : 'bg-base-100 border-base-300 hover:border-primary/50'"
+               (click)="toggleCheckEvidencia(ev, group)">
+            <div class="flex items-center gap-2.5 pr-2 flex-1 min-w-0">
+              <input type="checkbox"
+                     class="checkbox checkbox-xs sm:checkbox-sm checkbox-success shrink-0"
+                     [checked]="group.checklist[ev]"
+                     (click)="$event.stopPropagation()"
+                     (change)="toggleCheckEvidencia(ev, group)" />
+              <div class="flex-1 min-w-0">
+                <span class="text-xs font-bold text-base-content leading-tight block truncate" [title]="ev">{{ ev }}</span>
+                <span class="text-[10px] sm:text-[11px] font-medium"
+                      [ngClass]="group.checklist[ev] ? 'text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-base-content/60'">
+                  {{ group.checklist[ev] ? '✓ Cumple y Justifica' : 'Pendiente / No cubierto' }}
+                </span>
+              </div>
+            </div>
+            <span class="badge badge-xs sm:badge-sm font-bold shrink-0 border-none"
+                  [ngClass]="group.checklist[ev] ? 'badge-success text-white' : 'badge-ghost text-base-content/60'">
+              {{ group.checklist[ev] ? 'JUSTIFICA' : 'PENDIENTE' }}
+            </span>
+          </div>
+        </div>
+        <ng-template #noEvidenciasTpl>
+          <div class="alert alert-info text-xs rounded-lg py-2 mt-2">
+            No se definieron evidencias requeridas específicas para esta recomendación.
+          </div>
+        </ng-template>
+      </details>
+
+      <!-- 3. LISTA DE VERIFICABLES SUBIDOS POR ESTE RESPONSABLE -->
+      <div class="rounded-xl border border-secondary/20 bg-secondary/5 p-3.5 space-y-3">
+        <div class="flex items-center justify-between flex-wrap gap-2 border-b border-secondary/15 pb-2">
+          <div class="flex items-center gap-2">
+            <div class="p-1.5 bg-[#20315F] text-white rounded-lg">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-xs sm:text-sm font-bold text-secondary">
+                Verificables Remitidos por el Responsable
+              </h4>
+              <p class="text-[11px] text-base-content/70">
+                Documentos cargados con sus acciones de validación, ajuste de fecha y eliminación
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="badge badge-sm font-bold"
+                  [ngClass]="group.verificables.length > 0 ? 'badge-primary' : 'badge-ghost'">
+              {{ group.verificables.length }} archivo(s)
+            </span>
+
+            <!-- Botón Agregar Verificable (cuando la recomendación no está cumplida) -->
+            <button *ngIf="!isRecomendacionCumplida(group)"
+                    type="button"
+                    class="btn btn-xs sm:btn-sm !bg-[#20315F] hover:!bg-[#172548] !text-white gap-1 font-semibold shadow-xs border-none"
+                    (click)="openModalAgregar(group)"
+                    title="Agregar Verificable para este responsable">
+              <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              <span>Agregar Verificable</span>
+            </button>
+
+            <!-- Botón Verificables Adicionales (cuando la recomendación ya está cumplida) -->
+            <button *ngIf="isRecomendacionCumplida(group)"
+                    type="button"
+                    class="btn btn-xs sm:btn-sm btn-primary text-white gap-1 font-semibold shadow-xs"
+                    (click)="openModalAdicional(group)"
+                    title="Cargar Verificables Adicionales para este responsable">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              <span>Verificables Adicionales</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabla de Verificables de este Responsable -->
+        <div *ngIf="group.verificables && group.verificables.length > 0; else noVerifTpl" class="overflow-x-auto rounded-lg border border-base-200 shadow-xs bg-base-100">
+          <table class="table table-xs md:table-sm w-full">
+            <thead class="bg-[#20315F] text-white">
+              <tr>
+                <th class="w-8 text-center font-bold">N°</th>
+                <th class="text-center w-16 font-bold">Verificable</th>
+                <th class="font-bold">Descripción</th>
+                <th class="text-center w-28 font-bold">Fecha Carga</th>
+                <th class="text-center w-28 font-bold">Fecha Validación</th>
+                <th class="text-center w-32 font-bold">Estado</th>
+                <th class="w-48 font-bold">Motivo Estado</th>
+                <th class="text-center w-36 font-bold">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let verif of group.verificables; let vIdx = index" class="hover:bg-base-200/50">
+                <td class="text-center font-bold text-xs">{{ vIdx + 1 }}</td>
+                
+                <!-- Botón de Descarga del Archivo -->
+                <td class="text-center align-middle">
+                  <button class="w-7 h-7 sm:w-8 sm:h-8 mx-auto rounded-lg flex items-center justify-center bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200/80 hover:border-sky-600 transition-all duration-150 shadow-2xs hover:shadow-xs group disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+                          (click)="getFile(verif.areve_adjunto, verif.areve_codigo)"
+                          title="Descargar archivo adjunto"
+                          [disabled]="isLoadingFileMap[verif.areve_codigo]">
+                    <span *ngIf="isLoadingFileMap[verif.areve_codigo]" class="loading loading-spinner loading-xs text-sky-600"></span>
+                    <svg *ngIf="!isLoadingFileMap[verif.areve_codigo]" class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                  </button>
+                </td>
+
+                <td class="text-xs max-w-xs">
+                  <div class="line-clamp-2" [title]="verif.areve_descripcion">
+                    {{ verif.areve_descripcion || 'Sin descripción' }}
+                  </div>
+                </td>
+
+                <td class="text-center text-xs font-mono">
+                  {{ verif.areve_fecha_carga | date:'dd/MM/yyyy' }}
+                </td>
+
+                <td class="text-center text-xs font-mono">
+                  {{ verif.areve_fecha_validacion ? (verif.areve_fecha_validacion | date:'dd/MM/yyyy') : 'Pendiente' }}
+                </td>
+
+                <!-- Badge Estado -->
+                <td class="text-center align-middle">
+                  <div class="badge badge-sm sm:badge-md px-2.5 py-1 font-semibold truncate border-none"
+                       [ngClass]="verif.estado_seguimiento.areev_descripcion | statusColor">
+                    {{ verif.estado_seguimiento.areev_descripcion }}
+                  </div>
+                </td>
+
+                <td class="text-xs max-w-xs">
+                  <div class="line-clamp-2 text-base-content/80 italic" [title]="verif.areve_motivo_estado">
+                    {{ verif.areve_motivo_estado || 'Sin observaciones' }}
+                  </div>
+                </td>
+
+                <!-- ACCIONES POR VERIFICABLE -->
+                <td class="text-center align-middle">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <!-- Ajuste de Fecha Máxima Individual -->
+                    <button *ngIf="hasRole([2, 3])"
+                            class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center bg-amber-50 hover:bg-amber-500 text-amber-600 hover:text-white border border-amber-200/80 hover:border-amber-500 transition-all duration-150 shadow-2xs hover:shadow-xs disabled:opacity-30 disabled:pointer-events-none cursor-pointer group"
+                            [disabled]="isEditOrDeleteDisabled(verif)"
+                            (click)="openModalFechaMax($event, verif)"
+                            title="Ajustar fecha máxima individual">
+                      <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+
+                    <!-- Botón Validar (Abre modal de validación y calificación) -->
+                    <button class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center bg-emerald-50 hover:bg-emerald-600 text-emerald-600 hover:text-white border border-emerald-200/80 hover:border-emerald-600 transition-all duration-150 shadow-2xs hover:shadow-xs disabled:opacity-30 disabled:pointer-events-none cursor-pointer group"
+                            [disabled]="isEditOrDeleteDisabled(verif)"
+                            (click)="validarVerificable(verif)"
+                            title="Validar y Calificar Verificable">
+                      <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+
+                    <!-- Botón Editar -->
+                    <button *ngIf="canEditVerificable(verif)"
+                            class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white border border-indigo-200/80 hover:border-indigo-600 transition-all duration-150 shadow-2xs hover:shadow-xs disabled:opacity-30 disabled:pointer-events-none cursor-pointer group"
+                            title="Editar verificable"
+                            [disabled]="isEditOrDeleteDisabled(verif)"
+                            (click)="openModalEditVerificable($event, verif)">
+                      <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+
+                    <!-- Botón Eliminar / Borrar -->
+                    <button class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200/80 hover:border-rose-600 transition-all duration-150 shadow-2xs hover:shadow-xs disabled:opacity-30 disabled:pointer-events-none cursor-pointer group"
+                            title="Eliminar verificable"
+                            [disabled]="isEditOrDeleteDisabled(verif)"
+                            (click)="openModalConf(verif)">
+                      <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-template #noVerifTpl>
+          <div class="p-3 bg-base-100 rounded-lg border border-dashed border-base-300 text-center text-xs text-base-content/60">
+            Este responsable aún no ha subido documentos verificables.
+          </div>
+        </ng-template>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Paginación de Responsables -->
+  <div *ngIf="responsablesGroups && responsablesGroups.length > 0" class="mt-4">
+    <app-pagination
+      [totalItems]="responsablesGroups.length"
+      [itemsPerPage]="itemsPerPage"
+      [currentPage]="currentPage"
+      [rowsPerPageOptions]="[1, 2, 3, 5]"
+      (pageChange)="onPageChange($event)"
+      (itemsPerPageChange)="onItemsPerPageChange($event)">
+    </app-pagination>
+  </div>
+
+</div>

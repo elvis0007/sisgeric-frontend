@@ -1,0 +1,36 @@
+/* Custom breakout tooltip to escape overflow-x-auto clipping */
+.tooltip-breakout {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.tooltip-breakout-content {
+  visibility: hidden;
+  position: fixed;
+  z-index: 99999;
+  background-color: #1e293b;
+  /* bg-slate-800 */
+  color: #f8fafc;
+  /* text-slate-50 */
+  padding: 0.85rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+  max-width: 24rem;
+  /* w-96 */
+  width: 24rem;
+  white-space: normal;
+  pointer-events: none;
+  font-weight: normal;
+  line-height: 1.4;
+  border: 1px solid #334155;
+  /* border-slate-700 */
+
+  /* Margin to position it slightly below the cursor/trigger */
+  margin-top: 0.25rem;
+}
+
+/* On hover, show the breakout content */
+.tooltip-breakout:hover .tooltip-breakout-content {
+  visibility: visible;
+}

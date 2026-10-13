@@ -1,0 +1,22 @@
+<div class="w-full">
+  <app-breadcrumbs />
+
+  <app-modal-atender-solicitud-auditor [reloadTable]="reloadTable.bind(this)" />
+  <app-modal-crear-solicitud />
+
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold pb-5 pt-3">Solicitudes</h1>
+  </div>
+  <div class="w-full justify-start mt-4 mb-4">
+    <app-search-filter class="w-full" (filterChange)="onFilterChange($event)" (loadingChange)="onLoadingChange($event)" />
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center items-center my-8">
+    <span class="loading loading-spinner loading-lg text-secondary"></span>
+  </div>
+
+  <app-table-solicitudes *ngIf="!isLoading" [solicitudes]="solicitudes" (selectionChange)="onSelectionChange($event)"
+    [reloadTable]="reloadTable.bind(this)" />
+
+</div>

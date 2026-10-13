@@ -1,0 +1,286 @@
+<!-- Filtros -->
+<div class="flex flex-col w-full gap-4 mb-6" (click)="closeDropdowns()">
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h3 class="card-title text-lg font-semibold mb-4">Filtros de búsqueda - Prórrogas Realizadas</h3>
+
+      <form [formGroup]="filterForm">
+        <!-- Grid responsivo de filtros -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full">
+          <!-- Fecha desde -->
+          <div class="indicator w-full">
+            <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">
+              Fecha desde
+            </span>
+            <input
+              type="date"
+              class="input input-bordered input-primary w-full"
+              [formControl]="startDateControl"
+              [max]="endDateControl.value"
+            />
+          </div>
+
+          <!-- Fecha hasta -->
+          <div class="indicator w-full">
+            <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">
+              Fecha hasta
+            </span>
+            <input
+              type="date"
+              class="input input-bordered input-primary w-full"
+              [formControl]="endDateControl"
+              [min]="startDateControl.value"
+            />
+          </div>
+
+          <!-- Estado recomendación (multiselect tipo dropdown) -->
+          <div class="indicator w-full relative" (click)="$event.stopPropagation()">
+            <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">
+              Estado recomendación
+            </span>
+            <button
+              type="button"
+              class="select select-bordered select-primary w-full text-left font-normal truncate"
+              (click)="toggleEstadoRecDropdown()"
+            >
+              {{ estadoRecSeleccionadosTexto }}
+            </button>
+
+            <div *ngIf="estadoRecDropdownOpen" class="absolute z-50 mt-1 top-full w-full bg-base-100 border border-base-300 rounded-box shadow-lg max-h-64 overflow-y-auto">
+              <label class="label cursor-pointer px-3 py-2 hover:bg-base-200">
+                <div class="flex items-center gap-2">
+                  <input type="checkbox" class="checkbox checkbox-sm checkbox-primary"
+                         [checked]="areAllEstadoRecSelected()"
+                         (change)="toggleSelectAllEstadoRec()">
+                  <span>Seleccionar todos</span>
+                </div>
+              </label>
+              <label *ngFor="let est of estadosSeguimiento" class="label cursor-pointer px-3 py-2 hover:bg-base-200">
+                <div class="flex items-center gap-2">
+                  <input type="checkbox" class="checkbox checkbox-sm checkbox-primary"
+                         [checked]="isEstadoRecSeleccionado(est.arees_codigo)"
+                         (change)="toggleEstadoRec(est.arees_codigo)">
+                  <span>{{ est.arees_descripcion }}</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Estado verificable (multiselect tipo dropdown) -->
+          <div class="indicator w-full relative" (click)="$event.stopPropagation()">
+            <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">
+              Estado verificable
+            </span>
+            <button
+              type="button"
+              class="select select-bordered select-primary w-full text-left font-normal truncate"
+              (click)="toggleEstadoVerificableDropdown()"
+            >
+              {{ estadoVerificableSeleccionadosTexto }}
+            </button>
+
+            <div *ngIf="estadoVerificableDropdownOpen" class="absolute z-50 mt-1 top-full w-full bg-base-100 border border-base-300 rounded-box shadow-lg max-h-64 overflow-y-auto">
+              <label class="label cursor-pointer px-3 py-2 hover:bg-base-200">
+                <div class="flex items-center gap-2">
+                  <input type="checkbox" class="checkbox checkbox-sm checkbox-primary"
+                         [checked]="areAllEstadoVerificableSelected()"
+                         (change)="toggleSelectAllEstadoVerificable()">
+                  <span>Seleccionar todos</span>
+                </div>
+              </label>
+              <label *ngFor="let estado of estadosVerificableDisponibles" class="label cursor-pointer px-3 py-2 hover:bg-base-200">
+                <div class="flex items-center gap-2">
+                  <input type="checkbox" class="checkbox checkbox-sm checkbox-primary"
+                         [checked]="isEstadoVerificableSeleccionado(estado)"
+                         (change)="toggleEstadoVerificable(estado)">
+                  <span>{{ estado }}</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Auditor -->
+          <div class="indicator w-full">
+            <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">
+              Auditor
+            </span>
+            <select
+              class="select select-bordered select-primary w-full"
+              [formControl]="usuarioControl"
+            >
+              <option value="0">Todos</option>
+              <option *ngFor="let auditor of auditores" [value]="auditor.dsgus_cuenta">
+                {{ auditor.nombre_completo }} ({{ auditor.dsgus_cuenta }})
+              </option>
+            </select>
+          </div>
+
+          <!-- Búsqueda global / Palabra Clave -->
+          <div class="indicator w-full">
+            <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">
+              Palabra clave
+            </span>
+            <div class="relative w-full">
+              <input
+                type="text"
+                placeholder="Buscar por recomendación, informe, etc..."
+                class="input input-bordered input-primary w-full pr-10"
+                [formControl]="searchTermControl"
+              />
+              <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón Limpiar debajo de los filtros -->
+        <div class="flex justify-end mt-4">
+          <button type="button" (click)="clearFilters()" class="btn btn-outline btn-primary flex gap-2 items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            Limpiar Filtros
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Resultados de Tabla -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body p-4 sm:p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="card-title text-lg font-semibold">Resultado de Prórrogas Realizadas</h3>
+        
+        <!-- Botón Exportar Excel -->
+        <button
+          class="btn btn-primary btn-sm sm:btn-md"
+          [disabled]="!filteredReports.length"
+          (click)="exportToExcel(); $event.stopPropagation();"
+        >
+          <div class="flex flex-row items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M2.859 2.877l12.57-1.795a.5.5 0 0 1 .571.494v20.848a.5.5 0 0 1-.57.494L2.858 21.123a1 1 0 0 1-.859-.99V3.867a1 1 0 0 1 .859-.99M17 3h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-4zm-6.8 9L13 8h-2.4L9 10.286L7.4 8H5l2.8 4L5 16h2.4L9 13.714L10.6 16H13z" />
+            </svg>
+            <span class="hidden sm:inline">EXPORTAR</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Barra de progreso y carga dinámica -->
+      <app-report-loading *ngIf="isLoading"
+        message="Cargando prórrogas ejecutadas..."
+        subtitle="Consultando el historial de prórrogas concedidas y estados actuales...">
+      </app-report-loading>
+
+      <!-- Alerta Sin Datos -->
+      <div *ngIf="!isLoading && !filteredReports.length" class="alert alert-info justify-center my-8">
+        No se encontraron registros de prórrogas realizadas con los criterios seleccionados.
+      </div>
+
+      <!-- Tabla de Datos -->
+      <div *ngIf="!isLoading && filteredReports.length" class="w-full space-y-4">
+        <div class="report-table-shell overflow-x-auto rounded-lg shadow-sm border border-base-200">
+          <table class="table table-sm md:table-md w-full min-w-[1300px]">
+            <thead>
+              <tr class="bg-primary text-primary-content">
+                <th class="text-sm">Título Informe</th>
+                <th class="text-sm">Recomendación</th>
+                <th class="text-sm text-center">Estado Rec.</th>
+                <th class="text-sm text-center">Estado Verificable</th>
+                <th class="text-sm">Responsable<br>Recomendación</th>
+                <th class="text-sm">Realizado por</th>
+                <th class="text-sm text-center whitespace-nowrap">Fecha del Cambio</th>
+                <th class="text-sm text-center whitespace-nowrap">
+                  Fecha Cumplimiento<br>Anterior
+                </th>
+                <th class="text-sm text-center whitespace-nowrap">
+                  Fecha Cumplimiento<br>Cambiada
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-base-200">
+              <tr class="hover" *ngFor="let report of displayedReports">
+                <!-- Título Informe -->
+                <td class="text-sm">
+                  <div class="dropdown dropdown-hover">
+                    <div tabindex="0" role="button" class="hover:text-primary-focus cursor-pointer text-left">
+                      {{ report.tituloInforme | slice:0:60 }}...
+                    </div>
+                    <div *ngIf="report.tituloInforme" class="dropdown-content z-[1] card card-compact w-96 p-2 shadow bg-primary text-primary-content">
+                      <div class="card-body">
+                        <p class="whitespace-normal text-left text-xs leading-normal">{{ report.tituloInforme }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Recomendación -->
+                <td class="text-sm">
+                  <div class="dropdown dropdown-hover">
+                    <div tabindex="0" role="button" class="hover:text-primary-focus cursor-pointer text-left font-semibold">
+                      Rec. Nro {{ report.numeroRecomendacion }} - {{ report.descripcionRecomendacion | slice:0:50 }}...
+                    </div>
+                    <div *ngIf="report.descripcionRecomendacion" class="dropdown-content z-[1] card card-compact w-96 p-2 shadow bg-primary text-primary-content">
+                      <div class="card-body">
+                        <p class="whitespace-normal text-left text-xs leading-normal">{{ report.descripcionRecomendacion }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Estado Recomendación -->
+                <td class="text-sm whitespace-nowrap text-center">
+                  <span class="badge badge-outline badge-md">{{ report.estadoRecomendacion }}</span>
+                </td>
+
+                <!-- Estado Verificable -->
+                <td class="text-sm whitespace-nowrap text-center">
+                  <span class="badge badge-ghost badge-md">{{ report.estadoVerificable }}</span>
+                </td>
+
+                <!-- Responsable -->
+                <td class="text-sm">
+                  {{ report.responsable || '-' }}
+                </td>
+
+                <!-- Realizado por -->
+                <td class="text-sm font-semibold">
+                  {{ report.realizadoPor }}
+                </td>
+
+                <!-- Fecha del Cambio -->
+                <td class="text-sm whitespace-nowrap text-center text-primary font-medium">
+                  {{ formatDateTimeToDisplay(report.fechaCambio) }}
+                </td>
+
+                <!-- Fecha Anterior -->
+                <td class="text-sm whitespace-nowrap text-center text-error line-through">
+                  {{ formatDateToDisplay(report.fechaAnterior) || '-' }}
+                </td>
+
+                <!-- Fecha Cambiada -->
+                <td class="text-sm whitespace-nowrap text-center text-success font-bold">
+                  {{ formatDateToDisplay(report.fechaCambiada) }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginación reutilizable -->
+        <app-pagination 
+          [totalItems]="filteredReports.length" 
+          [itemsPerPage]="itemsPerPage" 
+          [currentPage]="currentPage"
+          (pageChange)="onPageChange($event)" 
+          (itemsPerPageChange)="onItemsPerPageChange($event)"
+        >
+        </app-pagination>
+      </div>
+    </div>
+  </div>
+</div>

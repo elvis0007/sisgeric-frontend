@@ -1,0 +1,785 @@
+<div class="flex flex-col w-full gap-6 mb-6">
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- TARJETAS KPI — Estilo idéntico al dashboard                             -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+
+    <!-- 1. Informes pendientes -->
+    <div
+      class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 group select-none">
+      <div class="card-body p-5 flex flex-row items-center justify-between w-full">
+        <div class="flex-1 flex flex-col items-center text-center justify-center min-w-0">
+          <h1 class="text-3xl sm:text-4xl font-black text-base-content tracking-tight leading-none mb-1.5">{{
+            totalInformesPendientes }}</h1>
+          <p class="text-xs font-bold text-base-content/70 leading-snug">Informes pendientes</p>
+        </div>
+        <div
+          class="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 ml-1 group-hover:scale-110">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Informes cumplidos -->
+    <div
+      class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 group select-none">
+      <div class="card-body p-5 flex flex-row items-center justify-between w-full">
+        <div class="flex-1 flex flex-col items-center text-center justify-center min-w-0">
+          <h1 class="text-3xl sm:text-4xl font-black text-emerald-600 tracking-tight leading-none mb-1.5">{{
+            totalInformesCumplidos }}</h1>
+          <p class="text-xs font-bold text-base-content/70 leading-snug">Informes cumplidos</p>
+        </div>
+        <div
+          class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 ml-1 group-hover:scale-110">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-500" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <path d="m9 15 2 2 4-4"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Recomendaciones pendientes -->
+    <div
+      class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 group select-none">
+      <div class="card-body p-5 flex flex-row items-center justify-between w-full">
+        <div class="flex-1 flex flex-col items-center text-center justify-center min-w-0">
+          <h1 class="text-3xl sm:text-4xl font-black text-indigo-600 tracking-tight leading-none mb-1.5">{{
+            totalRecomendacionesPendientes }}</h1>
+          <p class="text-xs font-bold text-base-content/70 leading-snug">Recomendaciones pendientes</p>
+        </div>
+        <div
+          class="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 ml-1 group-hover:scale-110">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Recomendaciones cumplidas -->
+    <div
+      class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 group select-none">
+      <div class="card-body p-5 flex flex-row items-center justify-between w-full">
+        <div class="flex-1 flex flex-col items-center text-center justify-center min-w-0">
+          <h1 class="text-3xl sm:text-4xl font-black text-teal-600 tracking-tight leading-none mb-1.5">{{
+            totalRecomendacionesCumplidas }}</h1>
+          <p class="text-xs font-bold text-base-content/70 leading-snug">Recomendaciones cumplidas</p>
+        </div>
+        <div
+          class="w-12 h-12 bg-teal-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 ml-1 group-hover:scale-110">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-teal-500" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Informes de arrastre -->
+    <div
+      class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 group select-none">
+      <div class="card-body p-5 flex flex-row items-center justify-between w-full">
+        <div class="flex-1 flex flex-col items-center text-center justify-center min-w-0">
+          <h1 class="text-3xl sm:text-4xl font-black text-error tracking-tight leading-none mb-1.5">{{
+            totalArrastreHistorico }}</h1>
+          <p class="text-xs font-bold text-base-content/70 leading-snug">Informes de arrastre</p>
+        </div>
+        <div
+          class="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 ml-1 group-hover:scale-110">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Total asignaciones -->
+    <div
+      class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 group select-none">
+      <div class="card-body p-5 flex flex-row items-center justify-between w-full">
+        <div class="flex-1 flex flex-col items-center text-center justify-center min-w-0">
+          <h1 class="text-3xl sm:text-4xl font-black text-amber-500 tracking-tight leading-none mb-1.5">{{
+            totalAsignaciones }}</h1>
+          <p class="text-xs font-bold text-base-content/70 leading-snug">Total asignaciones</p>
+        </div>
+        <div
+          class="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 ml-1 group-hover:scale-110">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-500" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- FILTROS DE BÚSQUEDA                                                    -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h3 class="card-title text-lg font-semibold mb-4">
+        Filtros de seguimiento
+      </h3>
+
+      <form [formGroup]="filterForm">
+        <div class="flex flex-col gap-4 w-full">
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 w-full">
+
+            <!-- Periodos de Evaluación (Multi-Selección) -->
+            <div class="indicator w-full">
+              <span class="indicator-item indicator-top indicator-center badge badge-primary badge-xs">Periodos de
+                Evaluación</span>
+              <div class="dropdown w-full">
+                <div tabindex="0" role="button"
+                  class="input input-bordered input-primary w-full flex items-center justify-between cursor-pointer font-semibold text-xs">
+                  <span class="truncate pr-2">{{ getPeriodosSeleccionadosLabel() }}</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-60 flex-shrink-0" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+                <div tabindex="0"
+                  class="dropdown-content z-[50] menu p-3 shadow-lg bg-base-100 rounded-box w-72 border border-base-200 mt-1 max-h-72 overflow-y-auto">
+                  <div class="cursor-pointer flex items-center justify-start gap-3 py-1.5 hover:bg-base-200 rounded-lg px-2 select-none"
+                    (click)="toggleAllPeriodos()">
+                    <input type="checkbox" class="checkbox checkbox-xs checkbox-primary pointer-events-none"
+                      [checked]="periodosSeleccionados.length === 0" />
+                    <span class="text-xs font-bold text-base-content">-- Todos los Periodos --</span>
+                  </div>
+                  <div class="divider my-1"></div>
+                  <div *ngFor="let p of getVisiblePeriodos()"
+                    class="cursor-pointer flex items-center justify-start gap-3 py-1.5 hover:bg-base-200 rounded-lg px-2 select-none"
+                    (click)="togglePeriodo(p.arcev_codigo)">
+                    <input type="checkbox" class="checkbox checkbox-xs checkbox-primary pointer-events-none"
+                      [checked]="periodosSeleccionados.includes(p.arcev_codigo)" />
+                    <span class="text-xs font-semibold text-base-content">{{ p.arcev_nombre }}</span>
+                  </div>
+                  <!-- Toggle mostrar todos los años -->
+                  <div class="divider my-1"></div>
+                  <div class="cursor-pointer flex items-center justify-start gap-2 py-1.5 hover:bg-base-200 rounded-lg px-2 select-none"
+                    (click)="mostrarTodosPeriodos = !mostrarTodosPeriodos">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="mostrarTodosPeriodos ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'" />
+                    </svg>
+                    <span class="text-xs font-semibold text-primary">{{ mostrarTodosPeriodos ? 'Ocultar años anteriores' : 'Mostrar todos los años' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fecha Corte Emisión Inf. -->
+            <div class="indicator w-full">
+              <span class="indicator-item indicator-top indicator-center badge badge-primary badge-xs">Corte Emisión Inf.</span>
+              <div class="relative w-full">
+                <input type="date" [formControl]="dateEmisionControl"
+                  class="input input-bordered input-primary w-full pr-10 custom-calendar-picker" />
+                <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"
+                    class="h-5 w-5 text-secondary">
+                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M18 2v2M6 2v2m5.996 9h.008m-.008 4h.008m3.987-4H16m-8 0h.009M8 17h.009M3.5 8h17m-18 4.243c0-4.357 0-6.536 1.252-7.89C5.004 3 7.02 3 11.05 3h1.9c4.03 0 6.046 0 7.298 1.354C21.5 5.707 21.5 7.886 21.5 12.244v.513c0 4.357 0 6.536-1.252 7.89C18.996 22 16.98 22 12.95 22h-1.9c-4.03 0-6.046 0-7.298-1.354C2.5 19.293 2.5 17.114 2.5 12.756zM3 8h18" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <!-- Fecha Corte Estado -->
+            <div class="indicator w-full">
+              <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">Corte Estado</span>
+              <div class="relative w-full">
+                <input type="date" [formControl]="dateEstadoControl"
+                  class="input input-bordered input-primary w-full pr-10 custom-calendar-picker" />
+                <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"
+                    class="h-5 w-5 text-secondary">
+                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M18 2v2M6 2v2m5.996 9h.008m-.008 4h.008m3.987-4H16m-8 0h.009M8 17h.009M3.5 8h17m-18 4.243c0-4.357 0-6.536 1.252-7.89C5.004 3 7.02 3 11.05 3h1.9c4.03 0 6.046 0 7.298 1.354C21.5 5.707 21.5 7.886 21.5 12.244v.513c0 4.357 0 6.536-1.252 7.89C18.996 22 16.98 22 12.95 22h-1.9c-4.03 0-6.046 0-7.298-1.354C2.5 19.293 2.5 17.114 2.5 12.756zM3 8h18" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <!-- Hora Corte (Opcional) -->
+            <div class="indicator w-full">
+              <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">Hora Corte (Opcional)</span>
+              <div class="relative w-full">
+                <input type="time" [formControl]="timeEstadoControl"
+                  class="input input-bordered input-primary w-full pr-10 text-xs font-semibold"
+                  placeholder="Fin de día" />
+                <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+
+            <!-- Años Anteriores (Multi-Selección) -->
+            <div class="indicator w-full">
+              <span class="indicator-item indicator-top indicator-center badge badge-primary badge-xs">Años
+                Anteriores</span>
+              <div class="dropdown w-full">
+                <div tabindex="0" role="button"
+                  class="input input-bordered input-primary w-full flex items-center justify-between cursor-pointer font-semibold text-sm">
+                  <span>{{ getAniosSeleccionadosLabel() }}</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-60" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+                <div tabindex="0"
+                  class="dropdown-content z-[50] p-3 shadow-lg bg-base-100 rounded-box w-full border border-base-200 mt-1 max-h-60 overflow-y-auto overflow-x-hidden">
+                  <div class="cursor-pointer flex items-center justify-start gap-3 py-1.5 hover:bg-base-200 rounded-lg px-2 select-none"
+                    (click)="toggleAllAnios()">
+                    <input type="checkbox" class="checkbox checkbox-xs checkbox-primary pointer-events-none"
+                      [checked]="aniosSeleccionados.length === 0" />
+                    <span class="text-sm font-bold text-base-content">Todos los Años</span>
+                  </div>
+                  <div class="divider my-1"></div>
+                  <div *ngFor="let anio of aniosDisponibles"
+                    class="cursor-pointer flex items-center justify-start gap-3 py-1.5 hover:bg-base-200 rounded-lg px-2 select-none"
+                    (click)="toggleAnio(anio)">
+                    <input type="checkbox" class="checkbox checkbox-xs checkbox-primary pointer-events-none"
+                      [checked]="aniosSeleccionados.includes(anio)" />
+                    <span class="text-sm font-semibold text-base-content">{{ anio }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ente de Control (Multi-Selección) -->
+            <div class="indicator w-full">
+              <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">Ente de Control</span>
+              <div class="dropdown dropdown-end w-full">
+                <div tabindex="0" role="button"
+                  class="input input-bordered input-primary w-full flex items-center justify-between cursor-pointer font-semibold text-sm">
+                  <span class="truncate">{{ getOrganismosSeleccionadosLabel() }}</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-60 flex-shrink-0" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+                <div tabindex="0"
+                  class="dropdown-content z-[50] p-3 shadow-2xl bg-base-100 rounded-box w-64 sm:w-72 max-w-[85vw] border border-base-200 mt-1 max-h-64 overflow-y-auto overflow-x-hidden">
+                  <div class="cursor-pointer flex items-center justify-start gap-3 py-1.5 hover:bg-base-200 rounded-lg px-2 select-none"
+                    (click)="toggleAllOrganismos()">
+                    <input type="checkbox" class="checkbox checkbox-xs checkbox-primary pointer-events-none"
+                      [checked]="organismosSeleccionados.length === 0" />
+                    <span class="text-sm font-bold text-base-content">Todos los Entes</span>
+                  </div>
+                  <div class="divider my-1"></div>
+                  <div *ngFor="let org of organismosControl"
+                    class="cursor-pointer flex items-center justify-start gap-3 py-1.5 hover:bg-base-200 rounded-lg px-2 select-none"
+                    (click)="toggleOrganismo(org.ainoc_codigo)">
+                    <input type="checkbox" class="checkbox checkbox-xs checkbox-primary pointer-events-none flex-shrink-0"
+                      [checked]="organismosSeleccionados.includes(org.ainoc_codigo)" />
+                    <span class="text-sm font-semibold text-base-content whitespace-normal leading-tight">{{ org.ainoc_descripcion }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Departamento del Responsable -->
+            <div class="indicator w-full">
+              <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">Departamento
+                Responsable</span>
+              <select formControlName="departamento" class="select select-bordered select-primary w-full">
+                <option value="0">Todos los Departamentos</option>
+                <option *ngFor="let dept of departamentosDisponibles" [value]="dept">
+                  {{ dept }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Búsqueda Rápida -->
+            <div class="indicator w-full">
+              <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">Palabra
+                Clave</span>
+              <div class="relative w-full">
+                <input type="text" formControlName="searchTerm" class="input input-bordered input-primary w-full pr-10"
+                  placeholder="Buscar por memo, auditor, texto..." />
+                <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
+                    class="h-4 w-4 opacity-70">
+                    <path fill-rule="evenodd"
+                      d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                      clip-rule="evenodd" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Opciones avanzadas y Botón Limpiar -->
+          <div
+            class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-3 border-t border-base-200 mt-2">
+            <div class="flex flex-wrap items-center gap-6">
+              <label class="cursor-pointer label justify-start gap-2 py-0">
+                <input type="checkbox" formControlName="soloVerificablesPendientes"
+                  class="checkbox checkbox-xs checkbox-primary" />
+                <span class="label-text text-sm font-semibold">Ocultar responsables con estado "JUSTIFICA"</span>
+              </label>
+
+              <label class="cursor-pointer label justify-start gap-2 py-0">
+                <input type="checkbox" formControlName="incluirCompletados"
+                  class="checkbox checkbox-xs checkbox-secondary" />
+                <span class="label-text text-sm font-semibold">Incluir informes completados</span>
+              </label>
+            </div>
+
+            <button type="button" (click)="clearFilters()" class="btn btn-outline btn-primary flex gap-2 items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+              Limpiar
+            </button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- RESULTADO DEL REPORTE                                                 -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+
+      <!-- Encabezado de resultados con acciones -->
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div class="flex items-center gap-3">
+          <h3 class="card-title text-xl font-bold">Resultado del reporte</h3>
+          <span class="badge badge-primary badge-lg font-bold">{{ filteredInformes.length }} informe(s)</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" class="btn btn-outline btn-primary btn-sm" (click)="expandAll()">
+            Desplegar Todos
+          </button>
+          <button type="button" class="btn btn-outline btn-ghost btn-sm" (click)="collapseAll()">
+            Colapsar Todos
+          </button>
+
+          <button class="btn btn-primary btn-sm sm:btn-md" [disabled]="filteredInformes.length === 0"
+            (click)="exportToExcel()">
+            <div class="flex flex-row items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
+                <path fill="currentColor"
+                  d="M2.859 2.877l12.57-1.795a.5.5 0 0 1 .571.494v20.848a.5.5 0 0 1-.57.494L2.858 21.123a1 1 0 0 1-.859-.99V3.867a1 1 0 0 1 .859-.99M17 3h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-4zm-6.8 9L13 8h-2.4L9 10.286L7.4 8H5l2.8 4L5 16h2.4L9 13.714L10.6 16H13z" />
+              </svg>
+              <span class="hidden sm:inline">EXPORTAR</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra de progreso y carga dinámica -->
+      <app-report-loading *ngIf="isLoading"
+        message="Cargando reporte a fecha de corte..."
+        subtitle="Analizando evaluaciones de recomendaciones y cortes históricos...">
+      </app-report-loading>
+
+      <!-- Estado vacío -->
+      <div *ngIf="!isLoading && filteredInformes.length === 0" class="alert alert-info justify-center my-8">
+        No se encontraron registros con los criterios seleccionados.
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════════ -->
+      <!-- VISTA JERÁRQUICA ESTRUCTURADA                                  -->
+      <!-- ═══════════════════════════════════════════════════════════════ -->
+      <div *ngIf="!isLoading && filteredInformes.length > 0" class="w-full space-y-5">
+        <div *ngFor="let inf of filteredInformes"
+          class="report-table-shell overflow-hidden rounded-xl shadow-md border border-base-content/10">
+
+          <!-- ENCABEZADO DE INFORME -->
+          <div class="p-5 cursor-pointer transition-colors" [ngClass]="{
+                 'bg-error/10 hover:bg-error/15 border-l-4 border-l-error': inf.esArrastreHistorico,
+                 'bg-primary/10 hover:bg-primary/15 border-l-4 border-l-primary': !inf.esArrastreHistorico
+               }" (click)="toggleExpand(inf)">
+
+            <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
+
+              <!-- Lado izquierdo: badges + título + metadatos -->
+              <div class="flex items-start gap-3 flex-1">
+                <button class="btn btn-circle btn-sm btn-primary mt-0.5 shrink-0">
+                  <span class="font-bold text-sm">{{ inf.expanded ? '−' : '+' }}</span>
+                </button>
+
+                <div class="space-y-3 flex-1">
+                  <!-- Badge de clasificación -->
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="badge font-bold"
+                      [ngClass]="inf.esArrastreHistorico ? 'badge-error text-white' : 'badge-primary'">
+                      INFORME EMITIDO {{ inf.anioEmision }}
+                    </span>
+                  </div>
+
+                  <!-- Título del informe -->
+                  <h4 class="font-bold text-base sm:text-lg text-base-content leading-snug">
+                    {{ inf.tituloInforme }}
+                  </h4>
+
+                  <!-- Metadatos del informe -->
+                  <div
+                    class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-3 bg-base-100/80 p-4 rounded-lg border border-base-content/5 mt-1">
+                    <div>
+                      <span
+                        class="text-xs text-base-content/50 font-semibold uppercase tracking-wider block mb-0.5">Memo
+                        Auditoría</span>
+                      <span class="text-sm font-bold text-primary">{{ inf.memoAuditoria }}</span>
+                    </div>
+                    <div>
+                      <span
+                        class="text-xs text-base-content/50 font-semibold uppercase tracking-wider block mb-0.5">Memo
+                        Aprobación Presidencia</span>
+                      <span class="text-sm font-bold text-base-content">{{ inf.memoAprobacion }}</span>
+                    </div>
+                    <div>
+                      <span
+                        class="text-xs text-base-content/50 font-semibold uppercase tracking-wider block mb-0.5">Auditor
+                        Asignado</span>
+                      <span class="text-sm font-bold text-secondary">{{ inf.auditorAsignado }}</span>
+                    </div>
+                    <div>
+                      <span
+                        class="text-xs text-base-content/50 font-semibold uppercase tracking-wider block mb-0.5">Organismo
+                        de Control</span>
+                      <span class="text-sm font-bold text-base-content">{{ inf.organismoControl }}</span>
+                    </div>
+                    <div>
+                      <span
+                        class="text-xs text-base-content/50 font-semibold uppercase tracking-wider block mb-0.5">Fecha
+                        Aprobación Presidencia</span>
+                      <span class="text-sm font-bold text-base-content">{{
+                        formatDateToDisplay(inf.fechaAprobacionPresidencia) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Lado derecho: progreso -->
+              <div
+                class="flex lg:flex-col items-center lg:items-end justify-between lg:justify-start gap-3 border-t lg:border-t-0 border-base-300 pt-3 lg:pt-0 lg:min-w-[160px]">
+                <div class="text-left lg:text-right">
+                  <span class="text-xs text-base-content/50 block font-semibold uppercase tracking-wider">Progreso
+                    Informe</span>
+                  <span class="font-black text-2xl text-primary">{{ inf.progresoGlobal }}%</span>
+                </div>
+                <progress class="progress progress-primary w-32 sm:w-40" [value]="inf.progresoGlobal"
+                  max="100"></progress>
+                <div class="flex flex-wrap items-center gap-1.5 justify-end">
+                  <span class="badge badge-success badge-xs gap-1 font-bold py-2 px-2 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                      stroke="currentColor" class="w-3 h-3">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {{ countByEstado(inf.recomendaciones, 'CUMPLIDA') }}
+                  </span>
+                  <span class="badge badge-xs gap-1 font-bold py-2 px-2 text-white border-none"
+                    style="background-color: #4A61A1;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                      stroke="currentColor" class="w-3 h-3">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {{ countPendientes(inf.recomendaciones) }}
+                  </span>
+                  <span class="text-xs text-base-content/50 font-semibold">/ {{ inf.recomendaciones.length }}
+                    rec.</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- CONTENIDO EXPANDIBLE: RECOMENDACIONES Y RESPONSABLES -->
+          <div *ngIf="inf.expanded" class="px-5 pb-5 pt-4 bg-base-100 border-t border-base-200 space-y-5">
+
+            <div *ngFor="let rec of inf.recomendaciones; let i = index"
+              class="border border-base-300 rounded-xl overflow-hidden bg-base-200/30">
+
+              <!-- Cabecera de la recomendación -->
+              <div
+                class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-base-200/50 border-b border-base-300">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="badge badge-secondary font-bold px-3 py-3 text-xs">{{ rec.codigo }}</span>
+                  <div class="badge px-3 py-3 font-semibold text-xs whitespace-nowrap"
+                    [ngClass]="rec.estadoRecomendacion | statusColor">
+                    {{ rec.estadoRecomendacion }}
+                  </div>
+                  <span class="text-sm font-semibold text-base-content/70">
+                    Fecha Máxima: <strong class="text-base-content">{{ formatDateToDisplay(rec.fechaMaximaCumplimiento)
+                      }}</strong>
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <span class="text-sm text-base-content/60 font-semibold">Progreso:</span>
+                  <progress class="progress progress-secondary w-24" [value]="rec.progresoPercent" max="100"></progress>
+                  <span class="text-sm font-black text-secondary">{{ rec.progresoPercent }}%</span>
+                </div>
+              </div>
+
+              <!-- Texto de la Recomendación -->
+              <div class="p-4 border-b border-base-300">
+                <p class="text-sm sm:text-base font-medium text-base-content leading-relaxed">{{ rec.descripcion }}</p>
+              </div>
+
+              <div class="p-4 border-b border-base-300 bg-base-100">
+                <div class="grid grid-cols-1 md:grid-cols-[200px_minmax(0,1fr)] gap-6 w-full max-w-2xl mx-auto">
+                <div class="min-w-0 self-start rounded-xl border border-base-content/20 bg-base-100 px-3 py-2">
+                  <button type="button" class="flex items-center justify-between gap-3 w-full text-left text-sm font-semibold rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+                    (click)="rec.riesgoOculto = !rec.riesgoOculto" [attr.aria-expanded]="!rec.riesgoOculto"
+                    [attr.aria-label]="rec.riesgoOculto ? 'Mostrar riesgo verificado' : 'Ocultar riesgo verificado'">
+                    <span>Riesgo verificado</span>
+                    <svg class="w-5 h-5 shrink-0 transition-transform" [class.rotate-180]="!rec.riesgoOculto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+                  </button>
+                  <div *ngIf="!rec.riesgoOculto" class="flex items-center justify-center min-h-12 py-2">
+                    <span class="badge badge-outline font-semibold" [ngClass]="{
+                      'badge-error': rec.riesgoVerificado === 'ALTO',
+                      'badge-warning': rec.riesgoVerificado === 'MODERADO',
+                      'badge-success': rec.riesgoVerificado === 'BAJO'
+                    }">{{ rec.riesgoVerificado ? (rec.riesgoVerificado | titlecase) : 'Sin registrar' }}</span>
+                  </div>
+                </div>
+                <div class="min-w-0 self-start rounded-xl border border-base-content/20 bg-base-100 px-3 py-2">
+                  <button type="button" class="flex items-center justify-between gap-3 w-full text-left text-sm font-semibold rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+                    (click)="rec.evidenciasOcultas = !rec.evidenciasOcultas" [attr.aria-expanded]="!rec.evidenciasOcultas"
+                    [attr.aria-label]="rec.evidenciasOcultas ? 'Mostrar evidencia requerida' : 'Ocultar evidencia requerida'">
+                    <span>Evidencia requerida</span>
+                    <svg class="w-5 h-5 shrink-0 transition-transform" [class.rotate-180]="!rec.evidenciasOcultas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+                  </button>
+                  <div *ngIf="!rec.evidenciasOcultas" class="mt-2">
+                    <ol *ngIf="rec.evidenciasRequeridas.length; else sinEvidenciaRequerida"
+                      class="list-decimal pl-5 space-y-1 text-sm">
+                      <li *ngFor="let evidencia of rec.evidenciasRequeridas" class="whitespace-pre-wrap break-words">{{ evidencia }}</li>
+                    </ol>
+                    <ng-template #sinEvidenciaRequerida><p class="text-sm text-base-content/60">Sin registrar</p></ng-template>
+                  </div>
+                </div>
+                </div>
+              </div>
+
+              <!-- Tabla de Responsables Pendientes -->
+              <div class="overflow-x-auto">
+                <table class="table table-sm md:table-md w-full">
+                  <thead>
+                    <tr class="bg-primary text-primary-content">
+                      <th class="text-sm font-bold w-1/5">Responsable Asignado</th>
+                      <th class="text-sm font-bold w-1/6">Departamento</th>
+                      <th class="text-sm font-bold text-center w-1/8">Fecha Máx. / Plazo</th>
+                      <th class="text-sm font-bold text-center w-1/8">Estado Verificable</th>
+                      <th class="text-sm font-bold text-center w-1/8">Estado Responsable</th>
+                      <th class="text-sm font-bold w-1/4">Observación Auditoría</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-base-100">
+                    <tr class="hover cursor-pointer group transition-colors hover:bg-primary/5" *ngFor="let resp of rec.responsables"
+                      (click)="abrirVisorVerificable(inf, rec, resp)"
+                      [title]="'Haga clic para ver el documento verificable de ' + resp.nombre">
+                      <td class="text-sm font-bold text-base-content group-hover:text-primary transition-colors">
+                        <div class="flex items-center justify-between gap-2">
+                          <span>{{ resp.nombre }}</span>
+                          <span class="text-xs font-normal text-primary opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-primary/10 px-2 py-0.5 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Verificable
+                          </span>
+                        </div>
+                      </td>
+                      <td class="text-sm text-base-content/90">{{ resp.departamento }}</td>
+                      <td class="text-center whitespace-nowrap">
+                        <div class="flex flex-col items-center gap-1">
+                          <span class="text-xs font-semibold text-base-content">
+                            {{ formatDateToDisplay(resp.fechaIndividual || rec.fechaMaximaCumplimiento) }}
+                          </span>
+                          <span *ngIf="resp.estadoIndividual !== 'CUMPLIDA' && resp.estadoVerificable !== 'JUSTIFICA' && resp.estadoIndividual !== 'NO APLICA' && resp.plazoIndividual !== undefined && resp.plazoIndividual !== null && resp.plazoIndividual !== '' && resp.plazoIndividual !== '—'"
+                            class="badge badge-sm py-1 px-2 text-[10px]"
+                            [ngClass]="getPlazoBadgeClass(resp.plazoIndividual)">
+                            {{ resp.plazoIndividual }} d
+                          </span>
+                        </div>
+                      </td>
+                      <td class="text-center whitespace-nowrap">
+                        <div class="badge px-3 py-3 font-semibold text-xs whitespace-nowrap inline-flex"
+                          [ngClass]="resp.estadoVerificable | statusColor">
+                          {{ resp.estadoVerificable }}
+                        </div>
+                      </td>
+                      <td class="text-center whitespace-nowrap">
+                        <div class="badge px-3 py-3 font-semibold text-xs whitespace-nowrap inline-flex"
+                          [ngClass]="(resp.estadoIndividual || rec.estadoRecomendacion) | statusColor">
+                          {{ resp.estadoIndividual || rec.estadoRecomendacion }}
+                        </div>
+                      </td>
+                      <td class="text-sm text-base-content/80 whitespace-pre-line">{{ formatearListaParaMostrar(resp.observaciones) }}</td>
+                    </tr>
+
+                    <tr *ngIf="rec.responsables.length === 0">
+                      <td colspan="6" class="text-center py-4 text-sm"
+                        [ngClass]="(rec.estadoRecomendacion === 'CUMPLIDA' || rec.progresoPercent === 100) ? 'text-success font-bold bg-success/5' : 'text-amber-700 dark:text-amber-300 font-semibold bg-amber-500/10'">
+                        <span *ngIf="rec.estadoRecomendacion === 'CUMPLIDA' || rec.progresoPercent === 100">
+                          ✓ Todos los responsables asociados registran estado "JUSTIFICA"
+                        </span>
+                        <span *ngIf="rec.estadoRecomendacion !== 'CUMPLIDA' && rec.progresoPercent < 100">
+                          ℹ No hay responsables pendientes en el departamento o criterio seleccionado (los responsables pendientes pertenecen a otra área o están filtrados)
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal Visor Integrado de Documento Verificable por Responsable -->
+<dialog id="modalVisorVerificable" class="modal z-[999] no-print" [ngClass]="{ 'modal-open': isVerificableModalOpen }">
+  <div *ngIf="isVerificableModalOpen" class="modal-box max-w-5xl w-11/12 h-[90vh] max-h-[90vh] flex flex-col bg-base-100 text-base-content rounded-2xl shadow-2xl border border-base-300 p-0 overflow-hidden relative">
+
+    <!-- Modal Header -->
+    <div class="flex items-center justify-between p-4 bg-slate-800 text-white border-b border-slate-700">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-slate-700 rounded-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-indigo-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-base sm:text-lg font-bold text-white leading-tight">
+            Documento Verificable: {{ currentVerificableData?.responsableNombre }}
+          </h3>
+          <p class="text-xs text-slate-300 font-medium">
+            {{ currentVerificableData?.departamento }} • {{ currentVerificableData?.memoAuditoria }}
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button *ngIf="currentVerificableData?.fileBase64" class="btn btn-sm bg-emerald-700 hover:bg-emerald-600 border-none text-white gap-2 font-bold"
+          (click)="descargarDocVerificable()" title="Descargar documento verificable">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span class="hidden sm:inline">Descargar Archivo</span>
+        </button>
+
+        <button class="btn btn-sm btn-circle btn-ghost text-slate-400 hover:text-white hover:bg-slate-700 text-lg"
+          (click)="cerrarVisorVerificable()">✕</button>
+      </div>
+    </div>
+
+    <!-- Metadata Banner -->
+    <div class="px-5 py-3 bg-base-200/60 border-b border-base-300 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="badge badge-secondary font-bold">{{ currentVerificableData?.codigoRec }}</span>
+        <div class="badge px-3 py-2 font-semibold text-xs" [ngClass]="(currentVerificableData?.estadoVerificable || '') | statusColor">
+          {{ currentVerificableData?.estadoVerificable }}
+        </div>
+        <span class="text-base-content/70 font-medium whitespace-pre-line">
+          <strong>Obs:</strong> {{ currentVerificableData?.observaciones }}
+        </span>
+      </div>
+
+      <div *ngIf="currentVerificableData?.verificableObj" class="flex items-center gap-3 text-base-content/70">
+        <span *ngIf="currentVerificableData?.verificableObj?.areve_fecha_carga">
+          <strong>Carga:</strong> {{ currentVerificableData?.verificableObj?.areve_fecha_carga | date:'dd/MM/yyyy HH:mm' }}
+        </span>
+        <span *ngIf="currentVerificableData?.verificableObj?.areve_fecha_validacion">
+          <strong>Validación:</strong> {{ currentVerificableData?.verificableObj?.areve_fecha_validacion | date:'dd/MM/yyyy HH:mm' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Visor Container -->
+    <div class="flex-1 p-4 bg-slate-900/10 overflow-hidden flex flex-col justify-center items-center relative">
+      
+      <!-- Loading State -->
+      <div *ngIf="currentVerificableData?.isLoadingFile" class="flex flex-col items-center justify-center gap-3 py-16">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+        <span class="text-sm font-semibold text-base-content/70">Cargando documento verificable...</span>
+      </div>
+
+      <!-- Error / Empty State -->
+      <div *ngIf="!currentVerificableData?.isLoadingFile && currentVerificableData?.fileError" class="flex flex-col items-center justify-center gap-4 max-w-md text-center p-8 bg-base-100 rounded-2xl shadow-md border border-base-200">
+        <div class="p-3 bg-amber-500/10 text-amber-600 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+          </svg>
+        </div>
+        <div>
+          <h4 class="font-bold text-base text-base-content">Información del Verificable</h4>
+          <p class="text-xs text-base-content/70 mt-1">{{ currentVerificableData?.fileError }}</p>
+        </div>
+        <button class="btn btn-sm btn-primary mt-2" (click)="cerrarVisorVerificable()">Entendido / Cerrar</button>
+      </div>
+
+      <!-- PDF / Image Viewer -->
+      <div *ngIf="!currentVerificableData?.isLoadingFile && !currentVerificableData?.fileError && safePdfUrl" class="w-full h-full flex flex-col items-center justify-center">
+        <!-- PDF Viewer -->
+        <iframe *ngIf="currentVerificableData?.fileType === 'pdf'"
+          [src]="safePdfUrl"
+          class="w-full h-full rounded-xl border border-base-300 bg-white shadow-inner"
+          title="Visor PDF Verificable">
+        </iframe>
+
+        <!-- Image Viewer -->
+        <img *ngIf="currentVerificableData?.fileType === 'image'"
+          [src]="safePdfUrl"
+          class="max-h-full max-w-full object-contain rounded-xl border border-base-300 shadow-md"
+          alt="Verificable Document Image" />
+      </div>
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="p-3 bg-base-200/80 border-t border-base-300 flex justify-end items-center">
+      <button class="btn btn-sm bg-red-600 hover:bg-red-700 text-white border-none font-bold px-4" (click)="cerrarVisorVerificable()">Cerrar Visor</button>
+    </div>
+
+  </div>
+</dialog>

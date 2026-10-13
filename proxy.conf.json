@@ -1,0 +1,10 @@
+{
+    "/sisrec/assets/**": {
+        "target": "http://localhost:4200/assets",
+        "pathRewrite": {
+            "^/sisrec/assets": ""
+        },
+        "secure": false,
+        "changeOrigin": true
+    }
+}

@@ -1,0 +1,59 @@
+<dialog id="modalFormInformeAg"
+  class="fixed inset-0 w-full h-full z-50 overflow-auto bg-black bg-opacity-50 text-secondary flex items-center justify-center"
+  [ngClass]="{ 'hidden': !modalSrvAsignAud.isModalOpen() }" (click)="closeModal($event)">
+
+  <div class="modal-box max-w-5xl rounded-lg shadow-lg relative" (click)="$event.stopPropagation()">
+    <!-- Evita que los clicks dentro del modal lo cierren -->
+    <div class="flex items-center justify-between">
+      <h2 class="text-2xl font-bold mb-4">Cambiar Auditor</h2>
+      <button class="btn btn-sm btn-circle btn-ghost text-lg" (click)="closeModal($event)">
+        ✕
+      </button>
+    </div>
+
+    <div *ngIf="!isEmpty">
+      <div *ngFor="let informe of informes; let i = index"
+        class="collapse collapse-plus bg-base-200 rounded-xl mb-3 hover:bg-base-300 transition-colors">
+        <input type="checkbox" />
+        <div class="collapse-title text-base font-semibold flex flex-row justify-between">
+          <div>
+            Informe {{ i + 1 }}:
+          </div>
+          <div>
+            <span>OT-{{informe.ainin_otnum}}-{{informe.ainin_otanio}}</span>
+
+          </div>
+        </div>
+        <div class="collapse-content flex flex-col gap-2">
+          <p><strong>Título:</strong> {{ informe.ainin_titulo }}</p>
+          <p><strong>Fecha de registro:</strong> {{ informe.ainin_fechaEmision }}</p>
+        </div>
+      </div>
+    </div>
+
+    <form (ngSubmit)="confirmAssignment()" [formGroup]="formAuditor">
+      <div class="form-control mb-7">
+        <label class="label">
+          <span class="label-text font-medium">Auditor Operativo*</span>
+        </label>
+        <select class="select select-bordered w-full" formControlName="aseru_cuenta">
+          <option disabled value="" selected>Seleccionar auditor operativo</option>
+          <option *ngFor="let auditor of auditorOperativos?.usuarios" [value]="auditor.dsgus_cuenta">
+            {{auditor.nombre_completo}}
+          </option>
+        </select>
+        <!-- <label class="label" *ngIf="!selectedAuditor">
+          <span class="label-text-alt text-error">Este campo es requerido</span>
+        </label> -->
+      </div>
+
+      <div class="flex gap-4 justify-center items-center">
+        <button type="button" class="btn btn-error w-full flex-1 text-white" (click)="closeModal($event)">CANCELAR
+        </button>
+        <button class="btn btn-primary w-full flex-1 text-white" [disabled]="isLoadingBoton"><span *ngIf="isLoadingBoton" class="loading loading-spinner text-secondary"></span>
+          {{isLoadingBoton ? 'CARGANDO...' :'CONFIRMAR' }}</button>
+      </div>
+    </form>
+
+  </div>
+</dialog>

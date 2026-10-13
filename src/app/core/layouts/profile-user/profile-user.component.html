@@ -1,0 +1,63 @@
+<dialog id="modalProfileUser" [ngClass]="{ 'hidden': !modalProfileUser.isModalOpen() }" (click)="closeModal()"
+    class="fixed inset-0 w-full h-full z-50 overflow-auto bg-black bg-opacity-50 backdrop-blur-sm text-secondary flex items-center justify-center">
+    <div class="modal-box max-w-4xl bg-base-100 rounded-lg shadow-lg relative p-6 w-full md:w-3/4 lg:w-2/3"
+        (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="relative h-28 bg-primary rounded-t-lg">
+            <button type="button" (click)="closeModal()"
+                class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 text-white">
+                ✕
+            </button>
+            <div class="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
+                <div class="avatar">
+                    <div class="w-32 h-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-4">
+                        <img [src]="userPhotoUrl" alt="Foto de perfil" class="object-cover" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6 pt-20">
+            <h2 class="text-3xl font-bold text-center mb-6">{{ user?.nombre_completo }}</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Basic Information -->
+                <div class="card bg-base-200 shadow-lg">
+                    <div class="card-body">
+                        <h3 class="card-title">Información Básica</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-sm font-medium opacity-70">Cuenta</label>
+                                <p class="text-lg font-semibold">{{ user?.dsgus_cuenta }}</p>
+                            </div>
+                            <!-- Add more user information here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Roles and Permissions -->
+                <div class="card bg-base-200 shadow-lg">
+                    <div class="card-body">
+                        <h3 class="card-title">Roles y Permisos</h3>
+                        <div class="space-y-4 max-h-64 overflow-y-auto">
+                            <div *ngFor="let rol of user?.roles"
+                                class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+                                <div class="card-body p-4">
+                                    <h4 class="font-medium">{{ rol.asero_descripcion }}</h4>
+                                    <p class="text-sm opacity-70">Asignado: {{ rol.asero_fecha }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-action mt-8 flex justify-center">
+                <button type="button" (click)="closeModal()" class="btn btn-primary w-full">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</dialog>

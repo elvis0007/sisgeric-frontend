@@ -1,0 +1,37 @@
+<div class="w-full">
+
+  <app-modal-responsables />
+  <app-modal-fecha-max [reloadTable]="reloadTable.bind(this)" />
+  <app-modal-estado-seguim [reloadTable]="reloadTable.bind(this)" />
+
+  <div [hidden]="rutaHijaActiva">
+    <h2 *ngIf="!isLoading" class="text-lg md:text-xl font-bold">Memorando: {{ memorando || ordenTrabajo }}</h2>
+    <p *ngIf="!isLoading" class="text-base-content mb-4">{{ informeTitulo }}</p>
+
+    <div class="flex flex-col lg:flex-row justify-between items-center mb-4 gap-4" *ngIf="!isLoading">
+      <h1 class="text-xl md:text-2xl font-bold w-full lg:w-auto">Recomendaciones</h1>
+      
+      <!-- Añadiendo input de búsqueda -->
+      <div class="relative w-full lg:w-72">
+        <input type="text" [formControl]="searchTermControl" class="input input-bordered input-primary w-full"
+          placeholder="Buscar por palabra clave ..." />
+        <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-4 w-4 opacity-70">
+            <path fill-rule="evenodd"
+              d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+              clip-rule="evenodd" />
+          </svg>
+        </span>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center my-8">
+      <span class="loading loading-spinner loading-lg text-secondary"></span>
+    </div>
+
+    <app-table-recomendaciones *ngIf="!isLoading" [recomendaciones]="recomendaciones" [searchTerm]="searchTermControl.value" />
+  </div>
+
+  <router-outlet (activate)="this.enActivacionRutaHija()" (deactivate)="this.enDesactivacionRutaHija()"></router-outlet>
+</div>

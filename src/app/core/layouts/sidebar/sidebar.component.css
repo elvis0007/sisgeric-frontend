@@ -1,0 +1,232 @@
+:host {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+/* Sidebar container */
+.sidebar-container {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(var(--b3)) transparent;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  height: calc(100vh - 5rem) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.sidebar-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-container::-webkit-scrollbar-thumb {
+  background: oklch(var(--b3));
+  border-radius: 2px;
+}
+
+.sidebar-container::-webkit-scrollbar-thumb:hover {
+  background: oklch(var(--bc) / 0.3);
+}
+
+/* Menu items spacing and margins */
+.menu li {
+  margin: 0.25rem 0.5rem;
+}
+
+/* Menu link general styles */
+.menu li > a,
+.menu li > details > summary {
+  padding: 0.75rem 1.0rem;
+  border-radius: 0.75rem; /* rounded-xl */
+  color: oklch(var(--bc) / 0.7);
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+}
+
+/* Hover state */
+.menu li > a:hover,
+.menu li > details > summary:hover {
+  background: oklch(var(--p) / 0.08);
+  color: #111827; /* Color más oscuro para visualizar */
+  transform: translateX(2px);
+}
+
+/* Active state (from routerLinkActive) */
+.menu li > a.active {
+  background: oklch(var(--p));
+  color: oklch(var(--pc));
+  font-weight: 600;
+  box-shadow: 0 4px 12px oklch(var(--p) / 0.25);
+}
+
+/* Hover on active state */
+.menu li > a.active:hover {
+  background: oklch(var(--p));
+  color: oklch(var(--pc));
+  transform: none;
+}
+
+/* Submenu items styling */
+.menu li > details > ul {
+  border-left: 2px solid oklch(var(--b3));
+  margin-left: 1.5rem;
+  padding-left: 0.5rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.menu li > details > ul > li {
+  margin: 0.125rem 0;
+}
+
+.menu li > details > ul > li > a {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem; /* text-sm */
+  color: oklch(var(--bc) / 0.6);
+  transition: all 0.2s ease-in-out;
+}
+
+.menu li > details > ul > li > a:hover {
+  background: oklch(var(--p) / 0.06);
+  color: #111827; /* Color más oscuro para visualizar */
+}
+
+.menu li > details > ul > li > a.active {
+  background: oklch(var(--p) / 0.12);
+  color: oklch(var(--p));
+  font-weight: 600;
+  box-shadow: none;
+}
+
+/* Details/summary arrow animation */
+.menu li > details > summary::after {
+  transition: transform 0.2s ease;
+}
+
+.menu li > details[open] > summary::after {
+  transform: rotate(180deg);
+}
+
+/* Divider line */
+.sidebar-divider {
+  height: 1px;
+  background: oklch(var(--bc) / 0.08);
+  margin: 0.5rem 1rem;
+}
+
+/* Menu Text transition animation */
+.menu-text {
+  transition: opacity 0.2s ease-in-out, width 0.2s ease-in-out;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   Dark Mode Overrides (legibilidad y contraste de tipografías)
+   ============================================================ */
+
+/* Normal state: pure white text for menu items */
+:host-context([data-theme="dark"]) .menu li > a,
+:host-context([data-theme="dark"]) .menu li > details > summary {
+  color: #ffffff !important;
+}
+
+/* Hover state: blue text (#3973d2) with a subtle blue tint background */
+:host-context([data-theme="dark"]) .menu li > a:hover,
+:host-context([data-theme="dark"]) .menu li > details > summary:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #3973d2 !important;
+}
+
+/* Active state: solid white background with darker blue text */
+:host-context([data-theme="dark"]) .menu li > a.active {
+  background: #ffffff !important;
+  color: #1a365d !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+:host-context([data-theme="dark"]) .menu li > a.active:hover {
+  background: #f1f5f9 !important;
+  color: #1a365d !important;
+}
+
+/* Submenu border */
+:host-context([data-theme="dark"]) .menu li > details > ul {
+  border-left-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Submenus normal state: soft white text */
+:host-context([data-theme="dark"]) .menu li > details > ul > li > a {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Submenu hover state: blue text and subtle tint background */
+:host-context([data-theme="dark"]) .menu li > details > ul > li > a:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #3973d2 !important;
+}
+
+/* Submenu active state: soft white background with darker blue text */
+:host-context([data-theme="dark"]) .menu li > details > ul > li > a.active {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #1a365d !important;
+}
+
+/* Collapsed state styling (only for screen sizes md and up, where sidebar collapses) */
+@media (min-width: 768px) {
+  /* When collapsed (not hovered) */
+  .sidebar-container:not(:hover) h3 {
+    opacity: 0 !important;
+    display: none !important;
+  }
+
+  /* Center the menu header icon when collapsed */
+  .sidebar-container:not(:hover) .menu-header-container {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Hide text labels when collapsed */
+  .sidebar-container:not(:hover) .menu-text {
+    opacity: 0 !important;
+    max-width: 0 !important;
+    width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: none !important;
+  }
+
+  /* Center icons and adjust padding when collapsed */
+  .sidebar-container:not(:hover) li > a,
+  .sidebar-container:not(:hover) li > details > summary {
+    justify-content: center !important;
+    padding: 0.75rem 0 !important;
+    width: 2.75rem !important;
+    height: 2.75rem !important;
+    margin: 0.25rem auto !important;
+  }
+
+  /* Hide details dropdown arrows when collapsed */
+  .sidebar-container:not(:hover) details > summary::after {
+    display: none !important;
+  }
+
+  /* Hide nested submenus when collapsed */
+  .sidebar-container:not(:hover) details > ul {
+    display: none !important;
+  }
+
+  /* Remove nested list left border/margin when collapsed */
+  .sidebar-container:not(:hover) details > ul {
+    border-left: none !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+}
+

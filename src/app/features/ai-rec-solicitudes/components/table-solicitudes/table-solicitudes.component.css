@@ -1,0 +1,29 @@
+:host {
+  display: block;
+}
+
+.solicitudes-table th,
+.solicitudes-table td {
+  border-color: hsl(var(--b3) / 0.65);
+}
+
+:host-context([data-theme='dark']) .solicitudes-table-wrapper {
+  border-color: hsl(var(--b3) / 0.9);
+  box-shadow: 0 8px 20px hsl(var(--bc) / 0.12);
+}
+
+:host-context([data-theme='dark']) .solicitudes-table thead tr {
+  background-color: hsl(var(--p) / 0.32);
+}
+
+:host-context([data-theme='dark']) .solicitudes-table tbody tr {
+  background-color: hsl(var(--b1) / 0.85);
+}
+
+:host-context([data-theme='dark']) .solicitudes-table tbody tr:hover {
+  background-color: hsl(var(--b3) / 0.5);
+}
+
+:host-context([data-theme='dark']) .solicitudes-table .badge {
+  border: 1px solid hsl(var(--bc) / 0.15);
+}

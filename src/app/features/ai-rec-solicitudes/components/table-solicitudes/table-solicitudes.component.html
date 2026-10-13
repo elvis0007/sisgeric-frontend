@@ -1,0 +1,87 @@
+<div class="solicitudes-table-wrapper overflow-x-auto rounded-lg shadow-sm border border-base-300 bg-base-100">
+  <table class="solicitudes-table table table-sm md:table-md w-full min-w-[800px] text-base-content">
+
+    <thead>
+      <tr class="bg-primary text-primary-content border-b border-primary/50">
+        <th class="text-sm w-12">N</th>
+        <th class="text-sm text-center flex-grow">Archivo</th>
+        <th class="text-sm text-start w-24 md:w-36 lg:w-80">Responsable</th>
+        <th class="text-sm text-center flex-grow">Número de Solicitud</th>
+        <th class="text-sm text-center flex-grow">Memorando</th>
+        <th class="text-sm text-center flex-grow">Fecha carga
+          <button class="btn btn-circle btn-xs bg-primary-focus hover:bg-primary-focus/80" 
+                title="Ordenar" (click)="ordenarPorFecha()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19V6.659c0-1.006 0-1.51.309-1.634c.308-.125.672.23 1.398.941L19 8.211M9 5v12.341c0 1.006 0 1.51-.309 1.634c-.308.125-.672-.23-1.398-.941L5 15.789" color="currentColor"/></svg>
+          </button>
+        </th>
+        <th class="text-sm text-center flex-grow">Fecha máxima actual</th>
+        <th class="text-sm text-center flex-grow">Fecha máxima solicitada</th>
+        <th class="text-sm text-center flex-grow">Estado</th>
+
+        <th class="text-sm text-center flex-grow">Atender</th>
+
+      </tr>
+    </thead>
+
+    <tbody class="bg-base-100 text-base-content">
+      <tr class="hover:bg-base-300/70 transition-colors border-b border-base-300/70" *ngFor="let solicitud of displayedSolicitudes let i = index">
+        <th class="text-sm">{{ (currentPage - 1) * itemsPerPage + i + 1 }}</th>
+        <th class="text-sm">
+          <button class="btn btn-circle btn-sm btn-info text-info-content" (click)="getFile(solicitud.areso_adjunto, solicitud.areso_codigo)"
+            title="Descargar archivo" [disabled]="isLoadingFileMap[solicitud.areso_codigo]">
+            <span *ngIf="isLoadingFileMap[solicitud.areso_codigo]" class="loading loading-dots loading-md text-secondary"></span>
+            <svg *ngIf="!isLoadingFileMap[solicitud.areso_codigo]" class="w-5 h-5 text-slate-300 transition-colors" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" color="currentColor"><path d="M21 11v-1c0-3.771 0-5.657-1.24-6.828C18.519 2 16.522 2 12.53 2h-1.06C7.479 2 5.482 2 4.24 3.172C3 4.343 3 6.229 3 10v4c0 3.771 0 5.657 1.24 6.828C5.481 22 7.478 22 11.47 22H12M8 7h8m-8 5h5"/><path d="M21 20.647V17c0-1.43-1.343-3-3-3s-3 1.57-3 3v3.5c0 .78.733 1.5 1.636 1.5c.904 0 1.637-.72 1.637-1.5v-2.735"/></g></svg>
+          </button>
+        </th>
+        <td class="text-sm text-start">{{solicitud.responsable.nombre_completo}}</td>
+        <td class="text-sm text-center">{{solicitud.numeroSolicitud ?? 'No disponible'}}</td>
+        <td class="text-sm text-center">{{solicitud.areso_memorando}}</td>
+        <td class="text-sm text-center">{{solicitud.areso_fecha_carga | date:'dd/MM/yyyy'}}</td>
+        <td class="text-sm text-center">{{solicitud.areso_fecha_max_ant | date:'dd/MM/yyyy'}}</td>
+        <td class="text-sm text-center">{{solicitud.areso_fecha_max_nue | date:'dd/MM/yyyy'}}</td>
+        <td class="text-sm text-center">
+          <div class="badge badge-lg px-4 py-4 font-sm truncate"
+            [ngClass]=" this.estadoSolicitudSrv.getEstadoLabel(solicitud.asero_estado_aprob) | statusColor">
+            {{ this.estadoSolicitudSrv.getEstadoLabel(solicitud.asero_estado_aprob) }}
+          </div>
+
+        </td>
+        <td>
+          <button
+            class="btn btn-circle btn-sm btn-success text-success-content"
+            title="Validar"
+            (click)="this.openModalAtender($event, solicitud)"
+            [disabled]="solicitud.asero_estado_aprob !== '2'">
+            <svg class="w-5 h-5 text-slate-300 transition-colors" xmlns="http://www.w3.org/2000/svg" width="20"
+              height="20" viewBox="0 0 24 24">
+              <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                color="currentColor">
+                <path
+                  d="M14.98 7.016s.5.5 1 1.5c0 0 1.589-2.5 3-3M9.995 2.021c-2.499-.105-4.429.182-4.429.182c-1.219.088-3.555.77-3.555 4.762c0 3.956-.025 8.834 0 10.779c0 1.188.736 3.96 3.282 4.108c3.095.18 8.67.219 11.228 0c.684-.039 2.964-.576 3.252-3.056c.299-2.57.24-4.355.24-4.78" />
+                <path
+                  d="M22 7.016c0 2.761-2.24 5-5.005 5a5 5 0 0 1-5.005-5c0-2.762 2.241-5 5.005-5a5 5 0 0 1 5.005 5m-15.02 6h4m-4 4h8" />
+              </g>
+            </svg>
+          </button></td>
+
+      </tr>
+      <!-- Empty State -->
+      <tr *ngIf="solicitudes.length === 0">
+        <td colspan="10" class="text-center py-4">
+          <div class="flex flex-col items-center gap-2">
+            <span class="text-base-content/70">No se encontraron registros</span>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+<!-- Paginación reutilizable -->
+<app-pagination 
+  [totalItems]="solicitudes.length"
+  [itemsPerPage]="itemsPerPage"
+  [currentPage]="currentPage"
+  (pageChange)="onPageChange($event)"
+  (itemsPerPageChange)="onItemsPerPageChange($event)">
+</app-pagination>

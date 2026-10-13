@@ -1,0 +1,333 @@
+<!-- chart-barras-anios.component.html -->
+<div class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 w-full flex flex-col">
+  <div class="card-body p-4 sm:p-6 flex-1 flex flex-col justify-between" [ngClass]="{'skeleton min-h-[500px]': isLoading}">
+    <div class="flex justify-between items-center mb-4" [ngClass]="{'hidden': isLoading}">
+      <div class="flex flex-col">
+        <h2 class="card-title text-lg sm:text-xl font-bold text-base-content">Por últimos 7 años de registro</h2>
+        <span class="text-sm text-base-content/60 mt-1">Evolución temporal del estado de recomendaciones</span>
+      </div>
+      <div class="flex gap-2">
+        <!-- Botón de resumen -->
+        <button 
+          class="btn btn-xs sm:btn-sm btn-outline gap-2" 
+          [class.btn-secondary]="mostrarResumen"
+          [class.btn-ghost]="!mostrarResumen"
+          (click)="toggleResumen()"
+          title="{{ mostrarResumen ? 'Ocultar resumen' : 'Mostrar resumen' }}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+            <path d="M8 14h.01"></path>
+            <path d="M12 14h.01"></path>
+            <path d="M16 14h.01"></path>
+            <path d="M8 18h.01"></path>
+            <path d="M12 18h.01"></path>
+            <path d="M16 18h.01"></path>
+          </svg>
+          <span class="hidden sm:inline">{{ mostrarResumen ? 'Ocultar resumen' : 'Mostrar resumen' }}</span>
+        </button>
+        
+        <!-- Botón de etiquetas -->
+        <button 
+          class="btn btn-xs sm:btn-sm btn-outline gap-2" 
+          [class.btn-primary]="mostrarEtiquetas"
+          [class.btn-ghost]="!mostrarEtiquetas"
+          (click)="toggleEtiquetas()"
+          title="{{ mostrarEtiquetas ? 'Ocultar valores' : 'Mostrar valores' }}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather">
+            <path d="M5 12H19"></path>
+            <path d="M5 12L9 8"></path>
+            <path d="M5 12L9 16"></path>
+            <path d="M19 6V18"></path>
+          </svg>
+          <span class="hidden sm:inline">{{ mostrarEtiquetas ? 'Ocultar valores' : 'Mostrar valores' }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Resumen Estadístico Ejecutivo -->
+    <div 
+      class="transition-all duration-500 ease-in-out overflow-hidden"
+      [ngClass]="{
+        'max-h-0 opacity-0 transform -translate-y-4': !mostrarResumen,
+        'max-h-[800px] opacity-100 transform translate-y-0': mostrarResumen,
+        'hidden': isLoading
+      }">
+      
+      <div class="bg-base-100 rounded-xl border border-base-content/10 shadow-md overflow-hidden">
+        
+        <!-- Header con navegación -->
+        <div class="bg-base-200 p-4 border-b border-base-content/10">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <h3 class="text-lg font-bold text-base-content flex items-center gap-2">
+              <div class="w-2 h-2 bg-primary rounded-full"></div>
+              Resumen Temporal
+            </h3>
+            
+            <!-- Navegación de vistas -->
+            <div class="flex bg-base-300 rounded-lg p-1">
+              <button 
+                (click)="cambiarVistaResumen('overview')"
+                class="px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200"
+                [ngClass]="{
+                  'bg-base-100 text-base-content shadow-sm': vistaResumen === 'overview',
+                  'text-base-content/60 hover:text-base-content': vistaResumen !== 'overview'
+                }">
+                General
+              </button>
+              <button 
+                (click)="cambiarVistaResumen('estados')"
+                class="px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200"
+                [ngClass]="{
+                  'bg-base-100 text-base-content shadow-sm': vistaResumen === 'estados',
+                  'text-base-content/60 hover:text-base-content': vistaResumen !== 'estados'
+                }">
+                Estados
+              </button>
+              <button 
+                (click)="cambiarVistaResumen('anios')"
+                class="px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200"
+                [ngClass]="{
+                  'bg-base-100 text-base-content shadow-sm': vistaResumen === 'anios',
+                  'text-base-content/60 hover:text-base-content': vistaResumen !== 'anios'
+                }">
+                Por Años
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenido dinámico -->
+        <div class="p-4 sm:p-6">
+          
+          <!-- Vista Overview -->
+          <div *ngIf="vistaResumen === 'overview'" class="animate-fade-in">
+            <!-- KPIs principales -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+              <div class="text-center p-4 bg-base-200/50 rounded-lg border border-base-content/5">
+                <div class="text-3xl font-black text-base-content">{{ getTotalGeneral() }}</div>
+                <div class="text-sm font-semibold text-base-content/70 mt-1">Total Asignadas</div>
+              </div>
+              <div class="text-center p-4 bg-base-200/50 rounded-lg border border-base-content/5">
+                <div class="text-3xl font-black text-success">{{ getPorcentaje(getTotalPorEstado().cumplidas) }}%</div>
+                <div class="text-sm font-semibold text-base-content/70 mt-1">Porcentaje Cumplimiento</div>
+              </div>
+              <div class="text-center p-4 bg-base-200/50 rounded-lg border border-base-content/5">
+                <div class="text-3xl font-black text-base-content">{{ getAnioConMasRecomendaciones().anio }}</div>
+                <div class="text-sm font-semibold text-base-content/70 mt-1">Año Destacado</div>
+              </div>
+              <div class="text-center p-4 bg-base-200/50 rounded-lg border border-base-content/5">
+                <div class="text-3xl font-black text-base-content">{{ labelsAnios.length }}</div>
+                <div class="text-sm font-semibold text-base-content/70 mt-1">Años Analizados</div>
+              </div>
+            </div>
+
+            <!-- Distribución visual rápida -->
+            <div class="bg-base-200/50 rounded-lg p-4 border border-base-content/5">
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-base font-bold text-base-content">Distribución General</span>
+                <span class="text-sm font-semibold text-base-content/60">{{ getTotalGeneral() }} total</span>
+              </div>
+              <div class="w-full bg-base-300 rounded-full h-4 overflow-hidden mb-3">
+                <div class="h-full flex">
+                  <div class="bg-emerald-500 transition-all duration-1000 ease-out flex items-center justify-center text-white text-xs font-medium" 
+                       [style.width.%]="getPorcentaje(getTotalPorEstado().cumplidas)">
+                    <span *ngIf="getPorcentaje(getTotalPorEstado().cumplidas) > 10">{{ getPorcentaje(getTotalPorEstado().cumplidas) }}%</span>
+                  </div>
+                  <div class="bg-blue-500 transition-all duration-1000 ease-out flex items-center justify-center text-white text-xs font-medium" 
+                       [style.width.%]="getPorcentaje(getTotalPorEstado().enProceso)">
+                    <span *ngIf="getPorcentaje(getTotalPorEstado().enProceso) > 10">{{ getPorcentaje(getTotalPorEstado().enProceso) }}%</span>
+                  </div>
+                  <div class="bg-red-500 transition-all duration-1000 ease-out flex items-center justify-center text-white text-xs font-medium" 
+                       [style.width.%]="getPorcentaje(getTotalPorEstado().noCumplidas)">
+                    <span *ngIf="getPorcentaje(getTotalPorEstado().noCumplidas) > 10">{{ getPorcentaje(getTotalPorEstado().noCumplidas) }}%</span>
+                  </div>
+                  <div class="bg-amber-500 transition-all duration-1000 ease-out flex items-center justify-center text-white text-xs font-medium" 
+                       [style.width.%]="getPorcentaje(getTotalPorEstado().noAplica)">
+                    <span *ngIf="getPorcentaje(getTotalPorEstado().noAplica) > 10">{{ getPorcentaje(getTotalPorEstado().noAplica) }}%</span>
+                  </div>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                <div class="flex items-center gap-2">
+                  <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                  <span class="text-base-content/70">Cumplidas ({{ getTotalPorEstado().cumplidas }})</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <span class="text-base-content/70">En proceso ({{ getTotalPorEstado().enProceso }})</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <span class="text-base-content/70">No cumplidas ({{ getTotalPorEstado().noCumplidas }})</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
+                  <span class="text-base-content/70">No aplica ({{ getTotalPorEstado().noAplica }})</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vista Estados -->
+          <div *ngIf="vistaResumen === 'estados'" class="animate-fade-in">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              
+              <!-- Cumplidas -->
+              <div class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                  <span class="text-sm px-2.5 py-1 bg-emerald-500/20 rounded-full font-bold">
+                    {{ getPorcentaje(getTotalPorEstado().cumplidas) }}%
+                  </span>
+                </div>
+                <h4 class="text-lg font-bold text-emerald-600 dark:text-emerald-400 mb-1">Cumplidas</h4>
+                <div class="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-2">{{ getTotalPorEstado().cumplidas }}</div>
+                <div class="w-full bg-emerald-500/20 rounded-full h-2">
+                  <div class="bg-emerald-500 h-2 rounded-full transition-all duration-1000" 
+                       [style.width.%]="getPorcentaje(getTotalPorEstado().cumplidas)"></div>
+                </div>
+              </div>
+
+              <!-- En Proceso -->
+              <div class="bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
+                    <div class="w-4 h-4 bg-blue-500 rounded-full"></div>
+                  </div>
+                  <span class="text-sm px-2.5 py-1 bg-blue-500/20 rounded-full font-bold">
+                    {{ getPorcentaje(getTotalPorEstado().enProceso) }}%
+                  </span>
+                </div>
+                <h4 class="text-lg font-bold text-blue-600 dark:text-blue-400 mb-1">En Proceso</h4>
+                <div class="text-3xl font-black text-blue-600 dark:text-blue-400 mb-2">{{ getTotalPorEstado().enProceso }}</div>
+                <div class="w-full bg-blue-500/20 rounded-full h-2">
+                  <div class="bg-blue-500 h-2 rounded-full transition-all duration-1000" 
+                       [style.width.%]="getPorcentaje(getTotalPorEstado().enProceso)"></div>
+                </div>
+              </div>
+
+              <!-- No Cumplidas -->
+              <div class="bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                  <span class="text-sm px-2.5 py-1 bg-red-500/20 rounded-full font-bold">
+                    {{ getPorcentaje(getTotalPorEstado().noCumplidas) }}%
+                  </span>
+                </div>
+                <h4 class="text-lg font-bold text-red-600 dark:text-red-400 mb-1">No Cumplidas</h4>
+                <div class="text-3xl font-black text-red-600 dark:text-red-400 mb-2">{{ getTotalPorEstado().noCumplidas }}</div>
+                <div class="w-full bg-red-500/20 rounded-full h-2">
+                  <div class="bg-red-500 h-2 rounded-full transition-all duration-1000" 
+                       [style.width.%]="getPorcentaje(getTotalPorEstado().noCumplidas)"></div>
+                </div>
+              </div>
+
+              <!-- No Aplica -->
+              <div class="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                  <span class="text-sm px-2.5 py-1 bg-amber-500/20 rounded-full font-bold">
+                    {{ getPorcentaje(getTotalPorEstado().noAplica) }}%
+                  </span>
+                </div>
+                <h4 class="text-lg font-bold text-amber-600 dark:text-amber-400 mb-1">No Aplica</h4>
+                <div class="text-3xl font-black text-amber-600 dark:text-amber-400 mb-2">{{ getTotalPorEstado().noAplica }}</div>
+                <div class="w-full bg-amber-500/20 rounded-full h-2">
+                  <div class="bg-amber-500 h-2 rounded-full transition-all duration-1000" 
+                       [style.width.%]="getPorcentaje(getTotalPorEstado().noAplica)"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vista Por Años -->
+          <div *ngIf="vistaResumen === 'anios'" class="animate-fade-in">
+            <div class="space-y-3 max-h-80 overflow-y-auto">
+              <div *ngFor="let dato of datosPorAnio; let i = index" 
+                   class="bg-base-200/50 rounded-lg p-4 hover:bg-base-300/50 transition-colors duration-200 border border-base-content/5">
+                
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-base-300 rounded-full flex items-center justify-center">
+                      <span class="text-sm font-semibold text-base-content">{{ dato.anio }}</span>
+                    </div>
+                    <div>
+                      <h4 class="font-bold text-base-content text-base">Año {{ dato.anio }}</h4>
+                      <p class="text-sm text-base-content/60">{{ dato.total }} recomendaciones</p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-base font-bold text-amber-600 dark:text-amber-400">
+                      {{ getPorcentajeCumplimientoPorAnio(dato.anio) }}%
+                    </div>
+                    <div class="text-xs text-base-content/60">cumplimiento</div>
+                  </div>
+                </div>
+
+                <!-- Barra de progreso por año -->
+                <div class="w-full bg-base-300 rounded-full h-3 overflow-hidden mb-2">
+                  <div class="h-full flex">
+                    <div class="bg-emerald-500 transition-all duration-1000 ease-out" 
+                         [style.width.%]="dato.total > 0 ? (dato.cumplidas / dato.total) * 100 : 0"
+                         title="Cumplidas: {{ dato.cumplidas }}"></div>
+                    <div class="bg-blue-500 transition-all duration-1000 ease-out" 
+                         [style.width.%]="dato.total > 0 ? (dato.enProceso / dato.total) * 100 : 0"
+                         title="En proceso: {{ dato.enProceso }}"></div>
+                    <div class="bg-red-500 transition-all duration-1000 ease-out" 
+                         [style.width.%]="dato.total > 0 ? (dato.noCumplidas / dato.total) * 100 : 0"
+                         title="No cumplidas: {{ dato.noCumplidas }}"></div>
+                    <div class="bg-amber-500 transition-all duration-1000 ease-out" 
+                         [style.width.%]="dato.total > 0 ? (dato.noAplica / dato.total) * 100 : 0"
+                         title="No aplica: {{ dato.noAplica }}"></div>
+                  </div>
+                </div>
+
+                <!-- Detalles rápidos -->
+                <div class="grid grid-cols-4 gap-2 text-xs">
+                  <div class="text-center">
+                    <div class="text-emerald-600 dark:text-emerald-400 font-bold text-sm">{{ dato.cumplidas }}</div>
+                    <div class="text-base-content/60">Cumplidas</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-blue-600 dark:text-blue-400 font-bold text-sm">{{ dato.enProceso }}</div>
+                    <div class="text-base-content/60">En proceso</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-red-600 dark:text-red-400 font-bold text-sm">{{ dato.noCumplidas }}</div>
+                    <div class="text-base-content/60">No cumplidas</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-amber-600 dark:text-amber-400 font-bold text-sm">{{ dato.noAplica }}</div>
+                    <div class="text-base-content/60">No aplica</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenedor responsivo: -->
+    <div class="relative w-full h-64 sm:h-80 md:h-96 lg:h-[500px]" [ngClass]="{'hidden': isLoading}">
+      <canvas #barChart class="block w-full h-full"></canvas>
+    </div>
+
+  </div>
+</div>

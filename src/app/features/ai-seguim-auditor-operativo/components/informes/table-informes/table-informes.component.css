@@ -1,0 +1,43 @@
+/* Mantiene las celdas alineadas al centro y evita scroll vertical vacío. */
+.report-table-shell {
+	overflow-y: clip;
+}
+
+.report-table-shell table {
+	width: 100%;
+}
+
+.report-table-shell th,
+.report-table-shell td {
+	vertical-align: middle;
+}
+
+/* Animación de vibración y destello para la campanita pendiente de notificar */
+@keyframes bellVibrateShake {
+  0% { transform: rotate(0deg) scale(1); }
+  4% { transform: rotate(-14deg) scale(1.1); }
+  8% { transform: rotate(14deg) scale(1.1); }
+  12% { transform: rotate(-12deg) scale(1.1); }
+  16% { transform: rotate(12deg) scale(1.1); }
+  20% { transform: rotate(-8deg) scale(1.05); }
+  24% { transform: rotate(8deg) scale(1.05); }
+  28% { transform: rotate(0deg) scale(1); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+@keyframes bellFlashPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.75);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+}
+
+.bell-pending-notify {
+  animation: bellVibrateShake 2.2s infinite ease-in-out, bellFlashPulse 1.4s infinite ease-in-out !important;
+}
+
+.bell-pending-notify svg {
+  animation: bellVibrateShake 2.2s infinite ease-in-out;
+}

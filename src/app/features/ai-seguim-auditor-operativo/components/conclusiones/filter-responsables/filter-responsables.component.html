@@ -1,0 +1,37 @@
+<div class="w-full space-y-4">
+  <div class="join w-full shadow-sm">
+    <!-- Departamento Select -->
+    <select 
+      [formControl]="departamentoControl"
+      class="select select-bordered select-primary join-item w-full max-w-xs text-sm min-w-[157px]"
+    >
+      <option value="">Seleccioné departamento</option>
+      <option *ngFor="let dep of departamentos" [value]="dep">{{ dep }}</option>
+    </select>
+
+    <!-- Search Input -->
+    <div class="relative join-item flex-1 min-w-64">
+      <input 
+        [formControl]="searchControl"
+        class="input input-bordered input-primary w-full pl-4 text-sm rounded-l-none"
+        placeholder="Buscar por cargo o nombres..."
+      />
+      
+      <!-- Search Icon -->
+      <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          fill="currentColor"
+          class="h-4 w-4 text-base-content/70"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>

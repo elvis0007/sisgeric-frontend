@@ -1,0 +1,15 @@
+{
+    "gitlens.launchpad.indicator.useColors": true,
+    "errorLens.statusBarColorsEnabled": false,
+    "errorLens.decorations": {
+        
+        "errorRange": {},
+        "warningRange": {},
+        "infoRange": {},
+        "hintRange": {},
+        "errorMessage": {},
+        "warningMessage": {},
+        "infoMessage": {},
+        "hintMessage": {}
+    }
+}

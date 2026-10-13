@@ -1,0 +1,142 @@
+<div class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 h-full flex flex-col">
+    <div class="card-body p-4 sm:p-6 flex-1 flex flex-col gap-4" [ngClass]="{'skeleton min-h-[500px]': isLoading}">
+
+        <!-- Encabezado -->
+        <div class="flex flex-col" [ngClass]="{'hidden': isLoading}">
+            <h2 class="card-title text-lg sm:text-xl font-bold text-base-content">Estado de recomendaciones por informes</h2>
+            <span class="text-sm text-base-content/60 mt-1">Listado detallado de cumplimiento segun memorandos de informes</span>
+        </div>
+
+        <div class="flex flex-col gap-4" [ngClass]="{'hidden': isLoading}">
+            <!-- Controles de busqueda y filtrado -->
+            <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center w-full gap-3">
+                <!-- Busqueda -->
+                <div class="relative w-full sm:w-60 md:w-64 lg:w-72">
+                    <input
+                        type="text"
+                        class="input input-bordered input-primary w-full focus:outline-none pr-10 text-sm sm:text-base"
+                        placeholder="Buscar por memorando..."
+                        (input)="onSearch($event)"
+                        [value]="searchTerm" />
+                    <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-base-content/40">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5">
+                            <path fill-rule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                </div>
+
+                <!-- Filtro por anios -->
+                <div class="relative dropdown-container w-full sm:w-56 md:w-60 lg:w-64">
+                    <button (click)="toggleDropdown()" class="btn btn-outline btn-primary w-full flex justify-between items-center text-sm font-normal normal-case" type="button">
+                        <span class="truncate">{{ getSelectionText() }}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div *ngIf="showDropdown" class="absolute z-20 mt-1 w-full bg-base-100 shadow-2xl max-h-60 overflow-auto rounded-lg border border-base-200">
+                        <div class="p-3 hover:bg-base-200 border-b border-base-200">
+                            <label class="flex items-center space-x-3 cursor-pointer w-full">
+                                <input type="checkbox" class="checkbox checkbox-primary checkbox-sm"
+                                    [checked]="selectedAnios.length === labelsAnios.length"
+                                    (change)="toggleSelectAll($event)" />
+                                <span class="text-sm font-bold">Seleccionar todos</span>
+                            </label>
+                        </div>
+                        <div class="p-3 hover:bg-base-200" *ngFor="let anio of labelsAnios">
+                            <label class="flex items-center space-x-3 cursor-pointer w-full">
+                                <input type="checkbox" class="checkbox checkbox-primary checkbox-sm"
+                                    [checked]="isAnioSelected(anio)"
+                                    (change)="toggleAnioSelection(anio)" />
+                                <span class="text-sm">{{ anio }}</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla -->
+            <div class="rounded-xl overflow-x-auto border border-base-300 shadow-sm">
+                <table class="table w-full min-w-[500px]">
+                    <thead>
+                        <tr class="text-sm sm:text-base">
+                            <th class="bg-base-300/70 text-base-content font-bold text-start py-4 px-4 border-b-2 border-base-300 min-w-[120px]">Memo Aprob.</th>
+                            <th class="font-bold text-center py-4 min-w-[80px] bg-blue-600 text-white border-b-2 border-blue-700">En Proceso</th>
+                            <th class="font-bold text-center py-4 min-w-[80px] bg-emerald-600 text-white border-b-2 border-emerald-700">Cumplidas</th>
+                            <th class="font-bold text-center py-4 min-w-[90px] bg-red-600 text-white border-b-2 border-red-700">No Cumplidas</th>
+                            <th class="font-bold text-center py-4 min-w-[80px] bg-amber-500 text-white border-b-2 border-amber-600">No Aplica</th>
+                            <th class="bg-base-300/70 text-base-content font-bold text-center py-4 min-w-[60px] border-b-2 border-base-300">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-base-200">
+                        <tr class="hover:bg-base-200/60 transition-colors duration-150" *ngFor="let item of displayedChartList">
+                            <!-- Memorando con tooltip al hover -->
+                            <td class="text-sm sm:text-base text-start py-3.5 px-4 font-medium text-base-content">
+                                <div class="dropdown dropdown-hover">
+                                    <div tabindex="0" role="button" class="hover:text-primary cursor-help transition-all duration-200 break-words line-clamp-2">
+                                        {{ item.memorando }}
+                                    </div>
+                                    <div class="dropdown-content z-[30] card card-compact w-96 p-4 shadow-2xl bg-base-200 border border-base-300 rounded-xl">
+                                        <div class="card-body">
+                                            <h4 class="font-bold text-xs uppercase tracking-wider text-base-content/60 mb-1">Titulo del Informe</h4>
+                                            <p class="text-sm sm:text-base leading-relaxed text-base-content">{{ item.tituloInforme }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- En Proceso -->
+                            <td class="text-center py-3.5 bg-blue-500/5 dark:bg-blue-950/10">
+                                <span *ngIf="item.enProceso > 0" class="inline-flex items-center justify-center w-8 h-8 text-sm font-bold rounded-full bg-blue-600 text-white shadow-sm">{{ item.enProceso }}</span>
+                                <span *ngIf="item.enProceso === 0" class="text-base-content/25 text-lg">-</span>
+                            </td>
+
+                            <!-- Cumplidas -->
+                            <td class="text-center py-3.5 bg-emerald-500/5 dark:bg-emerald-950/10">
+                                <span *ngIf="item.cumplidas > 0" class="inline-flex items-center justify-center w-8 h-8 text-sm font-bold rounded-full bg-emerald-600 text-white shadow-sm">{{ item.cumplidas }}</span>
+                                <span *ngIf="item.cumplidas === 0" class="text-base-content/25 text-lg">-</span>
+                            </td>
+
+                            <!-- No Cumplidas -->
+                            <td class="text-center py-3.5 bg-red-500/5 dark:bg-red-950/10">
+                                <span *ngIf="item.noCumplidas > 0" class="inline-flex items-center justify-center w-8 h-8 text-sm font-bold rounded-full bg-red-600 text-white shadow-sm">{{ item.noCumplidas }}</span>
+                                <span *ngIf="item.noCumplidas === 0" class="text-base-content/25 text-lg">-</span>
+                            </td>
+
+                            <!-- No Aplica -->
+                            <td class="text-center py-3.5 bg-amber-500/5 dark:bg-amber-950/10">
+                                <span *ngIf="item.noAplica > 0" class="inline-flex items-center justify-center w-8 h-8 text-sm font-bold rounded-full bg-amber-500 text-white shadow-sm">{{ item.noAplica }}</span>
+                                <span *ngIf="item.noAplica === 0" class="text-base-content/25 text-lg">-</span>
+                            </td>
+
+                            <!-- Total -->
+                            <td class="text-sm sm:text-base text-center font-black py-3.5 text-base-content">{{ item.total }}</td>
+                        </tr>
+                        <tr *ngIf="displayedChartList.length === 0">
+                            <td colspan="6" class="text-center py-10 text-sm sm:text-base text-base-content/50">No se encontraron resultados</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginacion -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-base-300" *ngIf="displayedChartList.length > 0">
+                <span class="text-sm text-base-content/60 order-2 sm:order-1">
+                    Mostrando {{ min(currentPage * itemsPerPage, totalItems) }} de {{ totalItems }} registros
+                </span>
+                <div *ngIf="!isLoading" class="flex justify-center order-1 sm:order-2">
+                    <div class="join bg-base-300/40 p-0.5 rounded-lg">
+                        <button class="join-item btn btn-sm btn-ghost hover:bg-base-300/80 rounded-md" [disabled]="currentPage === 1" (click)="goToPreviousPage()">&#11038;</button>
+                        <button *ngFor="let page of pages" class="join-item btn btn-sm btn-ghost rounded-md font-medium"
+                            [class.bg-primary]="page === currentPage"
+                            [class.text-primary-content]="page === currentPage"
+                            [class.shadow-sm]="page === currentPage"
+                            [disabled]="page === '...'" (click)="changePage(page)">
+                            {{ page }}
+                        </button>
+                        <button class="join-item btn btn-sm btn-ghost hover:bg-base-300/80 rounded-md" [disabled]="currentPage === totalPages" (click)="goToNextPage()">&#11039;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

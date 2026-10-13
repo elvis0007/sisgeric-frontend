@@ -1,0 +1,134 @@
+<div class="overflow-x-auto rounded-lg shadow-sm border border-base-200">
+  <table class="table table-sm md:table-md w-full min-w-[800px]">
+
+    <thead>
+      <tr class="bg-primary text-primary-content">
+        <th class="text-sm w-12">N Rec.</th>
+        <th class="text-sm text-start w-24 md:w-36 lg:w-80">Recomendación</th>
+        <th class="text-sm text-center flex-grow">Fecha Inicio </th>
+        <th class="text-sm text-center flex-grow">Fecha Máxima</th>
+        <th class="text-sm text-center flex-grow">Plazo</th>
+        <th class="text-sm text-center flex-grow">Estado</th>
+        <th class="text-sm text-center flex-grow">Motivo Estado</th>
+        <th class="text-sm text-center flex-grow">Responsables</th>
+        <th class="text-sm text-center w-24 md:w-36 lg:w-40">Acciones</th>
+      </tr>
+    </thead>
+
+    <tbody class="bg-base-200">
+      <tr class="hover" *ngFor="let recomendacion of displayedRecomendaciones">
+        <th class="text-sm">{{recomendacion.arere_num_rec}}</th>
+        <td class="text-sm text-start">{{recomendacion.arere_descripcion}}</td>
+        <td class="text-sm text-center">{{recomendacion.arere_fecha_inicio_control | date:'dd/MM/yyyy'}}</td>
+        <td class="text-sm text-center">{{recomendacion.arere_fecha_maxima | date:'dd/MM/yyyy'}}</td>
+        <td class="text-sm text-center">
+          <div class="flex flex-col justify-center items-center">
+            <div *ngIf="recomendacion.estado_seguimiento.arees_descripcion === 'CUMPLIDA'" class="bg-success rounded-full p-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-slate-300 transition-colors" viewBox="0 0 48 48">
+                <defs>
+                  <mask id="ipTCheckOne0">
+                    <g fill="none" stroke="#fff" stroke-linejoin="round" stroke-width="4">
+                      <path fill="#555555" d="M24 44a19.94 19.94 0 0 0 14.142-5.858A19.94 19.94 0 0 0 44 24a19.94 19.94 0 0 0-5.858-14.142A19.94 19.94 0 0 0 24 4A19.94 19.94 0 0 0 9.858 9.858A19.94 19.94 0 0 0 4 24a19.94 19.94 0 0 0 5.858 14.142A19.94 19.94 0 0 0 24 44Z"/>
+                      <path stroke-linecap="round" d="m16 24l6 6l12-12"/>
+                    </g>
+                  </mask>
+                </defs>
+                <path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipTCheckOne0)"/>
+              </svg>
+            </div>
+            <div *ngIf="recomendacion.estado_seguimiento.arees_descripcion !== 'CUMPLIDA'" [ngClass]="{
+              'bg-red-600 hover:bg-red-700': recomendacion.plazo < 0,
+              'bg-primary hover:bg-primary-dark': recomendacion.plazo >= 0
+            }" class="rounded-full p-1">
+              <svg class="w-7 h-7 text-slate-300 transition-colors" xmlns="http://www.w3.org/2000/svg" width="1em"
+                height="2em" viewBox="0 0 24 24">
+                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0m9 0h3.5M12 7v5" />
+              </svg>
+            </div>
+            <span *ngIf="recomendacion.estado_seguimiento.arees_descripcion !== 'CUMPLIDA'" class="text-sm text-secondary mt-1 font-semibold">
+              {{ recomendacion.plazo | abs }}
+            </span>
+            <span *ngIf="recomendacion.estado_seguimiento.arees_descripcion !== 'CUMPLIDA'" class="text-sm text-secondary font-semibold">
+              {{ recomendacion.plazo < 0 ? 'días vencidos' : 'días vigentes' }}
+            </span>
+          </div>
+        </td>
+        <td class="text-sm text-center">
+          <div class="badge badge-lg truncate px-4 py-4 font-sm"
+            [ngClass]="recomendacion.estado_seguimiento.arees_descripcion | statusColor">
+            {{recomendacion.estado_seguimiento.arees_descripcion}}
+          </div>
+        </td>
+        <td class="text-sm text-center">{{recomendacion.motivo_estado}}</td>
+        <td class="text-sm text-center">
+          <div class="indicator">
+            <span class="indicator-item badge badge-warning text-sm text-secondary font-semibold">{{recomendacion.responsables}}</span>
+            <button class="btn btn-circle btn-sm bg-cyan-600 hover:bg-cyan-700" title="ver"
+              (click)="openModal(recomendacion)">
+              <svg class="w-5 h-5 transition-colors text-slate-300" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.774 18c.75 0 1.345-.471 1.88-1.13c1.096-1.35-.703-2.43-1.389-2.957c-.697-.537-1.476-.842-2.265-.913m-1-2a2.5 2.5 0 0 0 0-5M3.226 18c-.75 0-1.345-.471-1.88-1.13c-1.096-1.35.703-2.43 1.389-2.957C3.432 13.376 4.21 13.07 5 13m.5-2a2.5 2.5 0 0 1 0-5m2.584 9.111c-1.022.632-3.701 1.922-2.07 3.536C6.813 19.436 7.7 20 8.817 20h6.368c1.117 0 2.004-.564 2.801-1.353c1.632-1.614-1.047-2.904-2.069-3.536a7.46 7.46 0 0 0-7.832 0M15.5 7.5a3.5 3.5 0 1 1-7 0a3.5 3.5 0 0 1 7 0" color="currentColor"/></svg>
+            </button>
+          </div>
+        </td>
+        <td>
+          <div class="flex gap-1 items-center justify-center">
+            <!-- Delete Button -->
+            <button class="btn btn-circle btn-sm bg-red-600 hover:bg-red-700" title="Eliminar"
+              [disabled]="isCumplida(recomendacion)"
+              (click)="this.openModalConf(recomendacion)">
+              <svg class=" w-5 h-5 text-slate-300 transition-colors" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24">
+                <path fill="currentColor"
+                  d="M14.28 2a2 2 0 0 1 1.897 1.368L16.72 5H20a1 1 0 1 1 0 2l-.003.071l-.867 12.143A3 3 0 0 1 16.138 22H7.862a3 3 0 0 1-2.992-2.786L4.003 7.07L4 7a1 1 0 0 1 0-2h3.28l.543-1.632A2 2 0 0 1 9.721 2zM9 10a1 1 0 0 0-.993.883L8 11v6a1 1 0 0 0 1.993.117L10 17v-6a1 1 0 0 0-1-1m6 0a1 1 0 0 0-1 1v6a1 1 0 1 0 2 0v-6a1 1 0 0 0-1-1m-.72-6H9.72l-.333 1h5.226z" />
+              </svg>
+            </button>
+
+            <!-- Edit Button -->
+            <button class="btn btn-circle btn-sm bg-indigo-700 hover:bg-indigo-800" title="Editar"
+              [disabled]="isCumplida(recomendacion)"
+              (click)="editRecomendacion(recomendacion)">
+              <svg class="w-5 h-5 text-slate-300 transition-colors" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24">
+                <g fill="currentColor">
+                  <path
+                    d="M16.607 3.005a2.57 2.57 0 0 1 3.64-.001l.75.751a2.57 2.57 0 0 1 0 3.637l-7.6 7.604a2.57 2.57 0 0 1-1.819.754H9a.75.75 0 0 1-.75-.75v-2.562c0-.682.27-1.336.752-1.818z" />
+                  <path
+                    d="M11.943 2.25H12a.75.75 0 0 1 0 1.5c-2.143 0-3.674.002-4.838.158c-1.142.154-1.817.444-2.314.94c-.496.497-.786 1.172-.94 2.314C3.752 8.326 3.75 9.857 3.75 12s.002 3.674.158 4.838c.154 1.142.444 1.817.94 2.314c.497.496 1.172.786 2.314.94c1.164.156 2.695.158 4.838.158s3.674-.002 4.838-.158c1.142-.154 1.817-.444 2.314-.94c.496-.497.786-1.172.94-2.314c.156-1.164.158-2.696.158-4.838a.75.75 0 0 1 1.5 0v.057c0 2.073 0 3.705-.171 4.98c-.176 1.31-.545 2.354-1.367 3.175c-.821.822-1.866 1.19-3.174 1.367c-1.276.171-2.908.171-4.981.171h-.114c-2.073 0-3.705 0-4.98-.171c-1.31-.176-2.354-.545-3.175-1.367c-.822-.821-1.19-1.866-1.367-3.174c-.171-1.276-.171-2.908-.171-4.981v-.114c0-2.073 0-3.705.171-4.98c.176-1.31.545-2.354 1.367-3.175c.821-.822 1.866-1.19 3.174-1.367c1.276-.171 2.908-.171 4.981-.171" />
+                </g>
+              </svg>
+            </button>
+            <button type="button" class="btn btn-circle btn-sm bg-emerald-700 hover:bg-emerald-800"
+              title="Ver riesgo y evidencia requerida" aria-label="Ver riesgo y evidencia requerida"
+              (click)="verRiesgo(recomendacion)">
+                <svg class="w-5 h-5 text-slate-300 transition-colors" xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24">
+                  <path fill="currentColor"
+                    d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75s-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12m9.03-4.03a.75.75 0 1 0-1.06 1.06L13.19 12l-2.97 2.97a.75.75 0 1 0 1.06 1.06l3.5-3.5a.75.75 0 0 0 0-1.06z" />
+                </svg>
+              </button>
+          </div>
+        </td>
+      </tr>
+      <!-- Empty State -->
+      <tr *ngIf="filteredRecomendaciones.length === 0">
+        <td colspan="9" class="text-center py-4">
+          <div class="flex flex-col items-center gap-2">
+            <span class="text-base-content/70" *ngIf="searchTerm">No se encontraron resultados para "{{searchTerm}}"</span>
+            <span class="text-base-content/70" *ngIf="!searchTerm">No se encontraron registros</span>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+
+  </table>
+
+</div>
+
+<!-- Paginación reutilizable -->
+<app-pagination 
+  [totalItems]="filteredRecomendaciones.length"
+  [itemsPerPage]="itemsPerPage"
+  [currentPage]="currentPage"
+  (pageChange)="onPageChange($event)"
+  (itemsPerPageChange)="onItemsPerPageChange($event)">
+</app-pagination>

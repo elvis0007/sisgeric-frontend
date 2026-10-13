@@ -1,0 +1,27 @@
+<div class="w-full">
+  <div class="w-full">
+    <app-modal-assing></app-modal-assing>
+    <app-modal-edit-director></app-modal-edit-director>
+  </div>
+
+  <!-- Título -->
+  <h1 class="text-xl md:text-2xl font-bold pt-3 pb-5">
+    Asignación de roles - {{ descriptionRole }}
+  </h1>
+
+  <!-- Barra de búsqueda y botón agregar -->
+  <div class="flex flex-wrap justify-between items-center mb-4">
+    <div class="flex flex-wrap items-center w-full max-w-sm mb-2 md:mb-0">
+      <app-input placeholder="Buscar por nombres de usuario..." type="search" class="flex-grow md:w-auto"
+        (input)="filterUsers()"></app-input>
+    </div>
+    <button class="btn btn-primary w-full lg:w-auto" (click)="openModal()">AGREGAR</button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center items-center my-8">
+    <span class="loading loading-spinner loading-lg text-secondary"></span>
+  </div>
+
+  <app-table-role-user [users]="filteredUsers" [roleId]="roleId" *ngIf="!isLoading" />
+</div>

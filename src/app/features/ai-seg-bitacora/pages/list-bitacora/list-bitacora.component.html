@@ -1,0 +1,15 @@
+<div class="w-full">
+  <app-breadcrumbs />
+</div>
+
+<h1 class="text-2xl font-bold pb-5 pt-3">Bitácora</h1>
+<app-search-filter (filterChange)="onFilterChange($event)" (export)="exportData()" (loadingChange)="onLoadingChange($event)" />
+
+<!-- Loading State -->
+<div *ngIf="isLoading" class="flex justify-center items-center my-8">
+  <span class="loading loading-spinner loading-lg text-secondary"></span>
+</div>
+
+<!-- Data Table -->
+<app-table-bitacora *ngIf="!isLoading" [bitacora]="bitacora" />
+

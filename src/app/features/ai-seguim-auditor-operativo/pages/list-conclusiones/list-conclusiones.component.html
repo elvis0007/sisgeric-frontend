@@ -1,0 +1,53 @@
+<div class="w-full">
+  <app-modal-form [reloadTable]="reloadTable.bind(this)" />
+
+  <div [hidden]="this.rutaHijaActiva">
+    <h3 *ngIf="!isLoading" class="text-lg md:text-xl font-bold">Orden de Trabajo:</h3>
+    <p *ngIf="!isLoading" class="text-base-content mb-4">{{ ordenTrabajo}}
+    </p>
+
+    <h3 *ngIf="!isLoading" class="text-base font-bold">Hallazgo:</h3>
+    <p *ngIf="!isLoading" class="text-base-content mb-4">{{ hallazgoTitle }}</p>
+
+    <div *ngIf="!isLoading" class="flex flex-col lg:flex-row justify-between items-center mb-4 gap-4">
+      <!-- Título -->
+      <h1 class="text-xl md:text-2xl font-bold w-full lg:w-auto">Conclusiones</h1>
+
+      <div class="flex flex-wrap gap-2 items-center w-full lg:w-auto">     
+        <!-- Search Input -->
+        <div class="flex gap-2 items-center w-full lg:w-auto">
+          <div class="relative w-full lg:w-72">
+            <input type="text" [formControl]="searchTermControl" class="input input-bordered input-primary w-full pr-10"
+              placeholder="Buscar por # recomendación ..." />
+            <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-4 w-4 opacity-70">
+                <path fill-rule="evenodd"
+                  d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                  clip-rule="evenodd" />
+              </svg>
+            </span>
+          </div>
+          <button type="button" (click)="searchTermControl.setValue('')" class="btn btn-outline btn-primary flex gap-2 items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            Limpiar
+          </button>
+        </div>
+        <button *ngIf="hasRole([3])" class="btn btn-primary w-full lg:w-auto" (click)="redireccionPagina()">
+          AGREGAR
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center my-8">
+      <span class="loading loading-spinner loading-lg text-secondary"></span>
+    </div>
+
+      <app-table-conclusiones *ngIf="!isLoading" [conclusiones]="conclusiones" [reloadTable]="reloadTable.bind(this)" />
+    </div>
+
+  <router-outlet (activate)="this.enActivacionRutaHija()" (deactivate)="this.enDesactivacionRutaHija()"></router-outlet>
+
+</div>

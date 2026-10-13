@@ -1,0 +1,55 @@
+<div class="w-full space-y-4">
+  <!-- Table wrapper with horizontal scroll -->
+  <div class="overflow-x-auto rounded-lg shadow-sm border border-base-200">
+    <table class="table table-sm md:table-md w-full min-w-[800px]">
+      <!-- Table Header -->
+      <thead>
+        <tr class="bg-primary text-primary-content">
+          <th class="text-sm w-12">N</th>
+          <th class="text-sm flex-grow">Título de hallazgo</th>
+          <th class="text-sm text-center w-32 md:w-48 lg:w-64">Conclusiones</th>
+        </tr>
+      </thead>
+
+      <!-- Table Body -->
+      <tbody class="bg-base-200">
+        <tr class="hover" *ngFor="let hallazgo of displayedHallazgos let i = index">
+          <th class="text-sm">{{(currentPage - 1) * itemsPerPage + i + 1}}</th>
+          <td class="text-sm">{{hallazgo.areha_titulo}}</td>
+          <td>
+            <div class="flex items-center justify-center">
+              <button 
+              class="btn btn-circle btn-sm bg-emerald-700 hover:bg-emerald-800"
+              (click)="redireccionPagina(hallazgo.areha_codigo)"
+              title="Conclusiones"
+            >
+              <svg class="w-5 h-5 text-slate-300 transition-colors" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75s-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12m9.03-4.03a.75.75 0 1 0-1.06 1.06L13.19 12l-2.97 2.97a.75.75 0 1 0 1.06 1.06l3.5-3.5a.75.75 0 0 0 0-1.06z"/>
+              </svg>
+            </button>
+
+            </div>
+          </td>
+        </tr>
+
+        <!-- Empty State -->
+        <tr *ngIf="hallazgos.length === 0">
+          <td colspan="3" class="text-center py-4">
+            <div class="flex flex-col items-center gap-2">
+              <span class="text-base-content/70">No se encontraron registros</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación reutilizable -->
+  <app-pagination 
+    [totalItems]="hallazgos.length"
+    [itemsPerPage]="itemsPerPage"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)"
+    (itemsPerPageChange)="onItemsPerPageChange($event)">
+  </app-pagination>
+</div>

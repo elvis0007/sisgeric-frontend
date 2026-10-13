@@ -1,0 +1,21 @@
+<div class="w-full">
+
+  <app-modal-responsables />
+
+  <!-- Contenido principal (se oculta cuando hay ruta hija activa) -->
+  
+    <h2 class="text-lg md:text-xl font-bold">Informe: {{ordenTrabajo}}</h2>
+    <p class="text-base-content mb-4">{{ informeTitulo }}</p>
+
+    <div class="flex flex-wrap justify-between items-center mb-4">
+      <h1 class="text-xl md:text-2xl font-bold">Recomendaciones</h1>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center my-8">
+      <span class="loading loading-spinner loading-lg text-secondary"></span>
+    </div>
+
+    <app-table-recomendaciones *ngIf="!isLoading" [recomendaciones]="recomendaciones" />
+
+</div>

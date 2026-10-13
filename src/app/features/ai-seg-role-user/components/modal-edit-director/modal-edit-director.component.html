@@ -1,0 +1,145 @@
+<dialog
+  id="modal_edit_director"
+  class="fixed inset-0 w-full h-full z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center text-secondary"
+  [ngClass]="{ 'hidden': !modalEditSrv.isModalOpen() }">
+  <div class="modal-box max-w-7xl w-[98vw] max-h-[98vh] rounded-lg shadow-lg relative flex flex-col">
+    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" (click)="closeModal()">
+      ✕
+    </button>
+    <h3 class="text-lg font-bold mb-4">Editar Director Departamental</h3>
+    
+    <form [formGroup]="formEdit" (ngSubmit)="onSubmit()" *ngIf="formEdit && !isLoadingUsuario" class="flex flex-col flex-1 overflow-hidden">
+      <div class="flex flex-col flex-1 space-y-4 overflow-hidden min-h-0">
+        <!-- Loading estado para usuario actual -->
+        <div *ngIf="isLoadingUsuario" class="flex justify-center items-center py-4">
+          <span class="loading loading-spinner loading-md text-secondary"></span>
+          <span class="ml-2">Cargando información del director...</span>
+        </div>
+
+        <!-- Usuario (selector personalizado con tabla) -->
+        <div class="form-control" *ngIf="!isLoadingUsuario">
+          <label class="label">
+            <span class="label-text">Usuario <span class="text-error">*</span></span>
+          </label>
+          
+          <!-- Selector personalizado -->
+          <div class="dropdown dropdown-open w-full" [class.dropdown-open]="showUsuarioTable">
+            <label 
+              tabindex="0" 
+              class="select select-bordered w-full cursor-pointer"
+              [class.select-error]="formEdit.get('codigo_per')?.invalid && formEdit.get('codigo_per')?.touched"
+              (click)="toggleUsuarioTable()">
+              <span *ngIf="selectedUsuarioNombre">{{ selectedUsuarioNombre }}</span>
+              <span *ngIf="!selectedUsuarioNombre" class="text-base-content/50">Seleccione un usuario</span>
+            </label>
+            
+            <!-- Tabla de usuarios (dropdown) -->
+            <div 
+              tabindex="0" 
+              class="dropdown-content mt-2 z-[1] w-full bg-base-100 rounded-lg shadow-lg border border-base-200 p-4"
+              [class.hidden]="!showUsuarioTable"
+              style="max-height: 75vh; min-width: 1000px; overflow-y: auto;">
+              
+              <!-- Filtros -->
+              <div class="mb-4">
+                <app-search-filter 
+                  *ngIf="!isLoadingUsuarios" 
+                  [users]="usuarios" 
+                  (filterChanged)="onFilterChanged($event)">
+                </app-search-filter>
+              </div>
+
+              <!-- Tabla -->
+              <div class="overflow-x-auto" style="max-height: 60vh; overflow-y: auto;">
+                <table class="table table-sm w-full">
+                  <thead>
+                    <tr class="bg-primary text-primary-content">
+                      <th class="text-sm w-12 text-center">Sel.</th>
+                      <th class="text-sm">Usuario</th>
+                      <th class="text-sm">Cargo</th>
+                      <th class="text-sm">Departamento</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-base-200">
+                    <tr 
+                      *ngFor="let user of displayedUsers; let i = index"
+                      class="hover cursor-pointer"
+                      [class.bg-primary]="selectedUsuarioCodigo === user.CODIGO"
+                      [class.bg-opacity-20]="selectedUsuarioCodigo === user.CODIGO"
+                      (click)="selectUsuarioFromTable(user)">
+                      <td class="text-center">
+                        <input 
+                          type="radio" 
+                          name="usuario-seleccionado" 
+                          class="radio radio-primary radio-sm"
+                          [checked]="selectedUsuarioCodigo === user.CODIGO"
+                          (click)="selectUsuarioFromTable(user)"
+                        />
+                      </td>
+                      <td class="text-sm">{{ user.NOMBRES }} {{ user.APELLIDOS }}</td>
+                      <td class="text-sm">{{ user.CARGO }}</td>
+                      <td class="text-sm">{{ user.DEPARTAMENTO }}</td>
+                    </tr>
+                    <tr *ngIf="!displayedUsers?.length && !isLoadingUsuarios">
+                      <td colspan="4" class="text-center py-4 text-base-content/70">
+                        No se encontraron registros
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Paginación (solo mostrar si hay búsqueda general, no cuando se selecciona un item específico) -->
+              <div *ngIf="!isLoadingUsuarios && filteredUsers.length > 0 && (!currentSearchTerm || !currentSearchTerm.includes(' - '))" class="mt-4">
+                <app-pagination 
+                  [totalItems]="filteredUsers.length"
+                  [itemsPerPage]="itemsPerPage"
+                  [currentPage]="currentPage"
+                  (pageChange)="onPageChange($event)"
+                  (itemsPerPageChange)="onItemsPerPageChange($event)">
+                </app-pagination>
+              </div>
+            </div>
+          </div>
+
+          <label class="label" *ngIf="formEdit.get('codigo_per')?.invalid && formEdit.get('codigo_per')?.touched">
+            <span class="label-text-alt text-error">El usuario es requerido</span>
+          </label>
+        </div>
+
+        <!-- Departamento -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Departamento <span class="text-error">*</span></span>
+          </label>
+          <select
+            formControlName="departamento"
+            class="select select-bordered"
+            [class.select-error]="formEdit.get('departamento')?.invalid && formEdit.get('departamento')?.touched"
+            [disabled]="isLoadingDepartamentos"
+          >
+            <option value="">Seleccione un departamento</option>
+            <option *ngFor="let depto of departamentos" [value]="depto">
+              {{ depto }}
+            </option>
+          </select>
+          <label class="label" *ngIf="formEdit.get('departamento')?.invalid && formEdit.get('departamento')?.touched">
+            <span class="label-text-alt text-error">El departamento es requerido</span>
+          </label>
+        </div>
+
+        <!-- Botones -->
+        <div class="modal-action">
+          <button type="button" class="btn btn-error text-white" (click)="closeModal()" [disabled]="isLoading || isLoadingUsuario">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="isLoading || isLoadingDepartamentos || isLoadingUsuario || isLoadingUsuarios">
+            <span *ngIf="isLoading" class="loading loading-spinner loading-sm"></span>
+            {{ isLoading ? 'Actualizando...' : 'Actualizar' }}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</dialog>
+

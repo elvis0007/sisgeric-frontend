@@ -1,0 +1,86 @@
+<app-modal-form [reloadTable]="reloadTable.bind(this)" />
+
+  <div class="flex flex-wrap justify-between items-center mb-4">
+    <h1 class="text-xl md:text-2xl font-bold">Entes de Control</h1>
+    <button class="btn btn-primary w-full lg:w-auto" (click)="openModalForm(null)">
+      AGREGAR
+    </button>
+  </div>
+
+<div class="w-full space-y-4">
+  <!-- Table wrapper with horizontal scroll -->
+  <div class="overflow-x-auto rounded-lg shadow-sm border border-base-200">
+    <table class="table table-sm md:table-md w-full min-w-[600px]">
+      <!-- Table Header -->
+      <thead>
+        <tr class="bg-primary text-primary-content">
+          <th class="text-sm w-12">N</th>
+          <th class="text-sm">Descripción</th>
+          <th class="text-sm">Fecha ingreso</th>
+          <th class="text-sm w-20 text-center">Acciones</th>
+        </tr>
+      </thead>
+
+      <!-- Table Body -->
+      <tbody class="bg-base-200">
+        <tr class="hover" *ngFor="let organismo of displayedOrganismos; let i = index">
+          <th class="text-sm">{{ (currentPage - 1) * itemsPerPage + i + 1 }}</th>
+          <td class="text-sm">{{ organismo.ainoc_descripcion }}</td>
+          <td class="text-sm">{{ organismo.ainoc_fecha | date:'dd/MM/yyyy' }}</td>
+
+          <td class="text-center">
+            <div class="flex gap-1 items-center justify-center"><button
+                class="btn btn-circle btn-sm bg-red-600 hover:bg-red-700" title="Eliminar"
+                (click)="this.openModalConf(organismo)">
+                <svg class=" w-5 h-5 text-slate-300 transition-colors" xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24">
+                  <path fill="currentColor"
+                    d="M14.28 2a2 2 0 0 1 1.897 1.368L16.72 5H20a1 1 0 1 1 0 2l-.003.071l-.867 12.143A3 3 0 0 1 16.138 22H7.862a3 3 0 0 1-2.992-2.786L4.003 7.07L4 7a1 1 0 0 1 0-2h3.28l.543-1.632A2 2 0 0 1 9.721 2zM9 10a1 1 0 0 0-.993.883L8 11v6a1 1 0 0 0 1.993.117L10 17v-6a1 1 0 0 0-1-1m6 0a1 1 0 0 0-1 1v6a1 1 0 1 0 2 0v-6a1 1 0 0 0-1-1m-.72-6H9.72l-.333 1h5.226z" />
+                </svg>
+              </button>
+
+              <button class="btn btn-circle btn-sm bg-indigo-700 hover:bg-indigo-800" title="Editar"
+                (click)="openModalForm(organismo)">
+                <svg class="w-5 h-5 text-slate-300 transition-colors" xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24">
+                  <g fill="currentColor">
+                    <path
+                      d="M16.607 3.005a2.57 2.57 0 0 1 3.64-.001l.75.751a2.57 2.57 0 0 1 0 3.637l-7.6 7.604a2.57 2.57 0 0 1-1.819.754H9a.75.75 0 0 1-.75-.75v-2.562c0-.682.27-1.336.752-1.818z" />
+                    <path
+                      d="M11.943 2.25H12a.75.75 0 0 1 0 1.5c-2.143 0-3.674.002-4.838.158c-1.142.154-1.817.444-2.314.94c-.496.497-.786 1.172-.94 2.314C3.752 8.326 3.75 9.857 3.75 12s.002 3.674.158 4.838c.154 1.142.444 1.817.94 2.314c.497.496 1.172.786 2.314.94c1.164.156 2.695.158 4.838.158s3.674-.002 4.838-.158c1.142-.154 1.817-.444 2.314-.94c.496-.497.786-1.172.94-2.314c.156-1.164.158-2.696.158-4.838a.75.75 0 0 1 1.5 0v.057c0 2.073 0 3.705-.171 4.98c-.176 1.31-.545 2.354-1.367 3.175c-.821.822-1.866 1.19-3.174 1.367c-1.276.171-2.908.171-4.981.171h-.114c-2.073 0-3.705 0-4.98-.171c-1.31-.176-2.354-.545-3.175-1.367c-.822-.821-1.19-1.866-1.367-3.174c-.171-1.276-.171-2.908-.171-4.981v-.114c0-2.073 0-3.705.171-4.98c.176-1.31.545-2.354 1.367-3.175c.821-.822 1.866-1.19 3.174-1.367c1.276-.171 2.908-.171 4.981-.171" />
+                  </g>
+                </svg>
+              </button>
+            </div>
+
+          </td>
+        </tr>
+
+        <!-- Empty State -->
+        <tr *ngIf="!displayedOrganismos?.length && !isLoading">
+          <td colspan="4" class="text-center py-4">
+            <div class="flex flex-col items-center gap-2">
+              <span class="text-base-content/70">No se encontraron registros</span>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="isLoading">
+          <td colspan="4" class="text-center py-4">
+            <div class="flex flex-col items-center">
+              <span class="loading loading-spinner text-secondary"></span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación reutilizable -->
+  <app-pagination 
+    [totalItems]="organismos.length"
+    [itemsPerPage]="itemsPerPage"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)"
+    (itemsPerPageChange)="onItemsPerPageChange($event)">
+  </app-pagination>
+</div>

@@ -1,0 +1,32 @@
+.recommendation-modal {
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.recommendation-modal-header {
+  position: sticky;
+  top: -1.5rem;
+  z-index: 10;
+  background: var(--fallback-b1, oklch(var(--b1) / 1));
+  padding-top: 0.5rem;
+}
+
+.evidence-list {
+  max-height: 7.25rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+  border-radius: 0.5rem;
+}
+
+.recommendation-modal-actions {
+  position: sticky;
+  bottom: -1.5rem;
+  z-index: 10;
+  background: var(--fallback-b1, oklch(var(--b1) / 1));
+  border-top: 1px solid var(--fallback-b3, oklch(var(--b3) / 1));
+  padding: 1rem 0;
+}

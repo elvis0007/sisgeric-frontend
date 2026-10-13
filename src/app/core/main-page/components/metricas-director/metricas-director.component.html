@@ -1,0 +1,50 @@
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
+
+    <!-- Recomendaciones Pendientes del Departamento -->
+    <div 
+      class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 group flex-1 cursor-pointer hover:-translate-y-1 active:scale-[0.98] select-none"
+      (click)="navigateToPendientesDepartamento()">
+        <div class="card-body p-4 relative flex flex-row items-center gap-4 h-[155px]" [ngClass]="{'skeleton': isLoading}">
+            <ng-container *ngIf="!isLoading">
+                <!-- Columna 1: Icono a la izquierda -->
+                <div class="w-20 h-20 bg-amber-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        <polyline points="12 11 12 15 14 15"></polyline>
+                    </svg>
+                </div>
+                
+                <!-- Columna 2: Contenido (número y etiqueta) centrado horizontalmente -->
+                <div class="flex-1 flex flex-col items-center justify-center text-center min-w-0 pr-4">
+                    <span class="text-5xl font-black text-base-content tracking-tight leading-none mb-1.5">{{metricasDirector?.enProceso || 0}}</span>
+                    <span class="text-xs font-bold text-base-content/60 tracking-wide uppercase leading-tight">Recomendaciones Pendientes<br><span class="text-[10px] text-amber-600 font-extrabold dark:text-amber-400">del Departamento</span></span>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+
+    <!-- Recomendaciones Vencidas del Departamento -->
+    <div 
+      class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 group flex-1 cursor-pointer hover:-translate-y-1 active:scale-[0.98] select-none"
+      (click)="navigateToVencidasDepartamento()">
+        <div class="card-body p-4 relative flex flex-row items-center gap-4 h-[155px]" [ngClass]="{'skeleton': isLoading}">
+            <ng-container *ngIf="!isLoading">
+                <!-- Columna 1: Icono a la izquierda -->
+                <div class="w-20 h-20 bg-rose-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-rose-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                </div>
+                
+                <!-- Columna 2: Contenido (número y etiqueta) centrado horizontalmente -->
+                <div class="flex-1 flex flex-col items-center justify-center text-center min-w-0 pr-4">
+                    <span class="text-5xl font-black text-base-content tracking-tight leading-none mb-1.5">{{metricasDirector?.noCumplidas || 0}}</span>
+                    <span class="text-xs font-bold text-base-content/60 tracking-wide uppercase leading-tight">Recomendaciones Vencidas<br><span class="text-[10px] text-rose-600 font-extrabold dark:text-rose-400">del Departamento</span></span>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,499 @@
+<app-modal-responsables />
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div *ngFor="let recomendacion of recomendaciones"
+    class="card rec-card-container shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden mt-5">
+    <div class="card-body p-5">
+      <!-- Informe -->
+      <div class="collapse collapse-plus rec-card-block rounded-xl transition-colors">
+        <input type="checkbox" />
+        <div class="collapse-title font-semibold rec-card-title flex items-center gap-2">
+          <span>Memorando</span>
+          <span>{{ recomendacion.ainin_memorando}}</span>
+        </div>
+        <div class="flex flex-col gap-2 collapse-content prose max-w-none">
+          <p class="rec-card-body">{{ recomendacion.ainin_titulo }}</p>
+        
+          <div class="flex flex-row gap-2">
+            <span class="rec-card-body font-semibold">Memo. aprobación:</span>
+            <p class="rec-card-body">{{ recomendacion.ainin_memo_aprobacion }}</p>
+          </div>
+          <div class="flex flex-row gap-2">
+            <span class="rec-card-body font-semibold">Auditor:</span>
+            <p class="rec-card-body">{{ recomendacion.ainin_usuario }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conclusión -->
+      <div class="collapse collapse-plus rec-card-block rounded-xl transition-colors">
+        <input type="checkbox" />
+        <div class="collapse-title font-semibold rec-card-title">
+          Conclusión
+        </div>
+        <div class="collapse-content prose max-w-none">
+          <p class="rec-card-body">{{ recomendacion.ainoc_descripcion }}</p>
+        </div>
+      </div>
+
+      <!-- Recomendación -->
+      <div class="collapse collapse-plus rec-card-block rounded-xl transition-colors">
+        <input type="checkbox" />
+        <div class="collapse-title font-semibold rec-card-title flex items-center gap-2">
+          <span>Recomendación</span>
+          <span>{{ recomendacion.recomendaciones.arere_num_rec }}</span>
+        </div>
+        <div class="collapse-content prose max-w-none flex flex-col gap-2.5">
+          <p class="rec-card-body w-full leading-relaxed">{{ recomendacion.recomendaciones.arere_descripcion }}</p>
+
+          <!-- Detalle de Riesgo al darle + (desplegar) -->
+          <div *ngIf="getRiesgoRecomendacion(recomendacion)" 
+               class="flex items-center gap-2 pt-2 border-t border-base-200/80">
+            <span class="text-xs sm:text-sm font-semibold rec-card-title">Riesgo de la recomendación:</span>
+            <span class="badge badge-sm sm:badge-md font-bold tracking-wide shadow-xs"
+                  [ngClass]="getRiesgoBadgeClass(getRiesgoRecomendacion(recomendacion))">
+              {{ getRiesgoRecomendacion(recomendacion) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evidencia Requerida -->
+      <div *ngIf="getEvidenciaTexto(recomendacion)" class="collapse collapse-plus rec-card-block rounded-xl transition-colors">
+        <input type="checkbox" />
+        <div class="collapse-title font-semibold rec-card-title flex items-center gap-2 text-indigo-700 dark:text-indigo-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>Evidencias Requeridas</span>
+        </div>
+        <div class="collapse-content prose max-w-none flex flex-col gap-2">
+          <div *ngIf="getEvidenciasList(recomendacion).length > 0; else singleEvidencia" class="space-y-2 py-1">
+            <div *ngFor="let ev of getEvidenciasList(recomendacion); let i = index" 
+                 class="flex items-start gap-3 p-2.5 rounded-xl bg-base-200/50 dark:bg-base-800/40 border border-base-300/60 dark:border-base-700/60 text-xs md:text-sm rec-card-body transition-colors">
+              <span class="inline-flex items-center justify-center w-6 h-6 min-w-[1.5rem] rounded-full bg-[#475D9D] text-white text-xs font-bold shrink-0 mt-0.5 shadow-xs ring-2 ring-[#475D9D]/20">
+                {{ i + 1 }}
+              </span>
+              <span class="leading-relaxed font-medium flex-1 pt-0.5 text-slate-800 dark:text-slate-100">{{ ev }}</span>
+            </div>
+          </div>
+          <ng-template #singleEvidencia>
+            <div class="p-2.5 rounded-xl bg-base-200/50 dark:bg-base-800/40 border border-base-300/60 dark:border-base-700/60 text-xs md:text-sm rec-card-body">
+              <p class="w-full leading-relaxed font-medium text-slate-800 dark:text-slate-100">{{ getEvidenciaTexto(recomendacion) }}</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Meta información: 1. ESTADO GENERAL Y PROGRESO GLOBAL -->
+      <div class="mt-5 space-y-3">
+        
+        <!-- Bloque 1: Estado General de la Recomendación -->
+        <div class="rec-card-block rounded-xl border-l-4 border-l-primary p-4 space-y-3">
+          
+          <!-- Fila 1: Estado General y Botón Ver Responsables -->
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+              <span class="font-semibold rec-card-title text-sm md:text-base flex-shrink-0">Estado General:</span>
+              <span class="badge badge-sm md:badge-lg px-2 py-2 md:px-3 md:py-3 text-xs md:text-sm break-words w-fit inline-flex items-center justify-center min-h-[2rem] md:min-h-[2.5rem]"
+                [ngClass]="(recomendacion.recomendaciones.estado_general?.arees_descripcion || recomendacion.recomendaciones.estado_seguimiento.arees_descripcion) | statusColor">
+                <span class="text-center leading-tight font-medium">
+                  {{ recomendacion.recomendaciones.estado_general?.arees_descripcion || recomendacion.recomendaciones.estado_seguimiento.arees_descripcion }}
+                </span>
+              </span>
+            </div>
+            <!-- Botón Ver Responsables -->
+            <button class="btn btn-circle btn-sm bg-cyan-600 hover:bg-cyan-700 self-end md:self-auto shadow-sm" title="Ver Responsables Asignados"
+              (click)="openModalResponsable(recomendacion)">
+              <svg class="w-4 h-4 transition-colors text-slate-100" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.774 18c.75 0 1.345-.471 1.88-1.13c1.096-1.35-.703-2.43-1.389-2.957c-.697-.537-1.476-.842-2.265-.913m-1-2a2.5 2.5 0 0 0 0-5M3.226 18c-.75 0-1.345-.471-1.88-1.13c-1.096-1.35.703-2.43 1.389-2.957C3.432 13.376 4.21 13.07 5 13m.5-2a2.5 2.5 0 0 1 0-5m2.584 9.111c-1.022.632-3.701 1.922-2.07 3.536C6.813 19.436 7.7 20 8.817 20h6.368c1.117 0 2.004-.564 2.801-1.353c1.632-1.614-1.047-2.904-2.069-3.536a7.46 7.46 0 0 0-7.832 0M15.5 7.5a3.5 3.5 0 1 1-7 0a3.5 3.5 0 0 1 7 0" color="currentColor"/></svg>
+            </button>
+          </div>
+
+          <!-- Fila 2: Progreso de la Recomendación -->
+          <div class="flex flex-col gap-1.5 pt-1">
+            <div class="flex items-center justify-between text-xs sm:text-sm font-semibold">
+              <span class="rec-card-title flex items-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                Progreso de la recomendación:
+              </span>
+              <span class="text-primary font-bold">
+                {{ getProgresoGlobal(recomendacion) }}%
+              </span>
+            </div>
+            <div class="w-full bg-base-300 rounded-full h-2.5 overflow-hidden">
+              <div class="h-2.5 rounded-full transition-all duration-500"
+                [ngClass]="{
+                  'bg-emerald-500': getProgresoGlobal(recomendacion) === 100,
+                  'bg-primary': getProgresoGlobal(recomendacion) > 0 && getProgresoGlobal(recomendacion) < 100,
+                  'bg-slate-400': getProgresoGlobal(recomendacion) === 0
+                }"
+                [style.width.%]="getProgresoGlobal(recomendacion)">
+              </div>
+            </div>
+          </div>
+
+          <!-- Fila 3: Fecha máxima general institucional -->
+          <div class="flex items-center gap-2 text-xs sm:text-sm pt-1">
+            <span class="font-semibold rec-card-title">Fecha máxima general:</span>
+            <span class="rec-card-body">{{ getFechaMaximaGeneral(recomendacion) | date:'dd/MM/yyyy' }}</span>
+          </div>
+
+        </div>
+
+        <!-- Bloque 2: Mi Estado (Seguimiento Individual) -->
+        <div class="rec-card-block rounded-xl border-l-4 border-l-secondary p-4 space-y-3">
+          
+          <!-- Fila 1: Mi Estado y Botón de Ampliación de Plazo -->
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+              <span class="font-semibold rec-card-title text-sm md:text-base flex-shrink-0">Mi Estado:</span>
+              <span class="badge badge-sm md:badge-lg px-2 py-2 md:px-3 md:py-3 text-xs md:text-sm break-words w-fit inline-flex items-center justify-center min-h-[2rem] md:min-h-[2.5rem]"
+                [ngClass]="(recomendacion.recomendaciones.estado_individual?.arees_descripcion || recomendacion.recomendaciones.estado_seguimiento.arees_descripcion) | statusColor">
+              <span class="text-center leading-tight font-medium">
+                {{ recomendacion.recomendaciones.estado_individual?.arees_descripcion || recomendacion.recomendaciones.estado_seguimiento.arees_descripcion }}
+              </span>
+            </span>
+          </div>
+
+          <!-- Botón Actualizar Fecha / Ampliación de Plazo Individual -->
+          <div class="flex items-center gap-2 self-end sm:self-auto">
+            <button *ngIf="(recomendacion.recomendaciones.estado_individual?.arees_codigo || recomendacion.recomendaciones.estado_seguimiento.arees_codigo) !== 2"
+                    class="btn btn-circle btn-sm transition-all duration-200 shadow-sm" 
+                    [ngClass]="getButtonClass(recomendacion)"
+                    [title]="getButtonTitle(recomendacion)"
+                    (click)="openModalSolicitudes($event, recomendacion)">
+              <svg class="w-4 h-4 text-slate-100" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <g fill="currentColor" fill-rule="evenodd" stroke-width="1.5" clip-rule="evenodd">
+                  <path d="M3 9.25a.75.75 0 0 0-.75.75v9A2.75 2.75 0 0 0 5 21.75h6.5v-3.5a6.75 6.75 0 0 1 6.75-6.75c1.281 0 2.48.473 3.5 1.093V10a.75.75 0 0 0-.75-.75z"/>
+                  <path d="M7 1.25a.75.75 0 0 1 .75.75v4a.75.75 0 0 1-1.5 0V4.75H5c-.69 0-1.25.56-1.25 1.25v4a.75.75 0 0 1-1.5 0V6A2.75 2.75 0 0 1 5 3.25h1.25V2A.75.75 0 0 1 7 1.25m8 0a.75.75 0 0 1 .75.75v4a.75.75 0 0 1-1.5 0V4.75H10.5a.75.75 0 0 1 0-1.5h3.75V2A.75.75 0 0 1 .75-.75M17.75 4a.75.75 0 0 1 .75-.75h.5A2.75 2.75 0 0 1 21.75 6v4a.75.75 0 0 1-1.5 0V6c0-.69-.56-1.25-1.25-1.25h-.5a.75.75 0 0 1-.75-.75m.24 10.75c-1.378 0-2.617.989-3.076 2.472a.75.75 0 1 1-1.433-.444c.622-2.008 2.371-3.528 4.51-3.528c1.998 0 3.66 1.33 4.374 3.142a.75.75 0 0 1-1.396.55c-.524-1.329-1.688-2.192-2.978-2.192"/>
+                  <path d="M22 13.8a.75.75 0 0 1 .75.75v1.622a1.35 1.35 0 0 1-1.35 1.35h-1.405a.75.75 0 0 1 0-1.5h1.255V14.55a.75.75 0 0 1 .75-.75m-3.99 7.45c1.379 0 2.618-.989 3.077-2.472a.75.75 0 1 1-1.433.444c-.622 2.008-2.371 3.528-4.51 3.528c-1.998 0-3.66 1.33-4.374-3.142a.75.75 0 1 1 1.396-.55c.524 1.329 1.688 2.192 2.978 2.192"/>
+                  <path d="M14 22.2a.75.75 0 0 1-.75-.75v-1.622c0-.746.604-1.35 1.35-1.35h1.405a.75.75 0 0 1 0 1.5H14.75v1.472a.75.75 0 0 1-.75.75"/>
+                </g>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Fila 2: Mi Fecha Máxima y Plazo -->
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+            <span class="font-semibold rec-card-title">Mi Fecha máxima:</span>
+            <span class="rec-card-body text-xs sm:text-sm">{{ getFechaMaximaIndividual(recomendacion) | date:'dd/MM/yyyy' }}</span>
+          </div>
+          
+          <!-- Plazo Individual (oculto si ya está cumplida) -->
+          <div *ngIf="(recomendacion.recomendaciones.estado_individual?.arees_codigo || recomendacion.recomendaciones.estado_seguimiento.arees_codigo) !== 2" 
+               class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+            <span class="font-semibold rec-card-title">Plazo:</span>
+            <span class="font-bold text-xs sm:text-sm"
+                  [ngClass]="{ 'text-red-600 dark:text-red-400': getPlazoIndividual(recomendacion) < 0 }"
+                  [style.color]="getPlazoIndividual(recomendacion) >= 0 ? '#16A34A' : null">
+              {{ getPlazoIndividual(recomendacion) | abs }} {{ getEstadoPlazo(getPlazoIndividual(recomendacion)) }}
+            </span>
+          </div>
+        </div>
+
+        </div>
+
+        <!-- Bloque 3: Plan de Acción (Card independiente) - Las CUMPLIDAS ya no tienen Plan de Acción -->
+        <div *ngIf="!esCumplida(recomendacion)"
+             class="rec-card-block rounded-xl border-l-4 p-4 space-y-3"
+             [ngClass]="esPlanBloqueadoPorVencimiento(recomendacion) ? 'border-l-rose-500 bg-rose-50/20 dark:bg-rose-950/10' : 'border-l-primary'">
+          <!-- Encabezado y Estado de Planificación -->
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 flex-shrink-0"
+                   [ngClass]="esPlanBloqueadoPorVencimiento(recomendacion) ? 'text-rose-600' : 'text-primary'"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              <span class="font-semibold rec-card-title text-sm md:text-base">Plan de Acción</span>
+              <span *ngIf="esPlanBloqueadoPorVencimiento(recomendacion)" class="badge badge-xs sm:badge-sm badge-error text-white font-bold ml-1">
+                🔒 Bloqueado por Vencimiento
+              </span>
+            </div>
+            <span class="badge badge-sm md:badge-md px-3 py-2 text-xs break-words w-fit inline-flex items-center justify-center font-semibold"
+                  [ngClass]="esPlanBloqueadoPorVencimiento(recomendacion) ? 'bg-rose-600 text-white' : (getResumenPlan(recomendacion).total > 0 ? 'bg-primary text-white' : 'bg-amber-500 text-white')">
+              {{ getResumenPlan(recomendacion).total > 0 ? (getResumenPlan(recomendacion).total + ' Actividades Planificadas') : 'Pendiente de Registro' }}
+            </span>
+          </div>
+
+          <!-- Indicadores del Cronograma -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs sm:text-sm pt-1 bg-base-200/40 rounded-lg p-2.5">
+            <div class="flex items-center gap-1.5">
+              <span class="font-medium text-base-content/70">Actividades programadas:</span>
+              <span class="font-bold text-primary">{{ getResumenPlan(recomendacion).total }}</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="font-medium text-base-content/70">Fecha Máxima:</span>
+              <span class="font-bold" [ngClass]="esPlanBloqueadoPorVencimiento(recomendacion) ? 'text-rose-600 font-extrabold' : 'text-secondary'">
+                {{ (getFechaMaximaIndividual(recomendacion) | date:'dd/MM/yyyy') || 'Sin fecha' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Botones de Acción del Plan de Acción -->
+          <div class="flex items-center gap-2 pt-1">
+            <!-- Botón Plan de Acción con contraste alto y visibilidad garantizada -->
+            <button class="btn btn-sm md:btn-md flex-1 gap-2 shadow hover:shadow-md transition-all font-bold text-white border-none !bg-[#20315F] hover:!bg-[#172548]"
+                    (click)="openMatrizPlan(recomendacion)"
+                    [title]="esPlanSoloConsulta(recomendacion) ? 'Plan en modo consulta (solo lectura).' : (getResumenPlan(recomendacion).total > 0 ? 'Ver y estructurar Plan de Acción' : 'Registrar nuevo Plan de Acción')">
+              <!-- Candado para plan bloqueado por vencimiento -->
+              <svg *ngIf="esPlanBloqueadoPorVencimiento(recomendacion)" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <!-- Icono más (+) para cuando está pendiente de registrar -->
+              <svg *ngIf="!esPlanSoloConsulta(recomendacion) && getResumenPlan(recomendacion).total === 0" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              <!-- Calendario/lista para plan activo en edición -->
+              <svg *ngIf="!esPlanSoloConsulta(recomendacion) && getResumenPlan(recomendacion).total > 0" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span class="text-xs sm:text-sm tracking-wide">
+                {{ esPlanSoloConsulta(recomendacion) ? 'PLAN DE ACCIÓN (MODO CONSULTA)' : (getResumenPlan(recomendacion).total > 0 ? 'PLAN DE ACCIÓN' : 'REGISTRAR PLAN DE ACCIÓN') }}
+              </span>
+            </button>
+
+            <button class="btn btn-outline btn-success btn-sm md:btn-md gap-1.5 shadow-sm hover:shadow hover:text-white transition-all"
+                    [disabled]="getResumenPlan(recomendacion).total === 0"
+                    (click)="exportarExcelPlan(recomendacion, $event)"
+                    title="Descargar Cronograma y Plan de Acción en Excel (.xlsx)">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm1.8 14.5l-1.4-2.3l-1.4 2.3h-1.6l2.2-3.3l-2.1-3.2h1.6l1.3 2.2l1.3-2.2h1.6l-2.1 3.2l2.2 3.3h-1.7zM13 9V3.5L18.5 9H13z"/>
+              </svg>
+              <span class="text-xs font-bold">Excel</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="divider my-3"></div>
+
+      <!-- Sección de Verificables: Se desbloquea en la Fecha Máxima o si ya fue creado -->
+      <div *ngIf="puedeCargarVerificable(recomendacion); else verificableEnEspera" class="space-y-3">
+        <!-- Estado Mi Verificable -->
+        <div class="rec-card-block rounded-xl border-l-4 border-l-secondary p-4 relative space-y-3">
+          <!-- Icono en esquina superior derecha -->
+          <div class="absolute top-2 right-2 md:top-3 md:right-3">
+            <div class="flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-full" 
+                 [ngClass]="isLoadingVerificable(recomendacion) ? 
+                           {'bg-gray-400/80 text-slate-100': true} :
+                           (getUltimoVerificableFor(recomendacion) ? 
+                           (getUltimoVerificableFor(recomendacion)!.estado_seguimiento.areev_descripcion | statusColor) : 
+                           {'bg-purple-900/80 text-slate-100/80': true})">
+              <!-- Spinner de carga -->
+              <span *ngIf="isLoadingVerificable(recomendacion)" class="loading loading-spinner loading-xs md:loading-sm"></span>
+              <!-- Icono normal -->
+              <svg *ngIf="!isLoadingVerificable(recomendacion)" class="w-3 h-3 md:w-5 md:h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path [attr.d]="getStatusIcon(getUltimoVerificableFor(recomendacion)?.estado_seguimiento?.areev_descripcion || 'VERIFICABLE NO CREADO')"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Título y Estado -->
+          <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 pr-8 md:pr-12 overflow-visible">
+            <span class="font-semibold rec-card-title text-base md:text-lg flex-shrink-0">Estado Mi Verificable:</span>
+            <div class="tooltip tooltip-top tooltip-custom w-fit" 
+                 [attr.data-tip]="getUltimoVerificableFor(recomendacion)?.estado_seguimiento?.areev_descripcion === 'PENDIENTE' ? 'Pendiente de revisión en auditoría' : ''">
+              <span class="badge badge-sm md:badge-lg px-2 py-2 md:px-3 md:py-3 text-xs md:text-sm break-words inline-flex items-center justify-center min-h-[2rem] md:min-h-[2.5rem]" 
+                    [ngClass]="isLoadingVerificable(recomendacion) ? 
+                             {'bg-gray-400/80 text-slate-100': true} :
+                             (getUltimoVerificableFor(recomendacion) ? 
+                             (getUltimoVerificableFor(recomendacion)!.estado_seguimiento.areev_descripcion | statusColor) : 
+                             {'bg-purple-900/80 text-slate-100/80': true})">
+                <span *ngIf="isLoadingVerificable(recomendacion)" class="flex items-center gap-1 md:gap-2">
+                  <span class="loading loading-dots loading-xs"></span>
+                  Cargando...
+                </span>
+                <span *ngIf="!isLoadingVerificable(recomendacion)" class="text-center leading-tight text-white font-semibold">
+                  {{ getUltimoVerificableFor(recomendacion)?.estado_seguimiento?.areev_descripcion || 'VERIFICABLE NO CREADO' }}
+                </span>
+              </span>
+            </div>
+          </div>
+          
+          <!-- Contenido del verificable -->
+          <div *ngIf="getUltimoVerificableFor(recomendacion); else noVerificables">
+            <!-- Fechas en una sola fila -->
+            <div class="flex flex-wrap gap-6 text-xs sm:text-sm">
+              <div class="flex items-center gap-2">
+                <span class="font-medium rec-card-title">Fecha de carga:</span>
+                <span class="rec-card-body">{{ getUltimoVerificableFor(recomendacion)!.areve_fecha_carga | date:'dd/MM/yyyy - HH:mm' }}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-medium rec-card-title">Fecha de validación:</span>
+                <span class="rec-card-body">{{ getUltimoVerificableFor(recomendacion)!.areve_fecha_validacion ? (getUltimoVerificableFor(recomendacion)!.areve_fecha_validacion | date:'dd/MM/yyyy - HH:mm') : 'Pendiente' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mensaje cuando no hay verificables -->
+          <ng-template #noVerificables>
+            <div class="flex items-center gap-2 text-slate-800 dark:text-slate-300">
+              <span class="text-xs sm:text-sm font-medium rec-card-body">No hay verificables cargados aún</span>
+            </div>
+          </ng-template>
+
+          <p *ngIf="!esCumplida(recomendacion)" class="text-[11px] text-base-content/60 italic pt-1 border-t border-base-200/60">
+            Auditoría contrastará el verificable subido contra el Plan de Acción planificado para certificar su cumplimiento.
+          </p>
+          <p *ngIf="esCumplida(recomendacion)" class="text-[11px] text-emerald-700 dark:text-emerald-300 font-medium italic pt-1 border-t border-base-200/60 flex items-center gap-1">
+            <span>✓</span> Recomendación validada y certificada como Cumplida por Auditoría en base al Plan de Acción y verificables remitidos.
+          </p>
+        </div>
+
+        <!-- Botón de acción para Verificables con color #20315F -->
+        <button class="btn w-full text-white hover:brightness-110 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 font-bold border-none"
+          style="background-color: #20315F;"
+          (click)="openModalVerif(recomendacion)">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+          {{ esCumplida(recomendacion) ? 'VER VERIFICABLES / HISTÓRICO' : 'SUBIR EL VERIFICABLE FINAL' }}
+        </button>
+      </div>
+
+      <!-- Bloque informativo mientras no sea la fecha máxima o requiera reestructuración -->
+      <ng-template #verificableEnEspera>
+        <div *ngIf="getValidacionPlan(recomendacion) as val" 
+             class="rounded-xl border p-4 flex flex-col gap-3 transition-all"
+             [ngClass]="{
+               'border-rose-400 bg-rose-50/70 dark:bg-rose-950/30 text-rose-950 dark:text-rose-100': val.motivo === 'VENCIDA',
+               'border-amber-300/80 bg-amber-50/50 dark:bg-amber-950/20 text-amber-950 dark:text-amber-100': val.motivo === 'REQUIERE_REESTRUCTURAR_PRORROGA' || val.motivo === 'SIN_PLAN',
+               'border-rose-300/80 bg-rose-50/50 dark:bg-rose-950/20 text-rose-950 dark:text-rose-100': val.motivo === 'ACTIVIDAD_EXCEDE_MAXIMA',
+               'border-base-300 bg-base-200/50 text-base-content': val.motivo === 'CRONOGRAMA_FUTURO' || !val.motivo
+             }">
+          <div class="flex items-start gap-3">
+            <!-- Icono dinámico según motivo -->
+            <div class="p-2 rounded-lg shrink-0 mt-0.5"
+                 [ngClass]="{
+                   'bg-rose-600/15 text-rose-600 dark:text-rose-400': val.motivo === 'VENCIDA',
+                   'bg-amber-500/15 text-amber-600 dark:text-amber-400': val.motivo === 'REQUIERE_REESTRUCTURAR_PRORROGA' || val.motivo === 'SIN_PLAN',
+                   'bg-rose-500/15 text-rose-600 dark:text-rose-400': val.motivo === 'ACTIVIDAD_EXCEDE_MAXIMA',
+                   'bg-primary/10 text-primary': val.motivo === 'CRONOGRAMA_FUTURO' || !val.motivo
+                 }">
+              <!-- Icono Vencida -->
+              <svg *ngIf="val.motivo === 'VENCIDA'" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <!-- Icono Sin Plan -->
+              <svg *ngIf="val.motivo === 'SIN_PLAN'" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <!-- Icono Prórroga aprobada -->
+              <svg *ngIf="val.motivo === 'REQUIERE_REESTRUCTURAR_PRORROGA'" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <!-- Icono Excede fecha máxima -->
+              <svg *ngIf="val.motivo === 'ACTIVIDAD_EXCEDE_MAXIMA'" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <!-- Icono Cronograma futuro -->
+              <svg *ngIf="val.motivo === 'CRONOGRAMA_FUTURO' || !val.motivo" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+
+            <!-- Contenido textual descriptivo -->
+            <div class="flex-1">
+              <!-- Títulos específicos -->
+              <h4 *ngIf="val.motivo === 'VENCIDA'" class="text-sm font-bold text-rose-700 dark:text-rose-300">
+                Recomendación Vencida — Solicitud de Ampliación de Plazo
+              </h4>
+              <h4 *ngIf="val.motivo === 'SIN_PLAN'" class="text-sm font-bold">
+                Plan de Acción Requerido
+              </h4>
+              <h4 *ngIf="val.motivo === 'REQUIERE_REESTRUCTURAR_PRORROGA'" class="text-sm font-bold text-amber-900 dark:text-amber-200">
+                Reestructuración Requerida por Ampliación de Plazo
+              </h4>
+              <h4 *ngIf="val.motivo === 'ACTIVIDAD_EXCEDE_MAXIMA'" class="text-sm font-bold text-rose-700 dark:text-rose-300">
+                Actividad Excede la Fecha Máxima Individual
+              </h4>
+              <h4 *ngIf="val.motivo === 'CRONOGRAMA_FUTURO' || !val.motivo" class="text-sm font-bold text-base-content">
+                Cronograma de Actividades en Ejecución
+              </h4>
+
+              <!-- Mensajes específicos -->
+              <p *ngIf="val.motivo === 'VENCIDA'" class="text-xs text-base-content/85 mt-1 leading-relaxed">
+                El plazo individual de esta recomendación venció el <strong>{{ val.fechaMaximaIndividual | date:'dd/MM/yyyy' }}</strong>. La subida de verificables y la modificación del plan de acción se encuentran <strong>bloqueadas</strong>. Debe realizar la <strong>Solicitud de Ampliación de Plazo</strong> para que Auditoría evalúe y asigne una nueva fecha máxima.
+              </p>
+
+              <p *ngIf="val.motivo === 'SIN_PLAN'" class="text-xs text-base-content/75 mt-1 leading-relaxed">
+                Debe estructurar y registrar su cronograma en el Plan de Acción previo a la entrega del verificable final.
+              </p>
+
+              <p *ngIf="val.motivo === 'REQUIERE_REESTRUCTURAR_PRORROGA'" class="text-xs text-base-content/80 mt-1 leading-relaxed">
+                Se aprobó una ampliación de plazo con nueva fecha máxima: <strong>{{ val.fechaMaximaIndividual | date:'dd/MM/yyyy' }}</strong>. Para poder subir el verificable final, el sistema requiere que <strong>reestructure sus actividades</strong> extendiéndolas hasta la nueva fecha máxima.
+              </p>
+
+              <p *ngIf="val.motivo === 'ACTIVIDAD_EXCEDE_MAXIMA'" class="text-xs text-base-content/80 mt-1 leading-relaxed">
+                La fecha de la actividad final (<strong>{{ val.fechaUltimaActividad | date:'dd/MM/yyyy' }}</strong>) supera la fecha máxima permitida (<strong>{{ val.fechaMaximaIndividual | date:'dd/MM/yyyy' }}</strong>). Ninguna actividad puede sobrepasar el plazo institucional. Debe reestructurar su plan de acción.
+              </p>
+
+              <p *ngIf="val.motivo === 'CRONOGRAMA_FUTURO' || !val.motivo" class="text-xs text-base-content/75 mt-1 leading-relaxed">
+                La fase final está planificada para el <strong>{{ val.fechaUltimaActividad | date:'dd/MM/yyyy' }}</strong>. La subida del verificable se habilitará automáticamente al cumplirse esa fecha. Si culminó sus actividades antes de tiempo y desea realizar la entrega hoy, debe <strong>reestructurar su Plan de Acción</strong> fijando la fecha de culminación a hoy.
+              </p>
+            </div>
+          </div>
+
+          <!-- Botón de acción directo para estructurar / reestructurar / solicitar prórroga -->
+          <div class="flex flex-wrap items-center justify-end gap-2 pt-1 border-t border-base-300/60">
+            <!-- Botón para Vencida (Acceso directo a Solicitud de Prórroga con efecto parpadeante) -->
+            <button *ngIf="val.motivo === 'VENCIDA'"
+                    class="btn btn-xs sm:btn-sm !bg-red-600 hover:!bg-red-700 !text-white !border-none gap-1.5 font-bold shadow-md hover:shadow-lg btn-prorroga-parpadeante"
+                    (click)="openModalSolicitudes($event, recomendacion)">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span>{{ tieneSolicitudPendiente(recomendacion) ? 'Ver Solicitud en Trámite' : 'Solicitar Ampliación de Plazo' }}</span>
+            </button>
+
+            <!-- Botón para Sin Plan (Coincidente con diseño de imagen 2) -->
+            <button *ngIf="val.motivo === 'SIN_PLAN'"
+                    class="btn btn-xs sm:btn-sm !bg-[#20315F] hover:!bg-[#172548] !text-white !border-none gap-1.5 font-bold shadow-sm"
+                    (click)="openMatrizPlan(recomendacion)">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Registrar Plan de Acción
+            </button>
+
+            <!-- Botón para Prórroga -->
+            <button *ngIf="val.motivo === 'REQUIERE_REESTRUCTURAR_PRORROGA'"
+                    class="btn btn-xs sm:btn-sm btn-warning text-slate-900 gap-1.5 font-bold shadow-sm"
+                    (click)="openMatrizPlan(recomendacion)">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Reestructurar Plan de Acción
+            </button>
+
+            <!-- Botón para Excede Fecha Máxima -->
+            <button *ngIf="val.motivo === 'ACTIVIDAD_EXCEDE_MAXIMA'"
+                    class="btn btn-xs sm:btn-sm btn-error text-white gap-1.5 font-bold shadow-sm"
+                    (click)="openMatrizPlan(recomendacion)">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              Reestructurar Plan de Acción
+            </button>
+
+            <!-- Botón para Cronograma Futuro (Entrega anticipada) -->
+            <button *ngIf="val.motivo === 'CRONOGRAMA_FUTURO' || !val.motivo"
+                    class="btn btn-xs sm:btn-sm btn-outline btn-primary gap-1.5 font-bold hover:shadow-sm"
+                    (click)="openMatrizPlan(recomendacion)">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Reestructurar Plan (Entrega Anticipada)
+            </button>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

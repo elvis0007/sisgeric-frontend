@@ -1,0 +1,129 @@
+/* Estilos personalizados para el tooltip */
+.tooltip-custom:before {
+  background-color: #1f2937 !important; /* bg-gray-800 */
+  color: #f9fafb !important; /* text-gray-50 */
+  border-radius: 0.5rem !important; /* rounded-lg */
+  padding: 0.5rem 0.75rem !important; /* px-3 py-2 */
+  font-size: 0.875rem !important; /* text-sm */
+  font-weight: 500 !important; /* font-medium */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important; /* shadow-lg */
+  white-space: nowrap !important; /* Evita que se corte el texto */
+  max-width: none !important; /* Permite que el tooltip sea más ancho */
+  z-index: 9999 !important; /* Asegura que esté por encima de otros elementos */
+}
+
+.tooltip-custom:after {
+  border-top-color: #1f2937 !important; /* Flecha del tooltip */
+  z-index: 9999 !important;
+}
+
+/* Ajustes específicos para móviles */
+@media (max-width: 640px) {
+  .tooltip-custom:before {
+    font-size: 0.75rem !important; /* text-xs en móvil */
+    padding: 0.375rem 0.5rem !important; /* Padding más pequeño */
+    transform: translateX(-50%) translateY(-100%) translateY(-0.5rem) !important;
+    left: 50% !important;
+    right: auto !important;
+    white-space: normal !important; /* Permite el wrap en móvil */
+    max-width: 200px !important; /* Ancho máximo en móvil */
+    text-align: center !important;
+  }
+}
+
+/* Ajustes específicos para tablets (iPad mini: 768px, iPad Air: 820px, Zenbook Fold: 853px) */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .tooltip-custom:before {
+    font-size: 0.8125rem !important; /* Entre text-xs y text-sm */
+    padding: 0.4375rem 0.625rem !important; /* Padding intermedio */
+    max-width: 280px !important; /* Ancho máximo para tablets */
+    white-space: normal !important; /* Permite el wrap */
+    text-align: center !important;
+    transform: translateX(-50%) translateY(-100%) translateY(-0.5rem) !important;
+    left: 50% !important;
+    right: auto !important;
+  }
+}
+
+/* Colores de texto unificados para modo claro */
+.rec-card-title {
+  color: #111827 !important; /* Casi negro en modo claro */
+}
+
+.rec-card-body {
+  color: #374151 !important; /* Gris oscuro en modo claro */
+}
+
+/* Forzar texto blanco en badges de estado para mejorar la legibilidad */
+.badge,
+.badge span {
+  color: #ffffff !important;
+}
+
+/* ==========================================
+   Estilos de Fondo unificados para la tarjeta
+   ========================================== */
+
+/* Fondo de la Tarjeta Principal en modo claro */
+.rec-card-container {
+  background-color: #F7F7F7 !important;
+}
+
+/* Fondo de los 5 bloques internos en modo claro */
+.rec-card-block {
+  background-color: #e8e8e8 !important;
+}
+
+/* Hover para los acordeones en modo claro */
+.collapse.rec-card-block:hover {
+  background-color: #dfdfdf !important; /* Un poco más oscuro en hover */
+}
+
+/* ==========================================
+   Modo Oscuro forzado mediante :host-context
+   ========================================== */
+
+/* Fondo de la Tarjeta Principal en modo oscuro: transparente para mezclarse con el fondo */
+:host-context([data-theme="dark"]) .rec-card-container {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Fondo de los 5 bloques internos en modo oscuro */
+:host-context([data-theme="dark"]) .rec-card-block {
+  background-color: #2a2f3d !important;
+}
+
+/* Hover para los acordeones en modo oscuro */
+:host-context([data-theme="dark"]) .collapse.rec-card-block:hover {
+  background-color: #333849 !important;
+}
+
+/* Textos en modo oscuro */
+:host-context([data-theme="dark"]) .rec-card-title {
+  color: #ffffff !important; /* Blanco en modo oscuro */
+}
+
+:host-context([data-theme="dark"]) .rec-card-body {
+  color: #e5e7eb !important; /* Gris claro en modo oscuro */
+}
+
+/* ====================================================
+   Animación parpadeante y brillante para botón prórroga
+   ==================================================== */
+@keyframes boton-prorroga-parpadeo {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.75), 0 4px 12px rgba(220, 38, 38, 0.4);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0.4), 0 6px 20px rgba(220, 38, 38, 0.75);
+    filter: brightness(1.25);
+  }
+}
+
+.btn-prorroga-parpadeante {
+  animation: boton-prorroga-parpadeo 1.4s infinite ease-in-out !important;
+}

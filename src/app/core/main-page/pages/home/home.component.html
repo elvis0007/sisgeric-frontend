@@ -1,0 +1,36 @@
+<app-profile-user></app-profile-user>
+
+<!-- Contenedor principal para el layout -->
+<div *ngIf="!rutaHijaActiva" class="flex flex-col gap-10">
+  <!-- Métricas del departamento (solo ROL_DIRECTOR) -->
+  <div *ngIf="hasRole([ROL_DIRECTOR])">
+    <app-metricas-director />
+  </div>
+
+  <!-- Métricas superiores (solo ROL_RESPONSABLE) -->
+  <div *ngIf="hasRole([ROL_RESPONSABLE])">
+    <app-metricas-responsable />
+  </div>
+
+  <!-- Gráfico Donut (roles de auditoría y director) -->
+  <div *ngIf="hasRole([ROL_AUDITOR_JEFE, ROL_AUDITOR_OPERATIVO, ROL_DIRECTOR])">
+    <app-chart-donut #chartDonutRef />
+  </div>
+
+  <!-- Fila inferior: Gráficos de barras y tablas -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+    <app-chart-bar-dpto *ngIf="hasRole([ROL_AUDITOR_JEFE, ROL_AUDITOR_OPERATIVO])" />
+    <app-list-detalle-recomend *ngIf="hasRole([ROL_DIRECTOR, ROL_RESPONSABLE])" />
+    <app-chart-bar-anio *ngIf="hasRole([ROL_AUDITOR_JEFE, ROL_AUDITOR_OPERATIVO, ROL_DIRECTOR, ROL_RESPONSABLE])" />
+  </div>
+
+  <div class="w-full" *ngIf="hasRole([ROL_AUDITOR_JEFE])">
+    <app-list-detalle-aijefe />
+  </div>
+</div>
+
+<!-- Router outlet si necesitas mostrar rutas hijas -->
+<router-outlet
+  (activate)="this.enActivacionRutaHija()"
+  (deactivate)="this.enDesactivacionRutaHija()"
+></router-outlet>

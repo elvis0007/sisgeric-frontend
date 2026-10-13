@@ -1,0 +1,274 @@
+<!-- Sección de filtros -->
+<div class="flex flex-col w-full gap-4">
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h3 class="card-title text-lg font-semibold mb-4">Filtros de búsqueda</h3>
+
+      <form [formGroup]="filterForm">
+        <div class="flex flex-col sm:flex-row sm:flex-wrap gap-4 w-full">
+          <!-- Date Range Group -->
+          <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <!-- Start Date -->
+            <div class="indicator w-full sm:w-auto">
+              <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">Fecha Desde</span>
+              <div class="relative w-full">
+                <input
+                  type="date"
+                  [formControl]="startDateControl"
+                  [max]="endDateControl.value"
+                  class="input input-bordered input-primary w-full pr-10 custom-calendar-picker" />
+                <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="h-5 w-5 text-secondary">
+                    <path
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M18 2v2M6 2v2m5.996 9h.008m-.008 4h.008m3.987-4H16m-8 0h.009M8 17h.009M3.5 8h17m-18 4.243c0-4.357 0-6.536 1.252-7.89C5.004 3 7.02 3 11.05 3h1.9c4.03 0 6.046 0 7.298 1.354C21.5 5.707 21.5 7.886 21.5 12.244v.513c0 4.357 0 6.536-1.252 7.89C18.996 22 16.98 22 12.95 22h-1.9c-4.03 0-6.046 0-7.298-1.354C2.5 19.293 2.5 17.114 2.5 12.756zM3 8h18" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <!-- End Date -->
+            <div class="indicator w-full sm:w-auto">
+              <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">Fecha Hasta</span>
+              <div class="relative w-full">
+                <input
+                  type="date"
+                  [formControl]="endDateControl"
+                  [min]="startDateControl.value"
+                  class="input input-bordered input-primary w-full pr-10 custom-calendar-picker" />
+                <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="h-5 w-5 text-secondary">
+                    <path
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M18 2v2M6 2v2m5.996 9h.008m-.008 4h.008m3.987-4H16m-8 0h.009M8 17h.009M3.5 8h17m-18 4.243c0-4.357 0-6.536 1.252-7.89C5.004 3 7.02 3 11.05 3h1.9c4.03 0 6.046 0 7.298 1.354C21.5 5.707 21.5 7.886 21.5 12.244v.513c0 4.357 0 6.536-1.252 7.89C18.996 22 16.98 22 12.95 22h-1.9c-4.03 0-6.046 0-7.298-1.354C2.5 19.293 2.5 17.114 2.5 12.756zM3 8h18" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estado seguimiento -->
+          <div class="indicator w-full sm:w-64">
+            <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">Estado Seguimiento</span>
+            <select class="select select-bordered select-primary w-full" [formControl]="estadoSegControl">
+              <option value="0">Todos</option>
+              <option *ngFor="let e of estadosSeguimiento" [value]="e.arees_codigo">{{ e.arees_descripcion }}</option>
+            </select>
+          </div>
+
+          <!-- Auditor operativo -->
+          <div class="indicator w-full sm:w-64">
+            <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">Auditor Operativo</span>
+            <select class="select select-bordered select-primary w-full" [formControl]="auditorControl">
+              <option value="0">Todos</option>
+              <option *ngFor="let a of auditores" [value]="a.dsgus_cuenta">{{ a.nombre_completo }}</option>
+            </select>
+          </div>
+          <!-- Search -->
+          <div class="indicator w-full sm:flex-1 sm:min-w-[16rem]">
+            <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">Palabra Clave</span>
+            <div class="relative w-full">
+              <input
+                type="text"
+                [formControl]="searchTermControl"
+                class="input input-bordered input-primary w-full pr-10"
+                placeholder="Buscar por palabra clave..." />
+              <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-4 w-4 opacity-70">
+                  <path
+                    fill-rule="evenodd"
+                    d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                    clip-rule="evenodd" />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón Limpiar debajo de los filtros -->
+        <div class="flex justify-end mt-4">
+          <button type="button" (click)="clearFilters()" class="btn btn-outline btn-primary flex gap-2 items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            Limpiar Filtros
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sección de tabla de resultados -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="card-title text-lg font-semibold">Resultado del reporte</h3>
+
+        <button class="btn btn-primary btn-sm sm:btn-md" [disabled]="!hasData" (click)="exportToExcel()">
+          <div class="flex flex-row items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M2.859 2.877l12.57-1.795a.5.5 0 0 1 .571.494v20.848a.5.5 0 0 1-.57.494L2.858 21.123a1 1 0 0 1-.859-.99V3.867a1 1 0 0 1 .859-.99M17 3h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-4zm-6.8 9L13 8h-2.4L9 10.286L7.4 8H5l2.8 4L5 16h2.4L9 13.714L10.6 16H13z" />
+            </svg>
+            <span class="hidden sm:inline">EXPORTAR</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Loading Progress -->
+      <app-report-loading *ngIf="isLoading"
+        message="Cargando reporte por estado de seguimiento jefatura..."
+        subtitle="Consultando estados de recomendaciones, auditorías y porcentajes de cumplimiento">
+      </app-report-loading>
+
+      <div *ngIf="!isLoading && !hasData" class="alert alert-info justify-center my-8">
+        No se encontraron registros con los criterios seleccionados.
+      </div>
+
+      <div *ngIf="!isLoading && hasData" class="w-full space-y-4">
+
+        <div class="overflow-x-auto rounded-lg shadow-sm border border-base-200">
+          <table class="table table-sm md:table-md w-full min-w-[1650px]">
+            <thead>
+              <tr class="bg-primary text-primary-content">
+                <th class="text-sm">Título informe</th>
+                <th class="text-sm">Recomendación</th>
+                <th class="text-sm">Organismo</th>
+                <th class="text-sm">Memorando</th>
+                <th class="text-sm">Memo aprob.</th>
+                <th class="text-sm">Fecha emisión</th>
+                <th class="text-sm">Fecha aprobación</th>
+                <th class="text-sm">Estado seguimiento</th>
+                <th class="text-sm">Auditor Operativo</th>
+                <th class="text-sm">Responsables</th>
+                <th class="text-sm">Riesgo</th>
+                <th class="text-sm">Evidencias requeridas</th>
+                <th class="text-sm text-center">Progreso %</th>
+              </tr>
+            </thead>
+
+            <tbody class="bg-base-200">
+              <tr class="hover" *ngFor="let r of displayedReports">
+                <td class="text-sm">
+                  <div class="dropdown dropdown-hover">
+                    <div tabindex="0" role="button" class="hover:text-primary-focus">
+                      {{ r.tituloInforme | slice:0:50 }}...
+                    </div>
+                    <div class="dropdown-content z-[1] card card-compact w-96 p-2 shadow bg-primary text-primary-content">
+                      <div class="card-body">
+                        <p>{{ r.tituloInforme }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-sm">
+                  <div class="dropdown dropdown-hover">
+                    <div tabindex="0" role="button" class="hover:text-primary-focus">
+                      {{ r.recomendacion | slice:0:50 }}...
+                    </div>
+                    <div class="dropdown-content z-[1] card card-compact w-96 p-2 shadow bg-primary text-primary-content">
+                      <div class="card-body">
+                        <p>{{ r.recomendacion }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-sm">{{ r.organismoControl }}</td>
+                <td class="text-sm">{{ r.memorando }}</td>
+                <td class="text-sm">{{ r.memoAprobacion }}</td>
+                <td class="text-sm">{{ r.fechaEmision }}</td>
+                <td class="text-sm">{{ r.fechaAprobacion }}</td>
+                <td class="text-sm text-center whitespace-nowrap">
+                  <span *ngIf="r.estadoSeguimiento; else sinEstadoSeguimiento"
+                    class="inline-flex items-center justify-center rounded-full min-w-[120px] min-h-8 px-3 py-1.5 text-xs font-bold uppercase leading-tight whitespace-nowrap"
+                    [ngClass]="r.estadoSeguimiento | statusColor">{{ r.estadoSeguimiento }}</span>
+                  <ng-template #sinEstadoSeguimiento><span class="text-base-content/60">Sin registrar</span></ng-template>
+                </td>
+                <td class="text-sm">{{ r.auditor }}</td>
+                <td class="text-sm min-w-[220px] max-w-[280px]">
+                  <ng-container *ngIf="listaResponsables(r.responsables) as responsables">
+                    <button *ngIf="responsables.length; else sinResponsables" type="button"
+                      class="w-full text-left rounded-lg p-1 hover:bg-primary/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+                      (click)="abrirResponsables($event, r)" [attr.aria-expanded]="responsableActivo === r"
+                      aria-controls="panel-responsables-jefatura" title="Ver responsables y estados">
+                      <span *ngFor="let responsable of responsables | slice:0:2; let i = index" class="block text-xs mb-1">
+                        <strong class="text-primary">R{{ i + 1 }}:</strong> {{ responsable.nombre }}
+                      </span>
+                      <span *ngIf="responsables.length > 2" class="badge badge-primary badge-sm text-xs">+{{ responsables.length - 2 }}</span>
+                      <span *ngIf="responsables.length <= 2" class="text-xs text-primary underline">Ver estados</span>
+                    </button>
+                    <ng-template #sinResponsables><span class="text-base-content/60">Sin responsables</span></ng-template>
+                  </ng-container>
+                </td>
+                <td class="text-center whitespace-nowrap">
+                  <span class="badge badge-outline font-semibold" [ngClass]="{
+                    'badge-error': r.riesgoVerificado === 'ALTO',
+                    'badge-warning': r.riesgoVerificado === 'MODERADO',
+                    'badge-success': r.riesgoVerificado === 'BAJO'
+                  }">{{ r.riesgoVerificado ? (r.riesgoVerificado | titlecase) : 'Sin registrar' }}</span>
+                </td>
+                <td class="text-sm min-w-[260px] max-w-[320px]">
+                  <span *ngIf="!r.evidenciaRequerida?.trim()" class="text-base-content/60">Sin registrar</span>
+                  <ol class="list-decimal pl-5 space-y-1 max-h-32 overflow-y-auto overscroll-contain pr-2">
+                    <li *ngFor="let evidencia of evidenciasRequeridas(r.evidenciaRequerida)" class="text-xs leading-relaxed break-words">{{ evidencia }}</li>
+                  </ol>
+                </td>
+                <td class="text-xs text-center whitespace-nowrap">
+                  <div class="flex items-center justify-center">
+                    <div class="radial-progress text-secondary"
+                         [style.--value]="r.progresoInforme || 0"
+                         [style.--size]="'3rem'" [style.--thickness]="'4px'">
+                      {{ (r.progresoInforme || 0).toFixed(1) }}%
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr *ngIf="!displayedReports.length">
+                <td colspan="13" class="text-center py-4">
+                  <div class="flex flex-col items-center gap-2">
+                    <span class="text-base-content/70">No se encontraron registros</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <app-pagination
+          [totalItems]="filteredReports.length"
+          [itemsPerPage]="itemsPerPage"
+          [currentPage]="currentPage"
+          (pageChange)="onPageChange($event)"
+          (itemsPerPageChange)="onItemsPerPageChange($event)">
+        </app-pagination>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="responsablesAbiertos" id="panel-responsables-jefatura" role="region"
+  aria-label="Responsables y estados" class="responsables-panel bg-base-100 border border-base-300 rounded-2xl shadow-2xl p-4"
+  [style.left.px]="panelX" [style.top.px]="panelY" (click)="$event.stopPropagation()">
+  <div class="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-base-200">
+    <h4 class="text-xs font-bold text-primary">RESPONSABLES Y ESTADOS</h4>
+    <span class="badge badge-primary badge-sm">{{ responsablesAbiertos.length }} resp.</span>
+    <button type="button" class="btn btn-ghost btn-xs btn-circle" (click)="cerrarResponsables()" aria-label="Cerrar responsables">&#215;</button>
+  </div>
+  <ol class="responsables-panel-lista space-y-2">
+    <li *ngFor="let responsable of responsablesAbiertos; let i = index"
+      class="flex items-center justify-between gap-3 bg-base-200/60 border border-base-300 rounded-xl px-3 py-2">
+      <span class="text-xs font-semibold break-words min-w-0"><strong class="text-primary">R{{ i + 1 }}:</strong> {{ responsable.nombre }}</span>
+      <span class="badge badge-sm text-[10px] shrink-0" [ngClass]="responsable.estado | statusColor">{{ responsable.estado || 'Sin estado' }}</span>
+    </li>
+  </ol>
+</div>

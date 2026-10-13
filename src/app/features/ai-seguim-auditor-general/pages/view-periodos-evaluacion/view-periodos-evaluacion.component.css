@@ -1,0 +1,5 @@
+/* Estilos personalizados para el tablero de periodos de evaluación */
+:host {
+  display: block;
+  width: 100%;
+}

@@ -1,0 +1,21 @@
+.report-table-shell {
+  overflow-y: clip;
+}
+
+.report-table-shell .dropdown {
+  position: relative;
+}
+
+.report-table-shell .dropdown .dropdown-content {
+  top: 100%;
+  bottom: auto;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+.report-table-shell tbody tr:nth-last-child(-n + 3) .dropdown .dropdown-content {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}

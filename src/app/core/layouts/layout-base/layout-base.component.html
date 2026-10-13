@@ -1,0 +1,85 @@
+<!-- layout-base.html -->
+<main class="min-h-screen flex flex-col">
+  <app-header class="w-full fixed top-0 z-50"></app-header>
+
+  <app-menu-responsivo class="md:hidden"></app-menu-responsivo>
+
+  <div class="flex-1 flex mt-20">
+    <div class="hidden md:block flex-shrink-0 transition-all duration-300 ease-in-out hover:w-64 w-16 sticky top-20 z-30 self-start" style="height: calc(100vh - 5rem);">
+      <app-sidebar class="w-full h-full block"></app-sidebar>
+    </div>
+
+
+    <dialog id="modalProfileUser" [ngClass]="{ 'hidden': banderaRol || isLoadingRole || !authenticationCompleted }"
+    class="fixed inset-0 w-full h-full z-50 overflow-auto bg-black bg-opacity-50 backdrop-blur-sm text-secondary flex items-center justify-center">
+    <div class="modal-box max-w-2xl bg-base-100 rounded-xl shadow-2xl relative p-8 w-full md:w-auto"
+        (click)="$event.stopPropagation()">
+
+        <!-- Header con ícono -->
+        <div class="flex flex-col items-center justify-center text-center mb-6">
+            <!-- Ícono de información -->
+            <div class="w-20 h-20 bg-info/10 rounded-full flex items-center justify-center mb-4">
+                <svg class="w-12 h-12 text-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+
+            <!-- Título principal -->
+            <h2 class="text-3xl font-bold text-info">Sin Recomendaciones Asignadas</h2>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="text-center mb-8">
+            <p class="text-base text-base-content/80 leading-relaxed mb-4">
+                No tiene recomendaciones asignadas o no cuenta con acceso a esta aplicación.
+            </p>
+
+            <!-- Información adicional -->
+            <div class="bg-base-200 rounded-lg p-4 mb-6">
+                <div class="flex items-center justify-center gap-2 text-sm text-base-content/60">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>Usuario: {{ currentUser }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <button class="btn btn-primary btn-lg" onclick="window.location.reload()">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Actualizar
+            </button>
+
+            <button class="btn btn-outline btn-lg" onclick="window.history.back()">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Volver
+            </button>
+        </div>
+
+        <!-- Footer con información adicional -->
+        <div class="mt-6 pt-4 border-t border-base-300 text-center">
+            <p class="text-xs text-base-content">
+                Para mayor información, contáctese con el administrador del sistema (ext. 1326).
+            </p>
+        </div>
+    </div>
+</dialog>
+
+    <!-- Contenido principal -->
+    <div class="flex-1 overflow-auto p-3 sm:p-6 mt-3">
+      <div class="max-w-auto mx-auto w-full">
+        <router-outlet></router-outlet>
+        <app-modal-confirmation />
+        <app-alerts-states />
+        <app-alert-notification (notificationReceived)="updateNotifications()" />
+      </div>
+    </div>
+  </div>
+</main>
+<app-footer />

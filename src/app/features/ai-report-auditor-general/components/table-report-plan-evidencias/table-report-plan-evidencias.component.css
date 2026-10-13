@@ -1,0 +1,94 @@
+/* Estilos de la tabla de Planes de Acción y Evidencias */
+
+.table th,
+.table td {
+  vertical-align: middle;
+}
+
+.report-table-shell {
+  overflow-x: auto;
+  overflow-y: visible;
+  position: relative;
+  width: 100%;
+}
+
+.report-table-shell .dropdown {
+  position: relative;
+}
+
+.report-table-shell .dropdown .dropdown-content {
+  top: 100%;
+  bottom: auto;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  z-index: 9999;
+}
+
+.report-table-shell .dropdown.dropdown-end .dropdown-content {
+  right: 0;
+  left: auto;
+}
+
+.report-table-shell tbody tr:not(:nth-child(-n + 2)):nth-last-child(-n + 3) .dropdown .dropdown-content {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  z-index: 9999;
+}
+
+/* Asegurar que la tabla use el 100% y no desborde con márgenes vacíos a la derecha */
+.report-table-shell table {
+  width: 100%;
+  min-width: 100%;
+}
+
+@media print {
+  .no-print,
+  .btn,
+  .dropdown,
+  form,
+  .card-body > div:first-child > div:last-child {
+    display: none !important;
+  }
+
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .card-body {
+    padding: 0 !important;
+  }
+
+  .print-table-container {
+    overflow: visible !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .table {
+    font-size: 9px !important;
+    width: 100% !important;
+  }
+
+  .table th,
+  .table td {
+    padding: 4px 6px !important;
+    border: 1px solid #ddd !important;
+  }
+
+  .badge {
+    border: 1px solid #999 !important;
+    background: transparent !important;
+    color: #000 !important;
+  }
+}
+
+.evidencia-resumen {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}

@@ -1,0 +1,243 @@
+<div class="w-full">
+  <app-breadcrumbs />
+
+  <div [hidden]="rutaHijaActiva">
+    <!-- Encabezado Principal SISREC -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 pt-3 border-b border-base-200 mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-base-content tracking-tight">Periodos y Cortes de Evaluación</h1>
+      </div>
+      <button (click)="openModalCrear()" class="btn btn-primary btn-sm flex items-center justify-center gap-2 font-bold text-xs shadow-sm hover:shadow-md transition-all self-start sm:self-auto">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>NUEVO CORTE DE EVALUACIÓN</span>
+      </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- TARJETAS KPI — Estilo estándar SISREC                                   -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <!-- 1. Total Periodos -->
+      <div class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 group select-none">
+        <div class="card-body p-5 flex flex-row items-center justify-between w-full">
+          <div class="flex-1 flex flex-col items-center text-center justify-center min-w-0">
+            <h1 class="text-3xl sm:text-4xl font-black text-base-content tracking-tight leading-none mb-1.5">{{ filteredPeriodos.length }}</h1>
+            <p class="text-xs font-bold text-base-content/70 leading-snug">Periodos del Año</p>
+          </div>
+          <div class="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 ml-1 group-hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Informes en Periodos -->
+      <div class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 group select-none">
+        <div class="card-body p-5 flex flex-row items-center justify-between w-full">
+          <div class="flex-1 flex flex-col items-center text-center justify-center min-w-0">
+            <h1 class="text-3xl sm:text-4xl font-black text-primary tracking-tight leading-none mb-1.5">{{ getTotalInformesAcumulados() }}</h1>
+            <p class="text-xs font-bold text-base-content/70 leading-snug">Informes Asignados</p>
+          </div>
+          <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 ml-1 group-hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Recomendaciones Evaluadas -->
+      <div class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 group select-none">
+        <div class="card-body p-5 flex flex-row items-center justify-between w-full">
+          <div class="flex-1 flex flex-col items-center text-center justify-center min-w-0">
+            <h1 class="text-3xl sm:text-4xl font-black text-secondary tracking-tight leading-none mb-1.5">{{ getTotalRecomendacionesAcumuladas() }}</h1>
+            <p class="text-xs font-bold text-base-content/70 leading-snug">Recomendaciones</p>
+          </div>
+          <div class="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 ml-1 group-hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Año Fiscal -->
+      <div class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 group select-none">
+        <div class="card-body p-5 flex flex-row items-center justify-between w-full">
+          <div class="flex-1 flex flex-col items-center text-center justify-center min-w-0">
+            <h1 class="text-3xl sm:text-4xl font-black text-emerald-600 tracking-tight leading-none mb-1.5">{{ selectedAnio }}</h1>
+            <p class="text-xs font-bold text-base-content/70 leading-snug">Año Fiscal Activo</p>
+          </div>
+          <div class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 ml-1 group-hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- BARRA DE FILTROS Y BÚSQUEDA (Estilo SISREC)                             -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="bg-base-100 border border-base-200 rounded-2xl p-4 shadow-sm mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="relative w-full sm:w-80">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (input)="filtrarPeriodos()" 
+          placeholder="Buscar por nombre o tipo..." 
+          class="input input-bordered input-sm w-full pl-9 pr-4 text-xs font-medium focus:outline-none" 
+        />
+        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-base-content/50">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-4 w-4">
+            <path fill-rule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clip-rule="evenodd" />
+          </svg>
+        </span>
+      </div>
+
+      <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+        <label class="text-xs font-bold text-base-content/70 whitespace-nowrap">Año Fiscal:</label>
+        <select 
+          [ngModel]="selectedAnio" 
+          (ngModelChange)="onAnioChange($event)" 
+          class="select select-bordered select-sm text-xs font-bold w-36 focus:outline-none"
+        >
+          <option *ngFor="let anio of aniosDisponibles" [value]="anio">
+            {{ anio }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- State: Loading -->
+    <div *ngIf="isLoading" class="flex justify-center items-center my-16">
+      <span class="loading loading-spinner loading-lg text-secondary"></span>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- GRID DE TARJETAS DE PERIODOS                                            -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="!isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div 
+        *ngFor="let periodo of filteredPeriodos" 
+        class="card bg-base-100 border border-base-200 shadow-sm hover:shadow-lg transition-all duration-300 rounded-2xl overflow-hidden group flex flex-col justify-between"
+      >
+        <div class="card-body p-5 flex flex-col justify-between">
+          <div>
+            <!-- Badges Superiores -->
+            <div class="flex justify-between items-center mb-3">
+              <span class="badge font-bold uppercase text-[11px] tracking-wider px-3 py-2" [ngClass]="getBadgeColor(periodo.arcev_tipo)">
+                {{ periodo.arcev_tipo }}
+              </span>
+              <span class="badge badge-success badge-outline font-bold text-[11px] px-2.5 py-2 gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-success"></span>
+                ACTIVO
+              </span>
+            </div>
+
+            <!-- Título del Periodo -->
+            <h2 class="text-lg font-bold text-base-content group-hover:text-primary transition-colors mb-3">
+              {{ periodo.arcev_nombre }}
+            </h2>
+
+            <!-- Bloque de Fechas -->
+            <div class="bg-base-200/50 rounded-xl p-3.5 space-y-2 text-xs mb-4 border border-base-content/10">
+              <div class="flex items-center justify-between border-b border-base-content/10 pb-2">
+                <span class="text-base-content/70 font-semibold">Rango Emisión:</span>
+                <span class="font-bold text-base-content" *ngIf="periodo.arcev_tipo !== 'CIERRE_ANUAL'">
+                  {{ periodo.arcev_fecha_inicio | date:'dd/MM/yyyy' }} — {{ periodo.arcev_fecha_fin | date:'dd/MM/yyyy' }}
+                </span>
+                <span class="font-bold text-base-content" *ngIf="periodo.arcev_tipo === 'CIERRE_ANUAL'">
+                  Acumulado hasta {{ periodo.arcev_fecha_fin | date:'dd/MM/yyyy' }}
+                </span>
+              </div>
+              <div class="flex items-center justify-between pt-0.5">
+                <span class="text-base-content/70 font-semibold">Fecha Corte:</span>
+                <span class="font-black text-primary text-sm">{{ periodo.arcev_fecha_corte | date:'dd/MM/yyyy' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas y Acción -->
+          <div>
+            <div class="grid grid-cols-2 gap-2 text-center py-3 my-2 border-y border-base-200 bg-base-200/30 rounded-xl">
+              <div class="flex flex-col items-center">
+                <span class="text-2xl font-black text-primary leading-tight">{{ periodo.total_informes || 0 }}</span>
+                <span class="text-[11px] font-bold text-base-content/60 uppercase tracking-wider">Informes</span>
+              </div>
+              <div class="flex flex-col items-center border-l border-base-200">
+                <span class="text-2xl font-black text-secondary leading-tight">{{ periodo.total_recomendaciones || 0 }}</span>
+                <span class="text-[11px] font-bold text-base-content/60 uppercase tracking-wider">Recomendaciones</span>
+              </div>
+            </div>
+
+            <div class="pt-2 flex items-center gap-2">
+              <button 
+                (click)="verDetalleInformes(periodo)" 
+                class="btn btn-primary btn-sm flex-1 gap-2 font-bold text-xs rounded-xl shadow-xs"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <span>Gestionar Informes</span>
+              </button>
+
+              <button 
+                (click)="eliminarPeriodo(periodo, $event)" 
+                class="btn btn-ghost btn-sm text-error hover:bg-error/15 rounded-xl px-2.5"
+                title="Eliminar este periodo de evaluación"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- State: Empty -->
+    <div *ngIf="!isLoading && filteredPeriodos.length === 0" class="text-center py-14 bg-base-100 rounded-2xl border border-base-200 my-6 shadow-sm">
+      <div class="w-12 h-12 bg-base-200 rounded-full flex items-center justify-center mx-auto mb-3 text-base-content/40">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <p class="text-sm font-semibold text-base-content/70">
+        No hay periodos de evaluación registrados para el año fiscal {{ selectedAnio }}.
+      </p>
+      <button (click)="openModalCrear()" class="btn btn-sm btn-ghost text-primary font-bold mt-2">
+        + Crear primer corte de evaluación
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal para Crear Periodo -->
+  <app-modal-crear-periodo 
+    *ngIf="isModalOpen" 
+    [anioPredeterminado]="selectedAnio" 
+    (closeModal)="closeModalCrear()" 
+    (periodoCreado)="onPeriodoCreado()"
+  ></app-modal-crear-periodo>
+
+  <!-- Outlet para Subrutas -->
+  <router-outlet 
+    (activate)="enActivacionRutaHija()" 
+    (deactivate)="enDesactivacionRutaHija()"
+  ></router-outlet>
+</div>
+

@@ -1,0 +1,78 @@
+<div class="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
+
+    <!-- Verificables Pendientes (Recomendaciones Pendientes) -->
+    <div 
+      class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 group flex-1 cursor-pointer hover:-translate-y-1 active:scale-[0.98] select-none"
+      (click)="navigateToRecomendaciones()">
+        <div class="card-body p-4 relative flex flex-row items-center gap-4 h-[155px]" [ngClass]="{'skeleton': isLoading}">
+            <ng-container *ngIf="!isLoading">
+                <!-- Columna 1: Icono a la izquierda -->
+                <div class="w-20 h-20 bg-blue-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 2h14M5 22h14M19 2v4a7 7 0 0 1-7 7 7 7 0 0 1-7-7V2M5 22v-4a7 7 0 0 1 7-7 7 7 0 0 1 7 7v4"/>
+                    </svg>
+                </div>
+                
+                <!-- Columna 2: Contenido (numero y etiqueta) centrado horizontalmente en el espacio restante -->
+                <div class="flex-1 flex flex-col items-center justify-center text-center min-w-0 pr-4">
+                    <span class="text-5xl font-black text-base-content tracking-tight leading-none mb-1.5">{{metricasResponsable?.verificablesPendientes}}</span>
+                    <span class="text-xs font-bold text-base-content/60 tracking-wide uppercase leading-tight">Recomendaciones<br>Pendientes</span>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+
+    <!-- Solicitudes en espera de aprobacion (Solicitudes en Espera) -->
+    <div 
+      class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 group flex-1 cursor-pointer hover:-translate-y-1 active:scale-[0.98] select-none"
+      (click)="navigateToSolicitudesEnEspera()">
+        <div class="card-body p-4 relative flex flex-row items-center gap-4 h-[155px]" [ngClass]="{'skeleton': isLoading}">
+            <ng-container *ngIf="!isLoading">
+                <!-- Columna 1: Icono a la izquierda -->
+                <div class="w-20 h-20 bg-blue-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 relative transition-transform duration-300 group-hover:scale-110">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <path d="M12 17h.01"/>
+                    </svg>
+                    <div class="absolute -bottom-1 -right-1 bg-blue-600 rounded-full w-5 h-5 flex items-center justify-center border-2 border-base-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- Columna 2: Contenido (numero y etiqueta) centrado horizontalmente en el espacio restante -->
+                <div class="flex-1 flex flex-col items-center justify-center text-center min-w-0 pr-4">
+                    <span class="text-5xl font-black text-base-content tracking-tight leading-none mb-1.5">{{metricasResponsable?.solicitudesPendientesAprobacion}}</span>
+                    <span class="text-xs font-bold text-base-content/60 tracking-wide uppercase leading-tight">Solicitudes<br>en Espera</span>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+
+    <!-- Recomendaciones Vencidas -->
+    <div 
+      class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 group flex-1 cursor-pointer hover:-translate-y-1 active:scale-[0.98] select-none"
+      (click)="navigateToRecomendacionesVencidasSinJustificar()">
+        <div class="card-body p-4 relative flex flex-row items-center gap-4 h-[155px]" [ngClass]="{'skeleton': isLoading}">
+            <ng-container *ngIf="!isLoading">
+                <!-- Columna 1: Icono a la izquierda -->
+                <div class="w-20 h-20 bg-red-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                </div>
+                
+                <!-- Columna 2: Contenido (numero y etiqueta) centrado horizontalmente en el espacio restante -->
+                <div class="flex-1 flex flex-col items-center justify-center text-center min-w-0 pr-4">
+                    <span class="text-5xl font-black text-base-content tracking-tight leading-none mb-1.5">{{metricasResponsable?.recomendacionesVencidasSinJustificar}}</span>
+                    <span class="text-xs font-bold text-base-content/60 tracking-wide uppercase leading-tight">Recomendaciones<br>Vencidas</span>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+
+</div>

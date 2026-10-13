@@ -1,0 +1,33 @@
+<div class="w-full">
+  <app-modal-validar-verificable [reloadTable]="reloadTable.bind(this)" />
+  <app-modal-verficable [reloadTable]="reloadTable.bind(this)" />
+  <app-modal-fecha-max [reloadTable]="reloadTable.bind(this)" />
+  <app-modal-matriz-plan-accion />
+  
+  <h3 *ngIf="!isLoading" class="text-lg md:text-xl font-bold">Recomendación: </h3>
+  <p *ngIf="!isLoading" class="text-base-content mb-4">{{tituloRecomendacion}}</p>
+
+  <h1 *ngIf="!isLoading" class="text-xl md:text-2xl font-bold">Evidencia</h1>
+  <div class="flex flex-wrap justify-between items-center mb-4 mt-4">
+
+    <div class="flex flex-col lg:flex-row items-start lg:items-center gap-4 w-full">
+      <app-search-filter class="flex-grow w-full"
+        (filterChange)="onFilterChange($event)" 
+        (loadingChange)="onLoadingChange($event)"
+        (responsablesStatusChange)="onResponsablesStatusChange($event)" />
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center items-center my-8">
+    <span class="loading loading-spinner loading-lg text-secondary"></span>
+  </div>
+
+  <app-table-verificables *ngIf="!isLoading" 
+    [verificables]="verificables" 
+    [recomendaciones]="recomendaciones" 
+    [selectedResponsableId]="selectedResponsableId"
+    [isCumplida]="isCumplida"
+    [reloadTable]="reloadTable.bind(this)" />
+
+</div>

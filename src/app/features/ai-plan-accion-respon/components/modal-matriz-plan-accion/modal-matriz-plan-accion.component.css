@@ -1,0 +1,144 @@
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.4);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.7);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* ==========================================================
+   Controles y textos de la Matriz con Contraste Garantizado
+   ========================================================== */
+.matriz-input {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  border-color: #94a3b8 !important;
+}
+
+.matriz-input::placeholder {
+  color: #64748b !important;
+  opacity: 1 !important;
+}
+
+:host-context([data-theme="dark"]) .matriz-input {
+  color: #f8fafc !important;
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+}
+
+:host-context([data-theme="dark"]) .matriz-input::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+}
+
+/* Textos principales y de apoyo */
+.matriz-text-main {
+  color: #0f172a !important;
+}
+
+.matriz-text-muted {
+  color: #334155 !important;
+}
+
+:host-context([data-theme="dark"]) .matriz-text-main {
+  color: #f8fafc !important;
+}
+
+:host-context([data-theme="dark"]) .matriz-text-muted {
+  color: #cbd5e1 !important;
+}
+
+/* ==========================================================
+   Centrado de selects e inputs en la Matriz
+   ========================================================== */
+.matriz-select {
+  text-align: center !important;
+  text-align-last: center !important;
+  -moz-text-align-last: center !important;
+}
+
+.matriz-select option {
+  text-align: center !important;
+}
+
+input[type="date"].matriz-input {
+  text-align: center !important;
+}
+
+input[type="date"].matriz-input::-webkit-date-and-time-value {
+  text-align: center !important;
+}
+
+/* ==========================================================
+   Ventana flotante / Tooltip moderna y elegante en Azul Marino Institucional
+   ========================================================== */
+.custom-plan-tooltip {
+  display: block !important;
+  text-align: left !important;
+}
+
+.custom-plan-tooltip:before {
+  max-width: 28rem !important;
+  width: max-content !important;
+  white-space: normal !important;
+  text-align: left !important;
+  font-size: 0.785rem !important;
+  line-height: 1.35rem !important;
+  font-weight: 500 !important;
+  padding: 0.85rem 1.15rem !important;
+  border-radius: 0.75rem !important;
+  background-color: #1c3a63 !important; /* Azul marino institucional */
+  color: #ffffff !important;
+  box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.45), 0 0 0 1px rgba(56, 189, 248, 0.25) !important;
+  border: 1.5px solid #38bdf8 !important; /* Borde celeste nítido que resalta con elegancia */
+  z-index: 9999 !important;
+}
+
+.custom-plan-tooltip:after {
+  border-bottom-color: #1c3a63 !important;
+  z-index: 9999 !important;
+}
+
+/* Anclaje al borde izquierdo para que nunca se desborde ni se corte por la izquierda */
+.custom-plan-tooltip-start:before {
+  left: 0 !important;
+  right: auto !important;
+  transform: translateX(0) !important;
+}
+
+.custom-plan-tooltip-start:after {
+  left: 1.75rem !important;
+  right: auto !important;
+  transform: translateX(0) !important;
+}
+
+/* Anclaje al borde derecho para que nunca se desborde por la derecha */
+.custom-plan-tooltip-end:before {
+  right: 0 !important;
+  left: auto !important;
+  transform: translateX(0) !important;
+}
+
+.custom-plan-tooltip-end:after {
+  right: 1.75rem !important;
+  left: auto !important;
+  transform: translateX(0) !important;
+}
+
+

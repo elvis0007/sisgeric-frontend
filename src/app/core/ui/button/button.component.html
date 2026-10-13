@@ -1,0 +1,10 @@
+<button
+  [class]="buttonClasses"
+  [disabled]="disabled || loading"
+  (click)="onClick()"
+>
+  @if (loading) {
+  <span class="loading loading-dots loading-sm mr-2"></span>
+  }
+  {{ loading ? loadingText : text }}
+</button>

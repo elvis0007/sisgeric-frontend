@@ -1,0 +1,36 @@
+<dialog id="modalFormOrganismo"
+  class="fixed inset-0 w-full h-full z-50 overflow-auto bg-black bg-opacity-50 text-secondary flex items-center justify-center"
+  [ngClass]="{ 'hidden': !modalFormSrv.isModalOpen() }" (click)="closeModal()">
+  <div class="modal-box max-w-2xl rounded-lg shadow-lg relative" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between">
+      <h2 class="text-2xl font-bold mb-4">{{ isEditMode ? 'Editar Ente de Control' : 'Ingresar Ente de Control' }}</h2>
+      <button class="btn btn-sm btn-circle btn-ghost text-lg" (click)="closeModal()">
+        ✕
+      </button>
+    </div>
+
+    <!-- Estado de loading -->
+    <form class="space-y-4" [formGroup]="formOrganismo" (ngSubmit)="toSend()">
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-medium">Ente de Control*</span>
+        </label>
+        <input class="input input-bordered w-full" [ngClass]="{
+                  'input-primary': !isFieldInvalid('ainoc_descripcion'),
+                  'input-error': isFieldInvalid('ainoc_descripcion')
+                }" placeholder="Ingrese el nombre del Ente de Control" formControlName="ainoc_descripcion" />
+        <label class="label" *ngIf="isFieldInvalid('ainoc_descripcion')">
+          <span class="label-text-alt text-error">Este campo es requerido</span>
+        </label>
+      </div>
+      <div class="flex gap-4 justify-center items-center mt-4">
+        <button type="button" class="btn btn-error text-white flex-1 w-full" (click)="closeModal()">CANCELAR</button>
+        <button class="btn btn-primary flex-1 w-full text-white" [disabled]="isLoadingSubmint">
+          <span *ngIf="isLoadingSubmint" class="loading loading-spinner text-secondary"></span>
+          {{isLoadingSubmint ? 'CARGANDO...' : isEditMode ? 'CONFIRMAR' : 'REGISTRAR' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</dialog>

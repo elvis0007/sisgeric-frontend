@@ -1,0 +1,272 @@
+@import '@fontsource/roboto/300.css';
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/500.css';  
+@import '@fontsource/roboto/700.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background-color: oklch(var(--b1));
+  color: oklch(var(--bc));
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+@layer utilities {
+  .custom-calendar-picker {
+    @apply [&::-webkit-calendar-picker-indicator]:opacity-0
+           [&::-webkit-calendar-picker-indicator]:absolute
+           [&::-webkit-calendar-picker-indicator]:inset-0
+           [&::-webkit-calendar-picker-indicator]:w-full
+           [&::-webkit-calendar-picker-indicator]:h-full
+           [&::-webkit-calendar-picker-indicator]:cursor-pointer;
+  }
+}
+
+/* ============================================================
+   Sidebar menu dark mode global overrides
+   ============================================================ */
+
+[data-theme="dark"] .sidebar-container .menu li > a,
+[data-theme="dark"] .sidebar-container .menu li > details > summary {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .sidebar-container .menu li > a:hover,
+[data-theme="dark"] .sidebar-container .menu li > details > summary:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #3973d2 !important;
+}
+
+[data-theme="dark"] .sidebar-container .menu li > a.active {
+  background: #ffffff !important;
+  color: #1a365d !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-theme="dark"] .sidebar-container .menu li > a.active:hover {
+  background: #f1f5f9 !important;
+  color: #1a365d !important;
+}
+
+[data-theme="dark"] .sidebar-container .menu li > details > ul {
+  border-left-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-theme="dark"] .sidebar-container .menu li > details > ul > li > a {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+[data-theme="dark"] .sidebar-container .menu li > details > ul > li > a:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #3973d2 !important;
+}
+
+[data-theme="dark"] .sidebar-container .menu li > details > ul > li > a.active {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #1a365d !important;
+}
+
+/* ============================================================
+   Table Dropdown Overrides (Prevents clipping and blank space)
+   ============================================================ */
+
+/* 1. By default, keep horizontal scroll and allow vertical overflow with minimum height for floating dialogs */
+.report-table-shell {
+  overflow-x: auto !important;
+  min-height: auto !important;
+}
+
+.overflow-x-auto {
+  overflow-x: auto !important;
+}
+
+/* 2. Top rows (rows 1 & 2) ALWAYS open downwards to prevent cutting off at the top of the table */
+table tbody tr:nth-child(-n + 2) .dropdown .dropdown-content {
+  top: 100% !important;
+  bottom: auto !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0 !important;
+  z-index: 9999 !important;
+  max-height: 14rem !important;
+  overflow-y: auto !important;
+}
+
+/* 3. Position dropdowns in the last 3 rows of any table to open upwards ONLY if they are NOT in the first 2 rows */
+table tbody tr:not(:nth-child(-n + 2)):nth-last-child(-n + 3) .dropdown .dropdown-content {
+  top: auto !important;
+  bottom: 100% !important;
+  margin-top: 0 !important;
+  margin-bottom: 0.5rem !important;
+  z-index: 9999 !important;
+  max-height: 14rem !important;
+  overflow-y: auto !important;
+}
+
+
+
+
+/* ============================================================
+   Dashboard — Tipografía global unificada
+   Fuente: Roboto (ya importada). Colores semánticos DaisyUI
+   para soporte automático de modo claro y oscuro.
+   ============================================================ */
+
+/* Forzar Roboto en todo el dashboard */
+app-home *,
+app-metricas-responsable *,
+app-chart-donut *,
+app-chart-bar-dpto *,
+app-chart-bar-anio *,
+app-list-detalle-recomend *,
+app-list-detalle-aijefe * {
+  font-family: 'Roboto', sans-serif !important;
+}
+
+/* Forzar que los textos de base usen colores semánticos de DaisyUI
+   para garantizar contraste en modo claro y oscuro */
+app-metricas-responsable .card,
+app-chart-donut .card,
+app-chart-bar-dpto .card,
+app-chart-bar-anio .card,
+app-list-detalle-recomend .card,
+app-list-detalle-aijefe .card {
+  color: oklch(var(--bc));
+}
+
+/* Espaciado garantizado entre app-metricas-responsable y el siguiente elemento */
+app-metricas-responsable {
+  display: block;
+  margin-bottom: 0 !important;
+}
+
+/* ============================================================
+   Dashboard — Verde Personalizado (#58D7A8)
+   ============================================================ */
+.bg-dashboard-green {
+  background-color: #58D7A8 !important;
+}
+
+.text-dashboard-green {
+  color: #58D7A8 !important;
+}
+
+.border-dashboard-green {
+  border-color: #3eb58b !important;
+}
+
+.bg-dashboard-green-light {
+  background-color: rgba(88, 215, 168, 0.15) !important;
+}
+
+/* Soporte de fondo suave oscuro para modo noche */
+.dark .bg-dashboard-green-dark,
+[data-theme="dark"] .bg-dashboard-green-dark {
+  background-color: rgba(88, 215, 168, 0.08) !important;
+}
+
+/* ============================================================
+   card-recomendacion: Fondos globales (fuera de encapsulación)
+   ============================================================ */
+
+/* MODO CLARO */
+.rec-card-container {
+  background-color: #F7F7F7 !important;
+}
+.rec-card-block {
+  background-color: #e8e8e8 !important;
+}
+.collapse.rec-card-block:hover {
+  background-color: #dfdfdf !important;
+}
+
+/* Textos en modo claro */
+.rec-card-title {
+  color: #111827 !important;
+}
+.rec-card-body {
+  color: #374151 !important;
+}
+
+/* Badges siempre con texto blanco */
+.rec-card-container .badge,
+.rec-card-container .badge span {
+  color: #ffffff !important;
+}
+
+/* MODO OSCURO */
+[data-theme="dark"] .rec-card-container {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+[data-theme="dark"] .rec-card-block {
+  background-color: #2a2f3d !important;
+}
+[data-theme="dark"] .collapse.rec-card-block:hover {
+  background-color: #333849 !important;
+}
+
+/* Textos en modo oscuro */
+[data-theme="dark"] .rec-card-title {
+  color: #ffffff !important;
+}
+[data-theme="dark"] .rec-card-body {
+  color: #e5e7eb !important;
+}
+
+/* Badges siempre con texto blanco en modo oscuro también */
+[data-theme="dark"] .rec-card-container .badge,
+[data-theme="dark"] .rec-card-container .badge span {
+  color: #ffffff !important;
+}
+
+/* Forzar que los botones de contorno (outline) de tipo primary (como Limpiar y Limpiar Filtros) tengan texto y borde blanco en modo oscuro */
+[data-theme="dark"] .btn-outline.btn-primary {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+[data-theme="dark"] .btn-outline.btn-primary:hover,
+[data-theme="dark"] .btn-outline.btn-primary:focus,
+[data-theme="dark"] .btn-outline.btn-primary:active {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+}
+/* Forzar que todos los iconos (SVG) dentro de cualquier botón circular (.btn-circle) sean siempre de color blanco puro */
+.btn-circle svg {
+  color: #ffffff !important;
+}
+
+/* ============================================================
+   Estilos unificados para Modo Claro (detalles/inputs readonly)
+   ============================================================ */
+
+/* Fondo de bloques desplegables (accordion/collapse) en modales en modo claro */
+html:not([data-theme="dark"]) details.bg-base-200,
+html:not([data-theme="dark"]) .collapse.bg-base-200 {
+  background-color: #e8e8e8 !important;
+}
+html:not([data-theme="dark"]) details.bg-base-200:hover,
+html:not([data-theme="dark"]) .collapse.bg-base-200:hover {
+  background-color: #dfdfdf !important;
+}
+
+/* Inputs y textareas no editables (readonly, disabled, bg-base-200) en modo claro */
+html:not([data-theme="dark"]) input[readonly],
+html:not([data-theme="dark"]) input:disabled,
+html:not([data-theme="dark"]) textarea[readonly],
+html:not([data-theme="dark"]) textarea:disabled,
+html:not([data-theme="dark"]) .input-disabled,
+html:not([data-theme="dark"]) input.bg-base-200,
+html:not([data-theme="dark"]) textarea.bg-base-200 {
+  background-color: #e8e8e8 !important;
+  color: #374151 !important;
+}
+

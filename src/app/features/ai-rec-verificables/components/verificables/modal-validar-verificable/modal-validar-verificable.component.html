@@ -1,0 +1,117 @@
+<dialog id="modalFormVerificableValidar"
+  class="fixed inset-0 w-full h-full z-50 overflow-auto bg-black bg-opacity-50 text-secondary flex items-center justify-center"
+  [ngClass]="{ 'hidden': !modalFormSrv.isModalOpen() }" (click)="closeModal($event)">
+  <div class="modal-box max-w-4xl rounded-lg shadow-lg relative" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between">
+      <h2 class="text-2xl font-bold mb-4">{{ isEditMode ? 'Validar Verificable' : 'Ingresar Verificable' }}</h2>
+      <button class="btn btn-sm btn-circle btn-ghost text-lg" (click)="closeModal($event)">
+        ✕
+      </button>
+    </div>
+
+    <section class="grid grid-cols-1 gap-2 rounded-2xl">
+      <!-- Columna 1: Informe -->
+      <details class="collapse collapse-plus bg-base-200 rounded-xl hover:bg-base-300 transition-colors">
+        <summary class="collapse-title font-semibold text-secondary">
+          Memorando {{detalleRecomendacion?.ainin_memorando}}
+        </summary>
+        <div class="collapse-content">
+          <div>
+            <p class="mt-1 text-base font-normal text-secondary">
+              {{detalleRecomendacion?.ainin_titulo }}
+            </p>
+            <div class="flex flex-row gap-2 mt-3">
+              <span class="text-base font-semibold text-secondary">Memo. aprobación:</span>
+              <p class="text-base font-normal text-secondary">{{detalleRecomendacion?.ainin_memo_aprobacion}}</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Columna 2: Recomendación -->
+      <details class="collapse collapse-plus bg-base-200 rounded-xl hover:bg-base-300 transition-colors">
+        <summary class="collapse-title font-semibold text-secondary">
+          Recomendación
+        </summary>
+        <div class="collapse-content">
+          <div>
+            <p class="mt-1 text-base font-normal text-secondary">
+              {{detalleRecomendacion?.recomendaciones?.arere_descripcion }}
+            </p>
+          </div>
+          <div class="flex flex-row gap-6">
+            <div>
+              <span class="block text-base font-semibold text-secondary">Fecha máxima de cumplimiento:</span>
+              <p class="mt-1 text-lg font-normal text-secondary">
+                {{detalleRecomendacion?.recomendaciones?.arere_fecha_maxima}}
+              </p>
+            </div>
+            <div>
+              <span class="block text-base font-semibold text-secondary">Plazo:</span>
+              <p class="mt-1 text-lg font-normal text-secondary">
+                <span class="text-sm text-secondary mt-1 font-semibold">{{detalleRecomendacion?.recomendaciones?.plazo
+                  || 0 | abs }}</span>
+                <span class="text-sm text-secondary font-semibold">
+                  {{ getEstadoPlazo() }}
+                </span>
+
+              </p>
+            </div>
+          </div>
+          <div *ngIf="detalleRecomendacion?.recomendaciones?.arere_evidencia_requerida" class="mt-3 pt-3 border-t border-base-300">
+            <span class="block text-xs font-bold text-primary">Evidencias Requeridas:</span>
+            <p class="text-xs text-secondary mt-1 whitespace-pre-line leading-relaxed">
+              {{ detalleRecomendacion?.recomendaciones?.arere_evidencia_requerida }}
+            </p>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <form class="space-y-4" [formGroup]="formVerificable" (ngSubmit)="toSend()">
+
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-medium">Estado de verificable*</span>
+        </label>
+        <select class="select select-bordered w-full" [ngClass]="{
+          'select-primary': !isFieldInvalid('areev_codigo'),
+          'select-error': isFieldInvalid('areev_codigo')
+        }" formControlName="areev_codigo">
+          <option disabled value="" selected>Seleccionar Estado de Verificable</option>
+          <option *ngFor="let estado of estadoSeguimientos" [value]="estado.areev_codigo">
+            {{estado.areev_descripcion}}
+          </option>
+        </select>
+        <label class="label" *ngIf="isFieldInvalid('areev_codigo')">
+          <span class="label-text-alt text-error">Este campo es requerido</span>
+        </label>
+      </div>
+
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-medium">Motivo estado seguimiento*</span>
+        </label>
+        <textarea class="textarea textarea-bordered min-h-[130px] w-full" [ngClass]="{
+                        'textarea-primary': !isFieldInvalid('areve_motivo_estado'),
+                        'textarea-error': isFieldInvalid('areve_motivo_estado')
+                      }"
+          placeholder="Recuerde que la observacion de la auditora es obligatoria, ingrese el motivo del estado del verificable y/o un resumen del verificable revisado para historial y reporte"
+          formControlName="areve_motivo_estado"></textarea>
+        <label class="label" *ngIf="isFieldInvalid('areve_motivo_estado')">
+          <span class="label-text-alt text-error">Este campo es requerido</span>
+        </label>
+      </div>
+
+      <div class="flex gap-4 justify-center items-center mt-4">
+        <button type="button" class="btn btn-error text-white flex-1 w-full"
+          (click)="closeModal($event)">CANCELAR</button>
+        <button class="btn btn-primary flex-1 w-full text-white" [disabled]="isLoadingSubmint">
+          <span *ngIf="isLoadingSubmint" class="loading loading-spinner text-secondary"></span>
+          {{isLoadingSubmint ? 'CARGANDO...' : isEditMode ? 'CONFIRMAR' : 'REGISTRAR' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</dialog>

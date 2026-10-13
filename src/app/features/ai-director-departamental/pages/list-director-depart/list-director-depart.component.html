@@ -1,0 +1,17 @@
+<div class="w-full">
+  <app-breadcrumbs />
+  <app-modal-atender-solicitud-director [reloadTable]="reloadTable.bind(this)" />
+
+  <h1 class="text-2xl font-bold pb-5 pt-3">Solicitudes</h1>
+  <div class="w-full justify-start mt-4 mb-4">
+    <app-search-filter-director class="w-full" (filterChange)="onFilterChange($event)"
+      (loadingChange)="onLoadingChange($event)" />
+  </div>
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center items-center my-8">
+    <span class="loading loading-spinner loading-lg text-secondary"></span>
+  </div>
+  <app-table-solicitudes-director *ngIf="!isLoading" [solicitudes]="solicitudes" (selectionChange)="onSelectionChange($event)"
+    [reloadTable]="reloadTable.bind(this)" />
+
+</div>

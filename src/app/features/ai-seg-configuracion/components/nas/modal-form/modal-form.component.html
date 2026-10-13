@@ -1,0 +1,225 @@
+<dialog id="modalFormConfiguracion"
+  class="fixed inset-0 w-full h-full z-50 overflow-auto bg-black bg-opacity-50 text-secondary flex items-center justify-center"
+  [ngClass]="{ 'hidden': !modalSrv.isModalOpen() }" (click)="closeModal()">
+  
+  <div class="modal-box max-w-2xl rounded-lg shadow-lg relative" (click)="$event.stopPropagation()">
+    <!-- Header del modal -->
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <h2 class="text-2xl font-bold">
+          {{ getModalTitle() }}
+        </h2>
+      </div>
+      <button class="btn btn-sm btn-circle btn-ghost text-lg" (click)="this.closeModal()">
+        ✕
+      </button>
+    </div>
+
+    <!-- Contenido del modal basado en el campo a editar -->
+    <div class="space-y-6">
+      
+      <!-- Edición de campo individual -->
+      <div *ngIf="editField" class="space-y-4">
+        <div class="alert alert-info">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>Estás editando únicamente el campo <strong>{{ getFieldLabel() }}</strong>. Los demás valores permanecerán sin cambios.</span>
+        </div>
+
+        <form [formGroup]="formConfiguracion" (ngSubmit)="toSend()" class="space-y-4">
+          
+          <!-- Campo Host -->
+          <div *ngIf="editField === 'host'" class="form-control">
+            <label class="label">
+              <span class="label-text font-semibold">🌐 Host del servidor NAS</span>
+            </label>
+            <input 
+              type="text" 
+              class="input input-bordered input-primary w-full" 
+              placeholder="Ej: 192.168.1.100 o nas.empresa.com"
+              formControlName="aseco_host" 
+              [ngClass]="{
+                'input-error': formConfiguracion.get('aseco_host')?.invalid &&
+                (formConfiguracion.get('aseco_host')?.dirty || formConfiguracion.get('aseco_host')?.touched)
+              }">
+            <label class="label" *ngIf="formConfiguracion.get('aseco_host')?.invalid && 
+              (formConfiguracion.get('aseco_host')?.dirty || formConfiguracion.get('aseco_host')?.touched)">
+              <span class="label-text-alt text-error">El host es requerido</span>
+            </label>
+          </div>
+
+          <!-- Campo Puerto -->
+          <div *ngIf="editField === 'port'" class="form-control">
+            <label class="label">
+              <span class="label-text font-semibold">🔌 Puerto de conexión</span>
+            </label>
+            <input 
+              type="number" 
+              class="input input-bordered input-primary w-full" 
+              placeholder="Ej: 22, 21, 990"
+              formControlName="aseco_port" 
+              [ngClass]="{
+                'input-error': formConfiguracion.get('aseco_port')?.invalid &&
+                (formConfiguracion.get('aseco_port')?.dirty || formConfiguracion.get('aseco_port')?.touched)
+              }">
+            <label class="label" *ngIf="formConfiguracion.get('aseco_port')?.invalid && 
+              (formConfiguracion.get('aseco_port')?.dirty || formConfiguracion.get('aseco_port')?.touched)">
+              <span class="label-text-alt text-error">El puerto es requerido</span>
+            </label>
+          </div>
+
+          <!-- Campo Usuario -->
+          <div *ngIf="editField === 'user'" class="form-control">
+            <label class="label">
+              <span class="label-text font-semibold">👤 Usuario de acceso</span>
+            </label>
+            <input 
+              type="text" 
+              class="input input-bordered input-primary w-full" 
+              placeholder="Nombre de usuario para el NAS"
+              formControlName="aseco_user" 
+              [ngClass]="{
+                'input-error': formConfiguracion.get('aseco_user')?.invalid &&
+                (formConfiguracion.get('aseco_user')?.dirty || formConfiguracion.get('aseco_user')?.touched)
+              }">
+            <label class="label" *ngIf="formConfiguracion.get('aseco_user')?.invalid && 
+              (formConfiguracion.get('aseco_user')?.dirty || formConfiguracion.get('aseco_user')?.touched)">
+              <span class="label-text-alt text-error">El usuario es requerido</span>
+            </label>
+          </div>
+
+          <!-- Campo Contraseña -->
+          <div *ngIf="editField === 'password'" class="space-y-4">
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">🔐 Nueva contraseña</span>
+              </label>
+              <input 
+                type="password" 
+                class="input input-bordered input-primary w-full" 
+                placeholder="Ingrese la nueva contraseña"
+                formControlName="aseco_contrasenia" 
+                [ngClass]="{
+                  'input-error': formConfiguracion.get('aseco_contrasenia')?.invalid &&
+                  (formConfiguracion.get('aseco_contrasenia')?.dirty || formConfiguracion.get('aseco_contrasenia')?.touched)
+                }">
+              <label class="label" *ngIf="formConfiguracion.get('aseco_contrasenia')?.invalid && 
+                (formConfiguracion.get('aseco_contrasenia')?.dirty || formConfiguracion.get('aseco_contrasenia')?.touched)">
+                <span class="label-text-alt text-error">La contraseña es requerida</span>
+              </label>
+            </div>
+
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">🔐 Confirmar contraseña</span>
+              </label>
+              <input 
+                type="password" 
+                class="input input-bordered input-primary w-full" 
+                placeholder="Confirme la nueva contraseña"
+                formControlName="aseco_contrasenia2" 
+                [ngClass]="{
+                  'input-error': formConfiguracion.get('aseco_contrasenia2')?.invalid &&
+                  (formConfiguracion.get('aseco_contrasenia2')?.dirty || formConfiguracion.get('aseco_contrasenia2')?.touched)
+                }">
+              <label class="label" *ngIf="formConfiguracion.get('aseco_contrasenia2')?.invalid && 
+                (formConfiguracion.get('aseco_contrasenia2')?.dirty || formConfiguracion.get('aseco_contrasenia2')?.touched)">
+                <span class="label-text-alt text-error">
+                  {{ formConfiguracion.get('aseco_contrasenia2')?.errors?.['noMatch'] ? 'Las contraseñas no coinciden' : 'Confirme la contraseña' }}
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Campo Nombre del Host -->
+          <div *ngIf="editField === 'hostname'" class="form-control">
+            <label class="label">
+              <span class="label-text font-semibold">🏷️ Nombre identificativo del host</span>
+            </label>
+            <input 
+              type="text" 
+              class="input input-bordered input-primary w-full" 
+              placeholder="Ej: NAS-Principal, Servidor-Backup"
+              formControlName="aseco_nombre_host" 
+              [ngClass]="{
+                'input-error': formConfiguracion.get('aseco_nombre_host')?.invalid &&
+                (formConfiguracion.get('aseco_nombre_host')?.dirty || formConfiguracion.get('aseco_nombre_host')?.touched)
+              }">
+            <label class="label" *ngIf="formConfiguracion.get('aseco_nombre_host')?.invalid && 
+              (formConfiguracion.get('aseco_nombre_host')?.dirty || formConfiguracion.get('aseco_nombre_host')?.touched)">
+              <span class="label-text-alt text-error">El nombre del host es requerido</span>
+            </label>
+          </div>
+
+          <!-- Campo Directorio -->
+          <div *ngIf="editField === 'directory'" class="form-control">
+            <label class="label">
+              <span class="label-text font-semibold">📁 Directorio de trabajo</span>
+            </label>
+            <input 
+              type="text" 
+              class="input input-bordered input-primary w-full" 
+              placeholder="Ej: /home/usuario, /var/data, C:\Datos"
+              formControlName="aseco_directorio" 
+              [ngClass]="{
+                'input-error': formConfiguracion.get('aseco_directorio')?.invalid &&
+                (formConfiguracion.get('aseco_directorio')?.dirty || formConfiguracion.get('aseco_directorio')?.touched)
+              }">
+            <label class="label" *ngIf="formConfiguracion.get('aseco_directorio')?.invalid && 
+              (formConfiguracion.get('aseco_directorio')?.dirty || formConfiguracion.get('aseco_directorio')?.touched)">
+              <span class="label-text-alt text-error">El directorio es requerido</span>
+            </label>
+          </div>
+
+          <!-- Campo Tamaño de Archivo -->
+          <div *ngIf="editField === 'filesize'" class="form-control">
+            <label class="label">
+              <span class="label-text font-semibold">📊 Tamaño máximo de archivo (MB)</span>
+            </label>
+            <input 
+              type="number" 
+              class="input input-bordered input-primary w-full" 
+              placeholder="Ej: 20, 50, 70"
+              min="1"
+              max="10240"
+              formControlName="aseco_size_file_mb" 
+              [ngClass]="{
+                'input-error': formConfiguracion.get('aseco_size_file_mb')?.invalid &&
+                (formConfiguracion.get('aseco_size_file_mb')?.dirty || formConfiguracion.get('aseco_size_file_mb')?.touched)
+              }">
+            <label class="label" *ngIf="formConfiguracion.get('aseco_size_file_mb')?.invalid && 
+              (formConfiguracion.get('aseco_size_file_mb')?.dirty || formConfiguracion.get('aseco_size_file_mb')?.touched)">
+              <span class="label-text-alt text-error">
+                {{ formConfiguracion.get('aseco_size_file_mb')?.errors?.['required'] ? 'El tamaño de archivo es requerido' : 
+                   formConfiguracion.get('aseco_size_file_mb')?.errors?.['min'] ? 'El tamaño mínimo es 1 MB' :
+                   formConfiguracion.get('aseco_size_file_mb')?.errors?.['max'] ? 'El tamaño máximo es 10240 MB (5 GB)' : 
+                   'Valor inválido' }}
+              </span>
+            </label>
+            <div class="label">
+              <span class="label-text-alt text-base-content/60">
+                Especifica el tamaño máximo permitido para archivos individuales
+              </span>
+            </div>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="grid grid-cols-2 gap-4 mt-8 pt-4 border-t border-base-300">
+            <button type="button" class="btn btn-error text-white w-full" (click)="closeModal()">
+              Cancelar
+            </button>
+            <button 
+              type="submit" 
+              class="btn btn-primary w-full" 
+              [disabled]="isLoadingSubmint || formConfiguracion.invalid">
+              <span *ngIf="isLoadingSubmint" class="loading loading-spinner text-secondary mr-2"></span>
+              {{ isLoadingSubmint ? 'Guardando...' : 'Guardar Cambios' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</dialog>

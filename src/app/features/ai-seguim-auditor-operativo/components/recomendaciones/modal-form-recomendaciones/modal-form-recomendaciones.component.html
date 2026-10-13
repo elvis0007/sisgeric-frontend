@@ -1,0 +1,257 @@
+<dialog id="modalFormConclusion"
+  class="fixed inset-0 w-full h-full z-50 overflow-auto bg-black bg-opacity-50 text-secondary flex items-center justify-center"
+  [ngClass]="{ 'hidden': !modalFormRecomendacionSrv.isModalOpen() }" (click)="closeModal()">
+  <div class="modal-box recommendation-modal max-w-4xl rounded-lg shadow-lg relative" (click)="$event.stopPropagation()">
+    <div class="recommendation-modal-header flex items-center justify-between">
+      <h2 class="text-2xl font-bold mb-4">{{ isEditMode ? 'Editar Recomendación' : 'Ingresar Recomendación' }}</h2>
+      <button class="btn btn-sm btn-circle btn-ghost text-lg" (click)="closeModal()">
+        ✕
+      </button>
+    </div>
+
+    <form class="grid grid-cols-1 md:grid-cols-2 gap-4"
+      [formGroup]="formRecomendacion" (ngSubmit)="toSend()">
+      <div class="form-control w-full">
+        <label class="label">
+          <span class="label-text font-medium">N° Rec.*</span>
+        </label>
+        <input type="number" class="input input-bordered input-primary w-full"
+          placeholder="Ingrese el número de recomendación"
+          [ngClass]="{
+                            'input-error': showNumRecError
+                        }" (input)="onNumRecomendacionInput()" formControlName="arere_num_rec" />
+        <label class="label" *ngIf="showNumRecError">
+          <span class="label-text-alt">Este campo es requerido</span>
+        </label>
+      </div>
+      <div class="form-control min-w-0 md:row-start-2 md:col-start-1">
+        <label class="label">
+          <span class="label-text font-medium">Recomendación*</span>
+        </label>
+        <textarea class="textarea textarea-bordered min-h-[130px] w-full" [ngClass]="{
+                  'textarea-primary': !isFieldInvalid('arere_descripcion'),
+                  'textarea-error': isFieldInvalid('arere_descripcion')
+                }" placeholder="Ingrese la recomendacion" formControlName="arere_descripcion"></textarea>
+        <label class="label" *ngIf="isFieldInvalid('arere_descripcion')">
+          <span class="label-text-alt text-error">Este campo es requerido</span>
+        </label>
+      </div>
+
+      <div class="form-control w-full min-w-0 md:row-start-1 md:col-start-2">
+        <label class="label" for="editar-recomendacion-riesgo">
+          <span class="label-text font-medium">Nivel de riesgo*</span>
+        </label>
+        <select id="editar-recomendacion-riesgo" formControlName="arere_riesgo_verificado"
+          class="select select-bordered select-primary w-full"
+          [class.select-error]="isFieldInvalid('arere_riesgo_verificado')" aria-required="true">
+          <option value="" disabled>Seleccione el riesgo</option>
+          <option value="ALTO">Alto</option>
+          <option value="MODERADO">Moderado</option>
+          <option value="BAJO">Bajo</option>
+        </select>
+        <p *ngIf="isFieldInvalid('arere_riesgo_verificado')" class="text-sm text-error mt-1" role="alert">
+          Seleccione el nivel de riesgo.
+        </p>
+      </div>
+
+      <div class="form-control w-full min-w-0 md:row-start-2 md:col-start-2">
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <div class="flex items-center gap-2">
+            <span class="label-text font-medium">Evidencias requeridas*</span>
+            <span class="badge badge-outline badge-sm" aria-label="Cantidad de evidencias">{{ evidencias.length }}</span>
+          </div>
+          <button type="button" class="btn btn-circle btn-sm btn-primary" (click)="agregarEvidencia()"
+            [disabled]="isLoadingSubmint" title="Agregar evidencia" aria-label="Agregar evidencia">
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+        </div>
+        <ol #listaEvidencias formArrayName="evidencias" class="evidence-list space-y-3" aria-label="Lista de evidencias requeridas">
+          <li *ngFor="let control of evidencias.controls; let i = index" class="flex items-start gap-2">
+            <label class="pt-3 text-sm font-semibold shrink-0" [for]="'nueva-evidencia-' + i">{{ i + 1 }}.</label>
+            <div class="flex-1 min-w-0">
+              <input type="text" [id]="'nueva-evidencia-' + i" [formControlName]="i"
+                class="input input-bordered input-primary w-full" maxlength="500"
+                [class.input-error]="formSubmitted && control.invalid"
+                [attr.aria-label]="'Evidencia requerida ' + (i + 1)" aria-required="true"
+                placeholder="Ingrese un documento o respaldo requerido" />
+              <p *ngIf="formSubmitted && control.invalid" class="text-xs text-error mt-1">
+                Complete esta evidencia o elim?nela.
+              </p>
+            </div>
+            <button type="button" class="btn btn-circle btn-sm btn-ghost text-error mt-2 shrink-0"
+              (click)="quitarEvidencia(i)" [disabled]="isLoadingSubmint || evidencias.length === 1"
+              title="Eliminar evidencia" [attr.aria-label]="'Eliminar evidencia ' + (i + 1)">
+              <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="m6 6 12 12M6 18 18 6" />
+              </svg>
+            </button>
+          </li>
+        </ol>
+        <p class="text-xs mt-2" [class.text-error]="evidenciaTexto.length > 2000">
+          {{ evidenciaTexto.length }}/2000 caracteres
+        </p>
+        <p *ngIf="evidenciaTexto.length > 2000" class="text-sm text-error mt-1" role="alert">
+          Las evidencias no deben superar los 2000 caracteres en total.
+        </p>
+      </div>
+
+      <!-- Sección de Responsables en Modo Edición -->
+      <section *ngIf="!isEditMode" class="md:col-span-2 bg-base-200/70 rounded-xl p-4 space-y-4">
+        <div class="flex justify-between items-center gap-2">
+          <h3 class="text-lg font-bold">Responsables Asignados</h3>
+          <span *ngIf="responsablesSeleccionados.length" class="badge badge-primary">{{ responsablesSeleccionados.length }}</span>
+        </div>
+        <p *ngIf="!responsablesSeleccionados.length" class="text-center py-5 text-base-content/80">Responsables sin asignar</p>
+        <div *ngIf="responsablesSeleccionados.length" class="space-y-2 max-h-40 overflow-y-auto">
+          <div *ngFor="let persona of responsablesSeleccionados" class="flex items-center justify-between gap-3 rounded-lg bg-base-100 p-3">
+            <div class="min-w-0"><p class="text-sm font-semibold">{{ persona.NOMBRES }} {{ persona.APELLIDOS }}</p><p class="text-xs text-base-content/70">{{ persona.CARGO }} - {{ persona.DEPARTAMENTO }}</p></div>
+            <button type="button" class="btn btn-ghost btn-sm btn-circle shrink-0" (click)="alternarResponsable(persona)" [disabled]="isLoadingSubmint" [attr.aria-label]="'Quitar responsable ' + persona.NOMBRES + ' ' + persona.APELLIDOS"><span aria-hidden="true">&times;</span></button>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary w-full" (click)="abrirSelectorResponsables()" [disabled]="isLoadingSubmint || cargandoPersonal">{{ cargandoPersonal ? 'CARGANDO PERSONAL...' : 'ASIGNAR RESPONSABLES' }}</button>
+      </section>
+
+      <div *ngIf="isEditMode" class="mt-2 md:col-span-2">
+        <!-- Indicador de carga de responsables -->
+        <div *ngIf="isLoadingResponsables" class="flex items-center gap-2 p-3 bg-base-200/50 rounded-xl text-sm text-secondary">
+          <span class="loading loading-spinner loading-sm text-primary"></span>
+          <span>Cargando responsables de la recomendación...</span>
+        </div>
+
+        <div *ngIf="!isLoadingResponsables">
+          <!-- Caso 1: Un solo responsable asignado -->
+          <div *ngIf="responsablesActivos.length === 1" class="bg-base-200/80 border border-base-300 rounded-xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-inner">
+            <div class="flex items-center gap-3">
+              <div class="avatar">
+                <div class="w-12 h-12 rounded-full border-2 border-primary/50 bg-base-100 flex items-center justify-center shadow-sm overflow-hidden">
+                  <img *ngIf="responsablesActivos[0].fotografia" [src]="'data:image/jpeg;base64,' + responsablesActivos[0].fotografia" alt="avatar" class="w-full h-full object-cover" />
+                  <span *ngIf="!responsablesActivos[0].fotografia" class="text-primary font-bold text-base">
+                    {{ responsablesActivos[0].nombre_completo.charAt(0) }}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="badge badge-primary badge-xs font-semibold uppercase">Responsable Asignado</span>
+                  <span *ngIf="responsablesActivos[0].arers_num_rol" class="text-xs text-secondary/60">Rol: {{ responsablesActivos[0].arers_num_rol }}</span>
+                </div>
+                <div class="font-bold text-sm text-secondary mt-0.5">{{ responsablesActivos[0].nombre_completo }}</div>
+                <div class="text-xs text-secondary/70">{{ responsablesActivos[0].arers_cargo || 'Sin cargo' }} • {{ responsablesActivos[0].arers_departamento }}</div>
+              </div>
+            </div>
+            <div class="sm:text-right bg-base-100 px-3 py-1.5 rounded-lg border border-base-200 shadow-sm shrink-0 w-full sm:w-auto">
+              <span class="text-[11px] font-medium text-secondary/60 block">Fecha individual actual:</span>
+              <span class="text-xs font-bold text-primary">{{ responsablesActivos[0].aredr_fecha_maxima || data.arere_fecha_maxima }}</span>
+            </div>
+          </div>
+
+          <!-- Caso 2: Múltiples responsables activos -->
+          <div *ngIf="responsablesActivos.length > 1" class="space-y-2.5">
+            <div class="form-control w-full">
+              <label class="label pb-1">
+                <span class="label-text font-medium text-secondary flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  Seleccionar responsable para cambio de fecha:*
+                </span>
+              </label>
+              <select class="select select-bordered select-primary w-full text-sm font-medium"
+                [value]="selectedResponsableCodigo !== null ? selectedResponsableCodigo : 'TODOS'"
+                (change)="onSelectResponsable($any($event.target).value)">
+                <option value="TODOS">Todos los responsables activos (Fecha general)</option>
+                <option *ngFor="let resp of responsablesActivos" [value]="resp.arers_codigo">
+                  {{ resp.nombre_completo }} — {{ resp.arers_cargo || resp.arers_departamento }} (Actual: {{ resp.aredr_fecha_maxima || data.arere_fecha_maxima }})
+                </option>
+              </select>
+            </div>
+
+            <!-- Detalle del responsable seleccionado si es individual -->
+            <div *ngIf="selectedResponsable" class="bg-base-200/80 border border-base-300 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-inner">
+              <div class="flex items-center gap-3">
+                <div class="avatar">
+                  <div class="w-10 h-10 rounded-full border border-primary/40 bg-base-100 flex items-center justify-center shadow-sm overflow-hidden">
+                    <img *ngIf="selectedResponsable.fotografia" [src]="'data:image/jpeg;base64,' + selectedResponsable.fotografia" alt="avatar" class="w-full h-full object-cover" />
+                    <span *ngIf="!selectedResponsable.fotografia" class="text-primary font-bold text-sm">
+                      {{ selectedResponsable.nombre_completo.charAt(0) }}
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <div class="font-bold text-sm text-secondary">{{ selectedResponsable.nombre_completo }}</div>
+                  <div class="text-xs text-secondary/70">{{ selectedResponsable.arers_cargo || 'Sin cargo' }} • {{ selectedResponsable.arers_departamento }}</div>
+                </div>
+              </div>
+              <div class="sm:text-right bg-base-100 px-3 py-1.5 rounded-lg border border-base-200 shadow-sm shrink-0 w-full sm:w-auto">
+                <span class="text-[11px] font-medium text-secondary/60 block">Fecha individual actual:</span>
+                <span class="text-xs font-bold text-primary">{{ selectedResponsable.aredr_fecha_maxima || data.arere_fecha_maxima }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Caso 3: Sin responsables asignados -->
+          <div *ngIf="responsablesActivos.length === 0" class="alert alert-info/10 border border-info/30 rounded-xl p-3 text-xs flex items-center gap-2 text-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-info shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>Esta recomendación aún no cuenta con responsables asignados. La fecha ingresada aplicará como fecha base de la recomendación.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-control min-w-0 md:col-span-2">
+        <label class="label">
+          <span class="label-text font-medium text-secondary">
+            <ng-container *ngIf="isEditMode && selectedResponsable">
+              Fecha máxima para <span class="text-primary font-bold">{{ selectedResponsable.nombre_completo }}</span>*
+            </ng-container>
+            <ng-container *ngIf="isEditMode && responsablesActivos.length > 1 && !selectedResponsable">
+              Fecha máxima general para <span class="text-primary font-bold">todos los responsables</span>*
+            </ng-container>
+            <ng-container *ngIf="!isEditMode || (isEditMode && responsablesActivos.length === 0)">
+              Fecha máxima de cumplimiento*
+            </ng-container>
+          </span>
+        </label>
+        <div class="relative w-full">
+          <input type="date" class="input input-bordered w-full pr-10 custom-calendar-picker"
+            formControlName="arere_fecha_maxima" placeholder="Seleccione fecha de emisión"
+            [min]="getMinDate()"
+            [ngClass]="{
+                  'input-primary': !isFieldInvalid('arere_fecha_maxima') && !isFechaMenorOGlobal(),
+                  'input-error': isFieldInvalid('arere_fecha_maxima') || isFechaMenorOGlobal()
+                }">
+          <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"
+              class="h-5 w-5 text-secondary">
+              <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M18 2v2M6 2v2m5.996 9h.008m-.008 4h.008m3.987-4H16m-8 0h.009M8 17h.009M3.5 8h17m-18 4.243c0-4.357 0-6.536 1.252-7.89C5.004 3 7.02 3 11.05 3h1.9c4.03 0 6.046 0 7.298 1.354C21.5 5.707 21.5 7.886 21.5 12.244v.513c0 4.357 0 6.536-1.252 7.89C18.996 22 16.98 22 12.95 22h-1.9c-4.03 0-6.046 0-7.298-1.354C2.5 19.293 2.5 17.114 2.5 12.756zM3 8h18" />
+            </svg>
+          </span>
+        </div>
+        <label class="label" *ngIf="isFieldInvalid('arere_fecha_maxima')">
+          <span class="label-text-alt text-error">Este campo es requerido</span>
+        </label>
+        <label class="label" *ngIf="isFechaMenorOGlobal()">
+          <span class="label-text-alt text-error font-medium flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-error inline" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            La fecha no puede ser anterior a la fecha global ({{ getFechaGlobalFormateada() }}). Debe ser posterior.
+          </span>
+        </label>
+      </div>
+
+      <div class="recommendation-modal-actions flex gap-4 justify-center items-center mt-4 md:col-span-2">
+        <button type="button" class="btn btn-error text-white flex-1 w-full" (click)="closeModal()">CANCELAR</button>
+        <button class="btn btn-primary flex-1 w-full text-white" [disabled]="isLoadingSubmint">
+          <span *ngIf="isLoadingSubmint" class="loading loading-spinner text-secondary"></span>
+          {{isLoadingSubmint ? 'CARGANDO...' : isEditMode ? 'CONFIRMAR' : 'REGISTRAR' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</dialog>
+
+<app-modal-add-responsables [responsables]="personalParaSeleccionar" (responsablesSelected)="recibirResponsables($event)" />

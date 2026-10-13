@@ -1,0 +1,24 @@
+<div class="w-full">
+
+  <app-breadcrumbs />
+
+  <app-modal-responsables />
+
+  <app-modal-historial />
+
+  <h1 class="text-2xl font-bold pb-5 pt-3">Recomendaciones</h1>
+
+  <div class="flex flex-col lg:flex-row items-start lg:items-center gap-4 w-full mb-5">
+    <app-search-filter class="flex-grow w-full" 
+      (filterChange)="onFilterChange($event)" (loadingChange)="onLoadingChange($event)"/>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center items-center my-8">
+    <span class="loading loading-spinner loading-lg text-secondary"></span>
+  </div>
+
+  <app-table-recomendaciones *ngIf="!isLoading" [recomendaciones]="recomendaciones" 
+    [reloadTable]="reloadTable.bind(this)" />
+
+</div>

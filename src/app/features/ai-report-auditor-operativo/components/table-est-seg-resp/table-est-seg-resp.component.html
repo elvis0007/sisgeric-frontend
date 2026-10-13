@@ -1,0 +1,465 @@
+<!-- Filtros de búsqueda -->
+<div class="flex flex-col w-full gap-4 mb-6">
+  <div class="card bg-base-100 shadow-xl border border-base-200">
+    <div class="card-body p-4 sm:p-6">
+      <div class="flex items-center justify-between gap-2 pb-2 mb-4 border-b border-base-200">
+        <div class="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          <h3 class="card-title text-base sm:text-lg font-bold">Filtros de búsqueda</h3>
+        </div>
+      </div>
+
+      <form [formGroup]="filterForm">
+        <!-- Grid responsivo de filtros -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full">
+          <!-- Fecha desde -->
+          <div class="indicator w-full">
+            <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">
+              Fecha desde
+            </span>
+            <input
+              type="date"
+              class="input input-bordered input-primary w-full"
+              [formControl]="startDateControl"
+              [max]="endDateControl.value"
+            />
+          </div>
+
+          <!-- Fecha hasta -->
+          <div class="indicator w-full">
+            <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">
+              Fecha hasta
+            </span>
+            <input
+              type="date"
+              class="input input-bordered input-primary w-full"
+              [formControl]="endDateControl"
+              [min]="startDateControl.value"
+            />
+          </div>
+
+          <!-- Ente de control (Multi-Selección) -->
+          <div class="indicator w-full">
+            <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">
+              Ente de control
+            </span>
+            <div class="dropdown dropdown-end w-full">
+              <div tabindex="0" role="button"
+                class="input input-bordered input-primary w-full flex items-center justify-between cursor-pointer font-semibold text-sm">
+                <span class="truncate">{{ getOrganismosSeleccionadosLabel() }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-60 flex-shrink-0" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              <div tabindex="0"
+                class="dropdown-content z-[50] p-3 shadow-2xl bg-base-100 rounded-box w-64 sm:w-72 max-w-[85vw] border border-base-200 mt-1 max-h-64 overflow-y-auto overflow-x-hidden">
+                <div class="cursor-pointer flex items-center justify-start gap-3 py-1.5 hover:bg-base-200 rounded-lg px-2 select-none"
+                  (click)="toggleAllOrganismos()">
+                  <input type="checkbox" class="checkbox checkbox-xs checkbox-primary pointer-events-none"
+                    [checked]="organismosSeleccionados.length === 0" />
+                  <span class="text-sm font-bold text-base-content">Todos los Entes</span>
+                </div>
+                <div class="divider my-1"></div>
+                <div *ngFor="let org of organismos"
+                  class="cursor-pointer flex items-center justify-start gap-3 py-1.5 hover:bg-base-200 rounded-lg px-2 select-none"
+                  (click)="toggleOrganismo(org.ainoc_codigo)">
+                  <input type="checkbox" class="checkbox checkbox-xs checkbox-primary pointer-events-none flex-shrink-0"
+                    [checked]="organismosSeleccionados.includes(org.ainoc_codigo)" />
+                  <span class="text-sm font-semibold text-base-content whitespace-normal leading-tight">{{ org.ainoc_descripcion }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estado recomendación (multiselect) -->
+          <div class="indicator w-full relative" (click)="$event.stopPropagation()">
+            <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">
+              Estado recomendación
+            </span>
+            <button
+              type="button"
+              class="select select-bordered select-primary w-full text-left font-normal truncate"
+              (click)="toggleEstadoRecDropdown()"
+            >
+              {{ estadoRecSeleccionadosTexto }}
+            </button>
+
+            <div *ngIf="estadoRecDropdownOpen" class="absolute z-50 mt-1 top-full w-full bg-base-100 border border-base-300 rounded-box shadow-lg max-h-64 overflow-y-auto">
+              <label class="label cursor-pointer px-3 py-2 hover:bg-base-200">
+                <div class="flex items-center gap-2">
+                  <input type="checkbox" class="checkbox checkbox-sm checkbox-primary"
+                         [checked]="areAllEstadoRecSelected()"
+                         (change)="toggleSelectAllEstadoRec()">
+                  <span class="text-xs font-semibold">Seleccionar todos</span>
+                </div>
+              </label>
+              <label *ngFor="let est of estadosSeguimiento" class="label cursor-pointer px-3 py-2 hover:bg-base-200">
+                <div class="flex items-center gap-2">
+                  <input type="checkbox" class="checkbox checkbox-sm checkbox-primary"
+                         [checked]="isEstadoRecSeleccionado(est.arees_codigo)"
+                         (change)="toggleEstadoRec(est.arees_codigo)">
+                  <span class="text-xs">{{ est.arees_descripcion }}</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Estado verificable (multiselect) -->
+          <div class="indicator w-full relative" (click)="$event.stopPropagation()">
+            <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">
+              Estado verificable
+            </span>
+            <button
+              type="button"
+              class="select select-bordered select-primary w-full text-left font-normal truncate"
+              (click)="toggleEstadoVerificableDropdown()"
+            >
+              {{ estadoVerificableSeleccionadosTexto }}
+            </button>
+
+            <div *ngIf="estadoVerificableDropdownOpen" class="absolute z-50 mt-1 top-full w-full bg-base-100 border border-base-300 rounded-box shadow-lg max-h-64 overflow-y-auto">
+              <label class="label cursor-pointer px-3 py-2 hover:bg-base-200">
+                <div class="flex items-center gap-2">
+                  <input type="checkbox" class="checkbox checkbox-sm checkbox-primary"
+                         [checked]="areAllEstadoVerificableSelected()"
+                         (change)="toggleSelectAllEstadoVerificable()">
+                  <span class="text-xs font-semibold">Seleccionar todos</span>
+                </div>
+              </label>
+              <label *ngFor="let estado of estadosVerificableDisponibles" class="label cursor-pointer px-3 py-2 hover:bg-base-200">
+                <div class="flex items-center gap-2">
+                  <input type="checkbox" class="checkbox checkbox-sm checkbox-primary"
+                         [checked]="isEstadoVerificableSeleccionado(estado)"
+                         (change)="toggleEstadoVerificable(estado)">
+                  <span class="text-xs">{{ estado }}</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Departamento -->
+          <div class="indicator w-full">
+            <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">
+              Departamento
+            </span>
+            <select
+              class="select select-bordered select-primary w-full"
+              [formControl]="departamentoControl"
+            >
+              <option value="0">Todos los departamentos</option>
+              <option *ngFor="let dept of departamentos" [value]="dept">
+                {{ dept }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Palabra clave -->
+          <div class="indicator w-full md:col-span-2 lg:col-span-2 xl:col-span-2">
+            <span class="indicator-item indicator-top indicator-center badge badge-ghost badge-sm">
+              Palabra clave
+            </span>
+            <input
+              type="text"
+              class="input input-bordered input-primary w-full"
+              [formControl]="searchTermControl"
+              placeholder="Buscar por memorando, informe, hallazgo, conclusión, recomendación, responsable, observación..."
+            />
+          </div>
+        </div>
+
+        <!-- Botón Limpiar Filtros -->
+        <div class="flex justify-end mt-4">
+          <button type="button" (click)="clearFilters()" class="btn btn-outline btn-primary btn-sm sm:btn-md flex gap-2 items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            Limpiar Filtros
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Resultado del Reporte -->
+  <!-- Resultado del Reporte -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="card-title text-lg font-semibold">Resultado del reporte</h3>
+
+        <!-- Botón Exportar a Excel -->
+        <button
+          class="btn btn-primary btn-sm sm:btn-md"
+          type="button"
+          [disabled]="!hasData || isLoading"
+          (click)="exportToExcel()"
+        >
+          <div class="flex flex-row items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M2.859 2.877l12.57-1.795a.5.5 0 0 1 .571.494v20.848a.5.5 0 0 1-.57.494L2.858 21.123a1 1 0 0 1-.859-.99V3.867a1 1 0 0 1 .859-.99M17 3h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-4zm-6.8 9L13 8h-2.4L9 10.286L7.4 8H5l2.8 4L5 16h2.4L9 13.714L10.6 16H13z"
+              />
+            </svg>
+            <span class="hidden sm:inline font-bold">EXPORTAR</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Loading Progress -->
+      <app-report-loading *ngIf="isLoading"
+        message="Cargando estado de seguimiento por responsable..."
+        subtitle="Consultando informes, hallazgos, recomendaciones y responsables asignados">
+      </app-report-loading>
+
+      <!-- Sin datos -->
+      <div *ngIf="!isLoading && !hasData" class="alert alert-info justify-center my-8">
+        No se encontraron registros con los criterios seleccionados.
+      </div>
+
+      <!-- Tabla de Datos -->
+      <div *ngIf="!isLoading && hasData" class="w-full">
+        <div class="report-table-shell overflow-x-auto rounded-lg shadow-sm border border-base-200">
+          <table class="table table-sm md:table-md w-full table-pin-rows">
+            <thead class="sticky top-0 z-20">
+              <tr class="bg-primary text-primary-content">
+                <th class="text-sm bg-primary text-primary-content">Memorando</th>
+                <th class="text-sm bg-primary text-primary-content">Informe</th>
+                <th class="text-sm bg-primary text-primary-content">Hallazgo</th>
+                <th class="text-sm bg-primary text-primary-content">Conclusión</th>
+                <th class="text-sm bg-primary text-primary-content">Recomendación</th>
+                <th class="text-sm bg-primary text-primary-content">Ente de control</th>
+                <th class="text-sm bg-primary text-primary-content">Responsable</th>
+                <th class="text-sm bg-primary text-primary-content">Departamento</th>
+                <th class="text-sm text-center bg-primary text-primary-content">Estado rec.</th>
+                <th class="text-sm text-center bg-primary text-primary-content">Estado verificable</th>
+                <th class="text-sm bg-primary text-primary-content min-w-[160px]">Obs. Verificable</th>
+                <th class="text-sm bg-primary text-primary-content min-w-[160px]">Obs. Auditora</th>
+                <th class="text-sm bg-primary text-primary-content">Fecha Vencimiento</th>
+              </tr>
+            </thead>
+            <tbody class="bg-base-200">
+              <tr class="hover" *ngFor="let r of displayedReports; let i = index">
+                <!-- Memorando -->
+                <td class="text-sm font-medium align-top py-3 px-3">
+                  <div class="font-bold text-primary">{{ r.memoAuditoria }}</div>
+                  <div *ngIf="r.memoPresidencia" class="text-xs text-base-content/60">{{ r.memoPresidencia }}</div>
+                </td>
+
+                <!-- Informe -->
+                <td class="text-sm align-top py-3 px-3 w-44 max-w-[180px]">
+                  <div class="hover:text-primary-focus cursor-pointer text-left leading-snug floating-trigger-btn"
+                       (mouseenter)="showFloating($event, { title: 'Título del Informe', content: r.tituloInforme }, 'tit_' + i)"
+                       (mouseleave)="scheduleHideFloating()"
+                       (click)="togglePinFloating($event, { title: 'Título del Informe', content: r.tituloInforme }, 'tit_' + i)">
+                    {{ (r.tituloInforme && r.tituloInforme.length > 50) ? (r.tituloInforme | slice:0:50) + '...' : (r.tituloInforme || '-') }}
+                  </div>
+                </td>
+
+                <!-- Hallazgo -->
+                <td class="text-sm align-top py-3 px-3 w-40 max-w-[160px]">
+                  <div class="hover:text-primary-focus cursor-pointer text-left leading-snug floating-trigger-btn"
+                       (mouseenter)="showFloating($event, { title: 'Hallazgo', content: r.hallazgo }, 'hall_' + i)"
+                       (mouseleave)="scheduleHideFloating()"
+                       (click)="togglePinFloating($event, { title: 'Hallazgo', content: r.hallazgo }, 'hall_' + i)">
+                    {{ (r.hallazgo && r.hallazgo.length > 45) ? (r.hallazgo | slice:0:45) + '...' : (r.hallazgo || '-') }}
+                  </div>
+                </td>
+
+                <!-- Conclusión -->
+                <td class="text-sm align-top py-3 px-3 w-40 max-w-[160px]">
+                  <div class="hover:text-primary-focus cursor-pointer text-left leading-snug floating-trigger-btn"
+                       (mouseenter)="showFloating($event, { title: 'Conclusión', content: r.conclusion }, 'concl_' + i)"
+                       (mouseleave)="scheduleHideFloating()"
+                       (click)="togglePinFloating($event, { title: 'Conclusión', content: r.conclusion }, 'concl_' + i)">
+                    {{ (r.conclusion && r.conclusion.length > 45) ? (r.conclusion | slice:0:45) + '...' : (r.conclusion || '-') }}
+                  </div>
+                </td>
+
+                <!-- Recomendación -->
+                <td class="text-sm align-top py-3 px-3 w-44 max-w-[180px]">
+                  <div class="hover:text-primary-focus cursor-pointer text-left leading-snug floating-trigger-btn"
+                       (mouseenter)="showFloating($event, { title: 'Recomendación' + (r.numeroRecomendacion ? (' N° ' + r.numeroRecomendacion) : ''), content: r.recomendacion }, 'rec_' + i)"
+                       (mouseleave)="scheduleHideFloating()"
+                       (click)="togglePinFloating($event, { title: 'Recomendación' + (r.numeroRecomendacion ? (' N° ' + r.numeroRecomendacion) : ''), content: r.recomendacion }, 'rec_' + i)">
+                    <strong *ngIf="r.numeroRecomendacion" class="font-bold text-primary mr-1">R{{ r.numeroRecomendacion }}:</strong>
+                    <span>{{ (r.recomendacion && r.recomendacion.length > 45) ? (r.recomendacion | slice:0:45) + '...' : (r.recomendacion || '-') }}</span>
+                  </div>
+                </td>
+
+                <!-- Ente de control -->
+                <td class="text-sm uppercase align-top py-3 px-3 w-32 font-medium">{{ r.organismoControl || '-' }}</td>
+
+                <!-- Responsable -->
+                <td class="text-sm uppercase align-top py-3 px-3 w-40 font-semibold text-base-content">{{ r.responsable || '-' }}</td>
+
+                <!-- Departamento -->
+                <td class="text-sm uppercase align-top py-3 px-3 w-36 text-base-content/80">{{ r.departamento || '-' }}</td>
+
+                <!-- Estado Recomendación -->
+                <td class="text-sm text-center align-top py-3 px-3 whitespace-nowrap">
+                  <span class="badge badge-md font-bold !text-white text-xs uppercase tracking-wide border-0 shadow-xs px-3 py-1.5 h-auto inline-flex items-center justify-center"
+                        style="color: #ffffff !important;"
+                        [ngClass]="r.estadoRecomendacion | statusColor">
+                    {{ r.estadoRecomendacion || '-' }}
+                  </span>
+                </td>
+
+                <!-- Estado Verificable -->
+                <td class="text-sm text-center align-top py-3 px-3 whitespace-nowrap">
+                  <span *ngIf="r.estadoVerificable"
+                        class="badge badge-md font-bold !text-white text-xs uppercase tracking-wide border-0 shadow-xs px-3 py-1.5 h-auto inline-flex items-center justify-center"
+                        style="color: #ffffff !important;"
+                        [ngClass]="r.estadoVerificable | statusColor">
+                    {{ r.estadoVerificable }}
+                  </span>
+                  <span *ngIf="!r.estadoVerificable" class="text-base-content/50 text-sm font-semibold">-</span>
+                </td>
+
+                <!-- Obs. Verificable Responsable -->
+                <td class="text-sm align-top py-3 px-3 w-48 max-w-[200px]">
+                  <ng-container *ngIf="r.descripcionVerificableResponsable as obsResp; else noObsResp">
+                    <div class="hover:text-primary-focus cursor-pointer text-left leading-snug floating-trigger-btn p-1.5 rounded bg-base-100/70 border border-base-300"
+                         (mouseenter)="showFloating($event, { title: 'Obs. Verificable Responsable', content: obsResp }, 'obsresp_' + i)"
+                         (mouseleave)="scheduleHideFloating()"
+                         (click)="togglePinFloating($event, { title: 'Obs. Verificable Responsable', content: obsResp }, 'obsresp_' + i)">
+                      <div class="line-clamp-2 select-none text-xs leading-tight">
+                        {{ obsResp }}
+                      </div>
+                    </div>
+                  </ng-container>
+                  <ng-template #noObsResp>
+                    <span class="text-base-content/40 text-sm">-</span>
+                  </ng-template>
+                </td>
+
+                <!-- Obs. Auditora -->
+                <td class="text-sm align-top py-3 px-3 w-48 max-w-[200px]">
+                  <ng-container *ngIf="r.observacionAuditor as obsAudit; else noObsAudit">
+                    <div class="hover:text-primary-focus cursor-pointer text-left leading-snug floating-trigger-btn p-1.5 rounded bg-base-100/70 border border-base-300"
+                         (mouseenter)="showFloating($event, { title: 'Observación Auditora', content: obsAudit }, 'obsaud_' + i)"
+                         (mouseleave)="scheduleHideFloating()"
+                         (click)="togglePinFloating($event, { title: 'Observación Auditora', content: obsAudit }, 'obsaud_' + i)">
+                      <div class="line-clamp-2 select-none text-xs leading-tight text-primary font-medium">
+                        {{ obsAudit }}
+                      </div>
+                    </div>
+                  </ng-container>
+                  <ng-template #noObsAudit>
+                    <span class="text-base-content/40 text-sm">-</span>
+                  </ng-template>
+                </td>
+
+                <!-- Fecha Vencimiento y Estado Plazo -->
+                <td class="text-sm whitespace-nowrap align-top py-3 px-3">
+                  <div class="font-medium">{{ r.fechaVencimiento || '-' }}</div>
+                  <div *ngIf="r.estadoPlazo" class="text-xs mt-0.5"
+                       [ngClass]="isVencido(r) ? 'text-error font-bold' : (isEnPlazo(r) ? 'text-success font-semibold' : 'text-slate-500 font-medium')">
+                    {{ r.estadoPlazo }}
+                    <span *ngIf="getDiasDisplay(r)">{{ getDiasDisplay(r) }}</span>
+                  </div>
+                </td>
+              </tr>
+
+              <tr *ngIf="!displayedReports.length">
+                <td colspan="13" class="text-center py-6">
+                  <span class="text-base-content/70">No se encontraron registros</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginación -->
+        <app-pagination
+          [totalItems]="filteredReports.length"
+          [itemsPerPage]="itemsPerPage"
+          [currentPage]="currentPage"
+          (pageChange)="onPageChange($event)"
+          (itemsPerPageChange)="onItemsPerPageChange($event)">
+        </app-pagination>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Fixed Dialog Card (Renderizado fuera de la tabla para cero saltos ni desbordes) -->
+  <div *ngIf="activeFloating"
+       class="fixed z-[99999] card card-compact shadow-2xl bg-base-100 text-base-content rounded-2xl border border-base-300 floating-portal-card transition-all duration-150 flex flex-col"
+       [style.top]="activeFloating.openAbove ? 'auto' : (activeFloating.y + 'px')"
+       [style.bottom]="activeFloating.openAbove ? (activeFloating.bottom + 'px') : 'auto'"
+       [style.left.px]="activeFloating.x"
+       [style.width.px]="activeFloating.width"
+       [style.max-height.px]="activeFloating.maxHeight"
+       (mouseenter)="cancelHide()"
+       (mouseleave)="scheduleHideFloating()"
+       (click)="$event.stopPropagation()">
+
+    <div class="card-body p-3.5 flex flex-col min-h-0 overflow-hidden">
+      <!-- Header fijo del diálogo -->
+      <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-base-200 shrink-0">
+        <div class="flex items-center gap-1.5 min-w-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="font-bold text-xs uppercase tracking-wider text-primary truncate">
+            {{ activeFloating.title }}
+          </span>
+        </div>
+
+        <!-- Botones de acción: Pantalla completa, Copiar, Cerrar -->
+        <div class="flex items-center gap-1 shrink-0">
+          <button class="btn btn-ghost btn-xs btn-circle text-primary" title="Ver en pantalla completa"
+                  (click)="openTextModal(activeFloating.title, activeFloating.content)">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+            </svg>
+          </button>
+
+          <button class="btn btn-ghost btn-xs btn-circle" title="Copiar contenido"
+                  (click)="copyToClipboard(activeFloating.rawText, activeFloating.id, $event)">
+            <svg *ngIf="copiedId !== activeFloating.id" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-base-content/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            <svg *ngIf="copiedId === activeFloating.id" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
+
+          <button class="btn btn-ghost btn-xs btn-circle text-base-content/60 hover:text-base-content" title="Cerrar"
+                  (click)="closeFloating($event)">✕</button>
+        </div>
+      </div>
+
+      <!-- Contenido scrollable -->
+      <div tabindex="0"
+           class="text-xs leading-relaxed overflow-y-auto overscroll-contain pr-1 text-base-content obs-list-container select-text whitespace-pre-line focus:outline-none flex-1 min-h-0">
+        {{ activeFloating.content }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Pantalla Completa para Textos Extensos -->
+  <dialog id="modal_texto_resp" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box max-w-2xl">
+      <h3 class="font-bold text-lg text-primary mb-3">{{ selectedModalTitle }}</h3>
+      <div class="text-sm leading-relaxed max-h-[60vh] overflow-y-auto whitespace-pre-line p-3 bg-base-200/50 rounded-xl border border-base-300 select-text">
+        {{ selectedModalText }}
+      </div>
+      <div class="modal-action">
+        <button class="btn btn-sm btn-outline" (click)="copyToClipboard(selectedModalText)">
+          Copiar Texto
+        </button>
+        <button class="btn btn-sm btn-primary" (click)="closeTextModal()">Cerrar</button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button (click)="closeTextModal()">close</button>
+    </form>
+  </dialog>
+</div>
+
+<!-- Backdrop para cerrar dropdowns de filtros -->
+<div class="fixed inset-0 z-40" *ngIf="estadoRecDropdownOpen || estadoVerificableDropdownOpen" (click)="closeDropdowns()"></div>

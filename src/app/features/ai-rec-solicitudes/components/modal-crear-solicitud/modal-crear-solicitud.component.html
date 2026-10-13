@@ -1,0 +1,147 @@
+<dialog id="modalCrearSolicitud"
+  class="fixed inset-0 w-full h-full z-50 overflow-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+  [ngClass]="{ 'hidden': !modalSrv.isModalOpen() }" (click)="closeModal()">
+  <div
+    class="modal-box w-full max-w-2xl rounded-2xl shadow-2xl relative bg-base-100 p-0 border border-base-200 overflow-hidden"
+    (click)="$event.stopPropagation()">
+
+    <!-- HEADER -->
+    <div class="flex items-center justify-between border-b border-base-200 px-6 py-4 bg-base-200/70">
+      <div>
+        <h2 class="text-xl font-bold text-base-content tracking-tight">Solicitud de Ampliación de Plazo</h2>
+        <p class="text-xs text-base-content/60 mt-0.5 font-medium">Complete los campos requeridos para continuar</p>
+      </div>
+      <button
+        class="btn btn-sm btn-circle btn-ghost text-base-content/60 hover:text-base-content hover:bg-base-300 transition-colors"
+        (click)="closeModal()">✕</button>
+    </div>
+
+    <!-- OVERLAY DE CARGA -->
+    <div *ngIf="isLoading" class="absolute inset-0 flex items-center justify-center bg-base-100/95 z-50 rounded-2xl">
+      <div class="flex flex-col items-center gap-3">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+        <p class="text-sm font-semibold text-base-content">Generando PDF oficial...</p>
+      </div>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div class="p-6 overflow-y-auto max-h-[78vh] space-y-5" [ngClass]="{'opacity-50 pointer-events-none': isLoading}">
+
+      <!-- INFORMACIÓN AUTOMÁTICA -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="form-control">
+          <label class="label pb-1.5">
+            <span class="label-text text-xs font-bold text-base-content/80 uppercase tracking-wider">Número de
+              Solicitud</span>
+          </label>
+          <input type="text"
+            class="input input-bordered bg-base-200/80 border-base-300 text-xs font-semibold text-base-content/90 cursor-not-allowed"
+            readonly [value]="numeroSolicitud()">
+        </div>
+        <div class="form-control">
+          <label class="label pb-1.5">
+            <span class="label-text text-xs font-bold text-base-content/80 uppercase tracking-wider">Destinatario</span>
+          </label>
+          <input type="text"
+            class="input input-bordered bg-base-200/80 border-base-300 text-xs font-semibold text-base-content/90 cursor-not-allowed"
+            readonly [value]="nombreDirector()">
+        </div>
+      </div>
+
+      <!-- FORMULARIO EDITABLE -->
+      <form [formGroup]="formSolicitud" class="space-y-5">
+        <!-- FECHAS -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="form-control">
+            <label class="label pb-1.5">
+              <span class="label-text text-xs font-bold text-base-content/80 uppercase tracking-wider">
+                Fecha de Solicitud <span class="text-error font-bold">*</span>
+              </span>
+            </label>
+            <input type="date"
+              class="input input-bordered bg-base-200/80 border-base-300 text-xs font-semibold text-base-content/90 cursor-not-allowed w-full"
+              formControlName="fecha" readonly [ngClass]="{'input-error': isFieldInvalid('fecha')}">
+            <label class="label pt-1" *ngIf="isFieldInvalid('fecha')">
+              <span class="label-text-alt text-error text-xs">{{ getErrorMessage('fecha') }}</span>
+            </label>
+          </div>
+
+          <div class="form-control">
+            <label class="label pb-1.5">
+              <span class="label-text text-xs font-bold text-base-content/80 uppercase tracking-wider">
+                Fecha Máxima Actual
+              </span>
+            </label>
+            <input type="date"
+              class="input input-bordered bg-base-200/80 border-base-300 text-xs font-semibold text-base-content/90 cursor-not-allowed w-full"
+              formControlName="fechaMaximaActual" readonly>
+          </div>
+
+          <div class="form-control">
+            <label class="label pb-1.5">
+              <span class="label-text text-xs font-bold text-base-content/80 uppercase tracking-wider">
+                Fecha Máxima Nueva <span class="text-error font-bold">*</span>
+              </span>
+            </label>
+            <input type="date"
+              class="input input-bordered w-full border-base-300 text-xs font-semibold focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+              formControlName="fechaCumplimiento"
+              [min]="getMinFechaCumplimiento()"
+              [max]="getMaxFechaCumplimiento()"
+              [ngClass]="{'input-error border-error': isFieldInvalid('fechaCumplimiento')}">
+            <label class="label pt-1" *ngIf="isFieldInvalid('fechaCumplimiento')">
+              <span class="label-text-alt text-error text-xs">{{ getErrorMessage('fechaCumplimiento') }}</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- DETALLE / MOTIVO -->
+        <div class="form-control">
+          <label class="label pb-1.5 justify-between">
+            <span class="label-text text-xs font-bold text-base-content/80 uppercase tracking-wider">
+              Descripción del Motivo <span class="text-error font-bold">*</span>
+            </span>
+            <span class="text-[11px] font-semibold text-base-content/60">
+              Encabezado fijo protegido (No borrable)
+            </span>
+          </label>
+          <textarea
+            class="textarea textarea-bordered text-xs leading-relaxed resize-none h-32 border-base-300 focus:border-primary focus:ring-1 focus:ring-primary transition-all font-sans"
+            placeholder="Explique el motivo a continuación del encabezado..." formControlName="detalle"
+            (input)="onDetalleInput($event)"
+            [ngClass]="{'textarea-error border-error': isFieldInvalid('detalle')}"></textarea>
+          <!-- Mensaje indicativo en letras plomas (se oculta al empezar a escribir) -->
+          <div *ngIf="getAdditionalMotivoLength() === 0" class="text-xs font-medium text-slate-400 dark:text-slate-500 mt-1 flex items-center gap-1.5 select-none">
+            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span class="font-bold text-slate-400 dark:text-slate-500">: ... complete</span>
+            <span class="text-slate-400 dark:text-slate-500">(complete a continuación con el motivo justificativo)</span>
+          </div>
+
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 pt-1">
+            <label class="label p-0" *ngIf="isFieldInvalid('detalle')">
+              <span class="label-text-alt text-error text-xs font-semibold">{{ getErrorMessage('detalle') }}</span>
+            </label>
+            <span class="text-xs font-bold ml-auto"
+              [ngClass]="getAdditionalMotivoLength() >= 100 ? 'text-success' : 'text-warning'">
+              Caracteres adicionales: {{ getAdditionalMotivoLength() }}/100 min.
+            </span>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="flex flex-col sm:flex-row justify-end gap-3 border-t border-base-200 px-6 py-4 bg-base-200/50">
+      <button type="button" class="btn btn-error text-white font-bold px-6 shadow-sm hover:shadow transition-all"
+        (click)="closeModal()" [disabled]="isLoading">
+        Cancelar
+      </button>
+      <button type="button"
+        class="btn bg-[#1f325b] hover:bg-[#152342] text-white font-bold px-6 border-none shadow-md hover:shadow-lg transition-all"
+        (click)="enviarSolicitud()" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Generar PDF</span>
+        <span *ngIf="isLoading" class="loading loading-dots loading-xs"></span>
+      </button>
+    </div>
+  </div>
+</dialog>

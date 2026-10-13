@@ -1,0 +1,455 @@
+<dialog id="modalFormSolicitudFechaMax"
+  class="fixed inset-0 w-full h-full z-50 overflow-auto bg-black bg-opacity-50 text-secondary flex items-center justify-center p-2 sm:p-4"
+  [ngClass]="{ hidden: !modalFormSrv.isModalOpen() }" (click)="closeModal($event)">
+
+  <div class="modal-box w-full max-w-6xl xl:max-w-7xl max-h-[94vh] rounded-2xl shadow-2xl relative bg-base-100 p-0 border border-base-300 flex flex-col overflow-hidden"
+    (click)="$event.stopPropagation()">
+
+    <!-- CABECERA DEL MODAL (ESTILO SISTEMA) -->
+    <div class="flex items-center justify-between px-6 py-4 shrink-0 border-b border-base-200">
+      <h2 class="text-2xl font-bold text-secondary">
+        {{ isEditMode ? "Editar Solicitud de Ampliación de Plazo" : "Ingresar Solicitud de Ampliación de Plazo" }}
+      </h2>
+      <button class="btn btn-sm btn-circle btn-ghost text-lg text-secondary hover:bg-base-300 transition-colors"
+        (click)="closeModal($event)" title="Cerrar modal">
+        ✕
+      </button>
+    </div>
+
+    <!-- PESTAÑAS RESPONSIVE (SOLO PANTALLAS PEQUEÑAS) -->
+    <div class="lg:hidden flex border-b border-base-300 bg-base-200/40 shrink-0">
+      <button type="button" class="flex-1 py-2.5 text-xs font-bold transition-all border-b-2 flex items-center justify-center gap-1.5"
+        [ngClass]="activeTab === 'form' ? 'border-primary text-primary bg-base-100' : 'border-transparent text-secondary/70 hover:text-secondary'"
+        (click)="setActiveTab('form')">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        1. Formulario de Solicitud
+      </button>
+      <button type="button" class="flex-1 py-2.5 text-xs font-bold transition-all border-b-2 flex items-center justify-center gap-1.5"
+        [ngClass]="activeTab === 'preview' ? 'border-primary text-primary bg-base-100' : 'border-transparent text-secondary/70 hover:text-secondary'"
+        (click)="setActiveTab('preview')">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        2. Previsualización de la Solicitud
+        <span class="badge badge-xs badge-primary font-bold">En vivo</span>
+      </button>
+    </div>
+
+    <!-- OVERLAY DE CARGA -->
+    <div *ngIf="isLoading" class="absolute inset-0 flex items-center justify-center bg-base-100 bg-opacity-80 z-20">
+      <div class="flex flex-col items-center gap-3">
+        <span class="loading loading-spinner loading-lg text-secondary"></span>
+        <p class="text-sm font-semibold text-secondary">Cargando información de la recomendación y destinatario...</p>
+      </div>
+    </div>
+
+    <!-- CUERPO PRINCIPAL (2 COLUMNAS EN DESKTOP) -->
+    <div class="p-4 sm:p-6 flex-1 overflow-y-auto grid grid-cols-1 lg:grid-cols-12 gap-6 items-start" [ngClass]="{'opacity-60 pointer-events-none': isLoading}">
+
+      <!-- ========================================== -->
+      <!-- COLUMNA IZQUIERDA: FORMULARIO DE SOLICITUD -->
+      <!-- ========================================== -->
+      <div class="lg:col-span-6 space-y-4" [ngClass]="{ 'hidden lg:block': activeTab === 'preview' }">
+
+        <!-- RESUMEN DE LA RECOMENDACIÓN E INFORME (ESTILO EXACTO AL SISTEMA) -->
+        <section class="grid grid-cols-1 gap-2 rounded-2xl">
+          <!-- Colapsable 1: Memorando -->
+          <details class="collapse collapse-plus bg-base-200 rounded-xl hover:bg-base-300 transition-colors">
+            <summary class="collapse-title font-semibold text-secondary text-sm">
+              Memorando {{ modalData?.memorandoInforme || modalData?.ainin_memorando || '-' }}
+            </summary>
+            <div class="collapse-content prose max-w-none text-xs">
+              <div>
+                <p class="mt-1 font-normal text-secondary">
+                  {{ modalData?.tituloInforme || modalData?.ainin_titulo }}
+                </p>
+                <div *ngIf="modalData?.memorandoAprobacion || modalData?.ainin_memo_aprobacion" class="flex flex-row gap-2 mt-2">
+                  <span class="font-semibold text-secondary">Memo. aprobación:</span>
+                  <p class="font-normal text-secondary">{{ modalData?.memorandoAprobacion || modalData?.ainin_memo_aprobacion }}</p>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <!-- Colapsable 2: Recomendación -->
+          <details class="collapse collapse-plus bg-base-200 rounded-xl hover:bg-base-300 transition-colors">
+            <summary class="collapse-title font-semibold text-secondary text-sm">
+              Recomendación
+            </summary>
+            <div class="collapse-content prose max-w-none text-xs">
+              <div>
+                <p class="mt-1 font-normal text-secondary leading-relaxed">
+                  {{ modalData?.descripcionRecomendacion || modalData?.arere_descripcion || '-' }}
+                </p>
+              </div>
+              <div class="flex flex-row gap-6 mt-2 pt-2 border-t border-base-300">
+                <div>
+                  <span class="block font-semibold text-secondary">Fecha máxima de cumplimiento actual:</span>
+                  <p class="mt-0.5 font-bold text-primary">
+                    {{ getFechaMaxima() }}
+                  </p>
+                </div>
+                <div>
+                  <span class="block font-semibold text-secondary">Plazo:</span>
+                  <p class="mt-0.5 font-bold"
+                     [ngClass]="getPlazo() < 0 ? 'text-red-600' : 'text-emerald-600'"
+                     [style.color]="getPlazo() >= 0 ? '#16A34A' : null">
+                    {{ getEstadoPlazo() }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </details>
+        </section>
+
+        <!-- FORMULARIO REACTIVO -->
+        <form class="space-y-4" [formGroup]="formSolicitud" (ngSubmit)="toSend()">
+
+          <!-- DATOS INSTITUCIONALES AUTOMÁTICOS -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- NÚMERO DE SOLICITUD -->
+            <div class="form-control">
+              <label class="label pb-1">
+                <span class="label-text text-xs font-bold text-secondary uppercase tracking-wider">
+                  Número de Solicitud
+                </span>
+              </label>
+              <input type="text"
+                class="input input-sm input-bordered w-full bg-base-200 border-base-300 text-xs font-bold text-primary cursor-not-allowed"
+                readonly [value]="numeroSolicitud()">
+            </div>
+
+            <!-- DESTINATARIO -->
+            <div class="form-control">
+              <label class="label pb-1">
+                <span class="label-text text-xs font-bold text-secondary uppercase tracking-wider">
+                  Destinatario
+                </span>
+              </label>
+              <input type="text"
+                class="input input-sm input-bordered w-full bg-base-200 border-base-300 text-xs font-semibold text-secondary cursor-not-allowed"
+                readonly [value]="nombreDirector()">
+            </div>
+          </div>
+
+          <!-- FECHAS -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <!-- FECHA DE SOLICITUD (HOY) -->
+            <div class="form-control">
+              <label class="label pb-1">
+                <span class="label-text text-xs font-bold text-secondary uppercase tracking-wider">
+                  Fecha Solicitud
+                </span>
+              </label>
+              <input type="date"
+                class="input input-sm input-bordered w-full bg-base-200 border-base-300 text-xs font-semibold text-secondary cursor-not-allowed"
+                readonly [value]="fechaSolicitud()">
+            </div>
+
+            <!-- FECHA MÁXIMA ACTUAL -->
+            <div class="form-control">
+              <label class="label pb-1">
+                <span class="label-text text-xs font-bold text-secondary uppercase tracking-wider">
+                  Fecha Máx. Actual
+                </span>
+              </label>
+              <input type="date"
+                class="input input-sm input-bordered w-full bg-base-200 border-base-300 text-xs font-semibold text-secondary cursor-not-allowed"
+                formControlName="areso_fecha_max_ant" readonly>
+            </div>
+
+            <!-- NUEVA FECHA MÁXIMA (EDITABLE) -->
+            <div class="form-control">
+              <label class="label pb-1">
+                <span class="label-text text-xs font-bold text-secondary uppercase tracking-wider">
+                  Nueva Fecha Máx. <span class="text-error font-bold">*</span>
+                </span>
+              </label>
+              <input type="date"
+                class="input input-sm input-bordered w-full text-xs font-semibold text-secondary border-base-300 focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                formControlName="areso_fecha_max_nue"
+                [min]="getMinDate()"
+                [max]="getMaxDate()"
+                [ngClass]="{'input-error border-error': isFieldInvalid('areso_fecha_max_nue')}">
+              <label class="label p-0 pt-0.5" *ngIf="isFieldInvalid('areso_fecha_max_nue')">
+                <span class="label-text-alt text-error text-[11px] leading-tight">{{ getErrorMessage('areso_fecha_max_nue') }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- SECCIÓN: TEXTO OFICIAL INSTITUCIONAL Y JUSTIFICACIÓN -->
+          <div class="form-control space-y-2 pt-1">
+            <div class="flex items-center gap-2 pb-0.5">
+              <svg class="w-4 h-4 text-primary shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <g fill="currentColor">
+                  <path d="M16.607 3.005a2.57 2.57 0 0 1 3.64-.001l.75.751a2.57 2.57 0 0 1 0 3.637l-7.6 7.604a2.57 2.57 0 0 1-1.819.754H9a.75.75 0 0 1-.75-.75v-2.562c0-.682.27-1.336.752-1.818z"/>
+                  <path d="M11.943 2.25H12a.75.75 0 0 1 0 1.5c-2.143 0-3.674.002-4.838.158c-1.142.154-1.817.444-2.314.94c-.496.497-.786 1.172-.94 2.314C3.752 8.326 3.75 9.857 3.75 12s.002 3.674.158 4.838c.154 1.142.444 1.817.94 2.314c.497.496 1.172.786 2.314.94c1.164.156 2.695.158 4.838.158s3.674-.002 4.838-.158c1.142-.154 1.817-.444 2.314-.94c.496-.497.786-1.172.94-2.314c.156-1.164.158-2.696.158-4.838a.75.75 0 0 1 1.5 0v.057c0 2.073 0 3.705-.171 4.98c-.176 1.31-.545 2.354-1.367 3.175c-.821.822-1.866 1.19-3.174 1.367c-1.276.171-2.908.171-4.981.171h-.114c-2.073 0-3.705 0-4.98-.171c-1.31-.176-2.354-.545-3.175-1.367c-.822-.821-1.19-1.866-1.367-3.174c-.171-1.276-.171-2.908-.171-4.981v-.114c0-2.073 0-3.705.171-4.98c.176-1.31.545-2.354 1.367-3.175c.821-.822 1.866-1.19 3.174-1.367c1.276-.171 2.908-.171 4.981-.171"/>
+                </g>
+              </svg>
+              <span class="label-text text-xs font-bold text-secondary uppercase tracking-wider">
+                Motivo y Justificación de la Solicitud
+              </span>
+            </div>
+
+            <!-- BLOQUE ENCABEZADO INSTITUCIONAL PREDETERMINADO (ESTILO SISTEMA) -->
+            <div class="rec-card-block rounded-xl border-l-4 border-l-primary bg-base-200 p-3.5 space-y-1.5 shadow-xs">
+              <div class="flex items-center gap-1.5 pb-1 border-b border-base-300 text-xs font-semibold text-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Texto institucional predeterminado (No editable)</span>
+              </div>
+              <p class="select-text text-justify font-normal text-xs text-secondary/90 leading-relaxed">
+                {{ getDefaultDetalleText() }}
+              </p>
+            </div>
+
+            <!-- INDICADOR CONECTOR (ESTILO SISTEMA) -->
+            <div class="flex items-center gap-2 px-1 text-xs font-semibold text-secondary">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+              <span>Su justificación se incorporará a continuación de <strong class="text-primary font-bold">"... en virtud de "</strong></span>
+            </div>
+
+            <!-- BLOQUE: CAMPO DE JUSTIFICACIÓN DEL USUARIO -->
+            <div class="space-y-1">
+              <div class="flex justify-between items-center pb-0.5">
+                <span class="text-xs font-bold text-secondary uppercase tracking-wider">
+                  Justificación del solicitante <span class="text-error font-bold">*</span>
+                </span>
+                <span class="text-[11px] font-bold"
+                  [ngClass]="getJustificacionLength() >= 100 ? 'text-success' : 'text-warning'">
+                  Caracteres: {{ getJustificacionLength() }}/100 mín.
+                </span>
+              </div>
+
+              <textarea
+                class="textarea textarea-bordered w-full text-xs leading-relaxed resize-none h-28 border-base-300 text-secondary focus:border-primary focus:ring-1 focus:ring-primary transition-all font-sans"
+                placeholder="Escriba aquí los argumentos y razones por las cuales solicita la ampliación de plazo..."
+                formControlName="justificacion"
+                [ngClass]="{'textarea-error border-error': isFieldInvalid('justificacion')}"></textarea>
+
+              <div class="flex justify-between items-center">
+                <label class="label p-0" *ngIf="isFieldInvalid('justificacion')">
+                  <span class="label-text-alt text-error text-[11px] font-medium">{{ getErrorMessage('justificacion') }}</span>
+                </label>
+                <span class="text-[10px] text-base-content/50 ml-auto italic">
+                  {{ getJustificacionLength() >= 100 ? 'Cumple con el mínimo de caracteres requerido' : 'Faltan ' + (100 - getJustificacionLength()) + ' caracteres para el mínimo' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- BOTONES DE ACCIÓN (DEL FORMULARIO - EXACTOS AL SISTEMA) -->
+          <div class="flex gap-4 justify-center items-center mt-4 pt-2 border-t border-base-300">
+            <button type="button" class="btn btn-error text-white flex-1 w-full font-bold uppercase tracking-wider"
+              (click)="closeModal($event)" [disabled]="isLoadingSubmint">
+              CANCELAR
+            </button>
+            <button type="submit" class="btn btn-primary text-white flex-1 w-full font-bold uppercase tracking-wider"
+              [disabled]="isLoadingSubmint">
+              <span *ngIf="isLoadingSubmint" class="loading loading-spinner text-secondary"></span>
+              {{ isLoadingSubmint ? 'CARGANDO...' : isEditMode ? 'CONFIRMAR' : 'REGISTRAR' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ============================================= -->
+      <!-- COLUMNA DERECHA: PREVISUALIZACIÓN DE LA SOLICITUD -->
+      <!-- ============================================= -->
+      <div class="lg:col-span-6 flex flex-col h-full space-y-3" [ngClass]="{ 'hidden lg:flex': activeTab === 'preview' }">
+
+        <!-- CABECERA: PREVISUALIZACIÓN DE LA SOLICITUD -->
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-base-200 border border-base-300">
+          <div class="flex items-center gap-2">
+            <div class="p-1.5 rounded-lg bg-primary/10 text-primary shrink-0">
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
+                  <path d="M21 11v-1c0-3.771 0-5.657-1.24-6.828C18.519 2 16.522 2 12.53 2h-1.06C7.479 2 5.482 2 4.24 3.172C3 4.343 3 6.229 3 10v4c0 3.771 0 5.657 1.24 6.828C5.481 22 7.478 22 11.47 22H12M8 7h8m-8 5h5"/>
+                  <path d="M21 20.647V17c0-1.43-1.343-3-3-3s-3 1.57-3 3v3.5c0 .78.733 1.5 1.636 1.5c.904 0 1.637-.72 1.637-1.5v-2.735"/>
+                </g>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-bold text-xs text-secondary uppercase tracking-wider">Previsualización de la solicitud</h3>
+              <p class="text-[10px] text-secondary/70 font-medium">Documento en tiempo real</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <!-- TOGGLE DE MODO DE VISTA: MISMO TAMAÑO Y TIPOGRAFÍA (FORMATO / PDF) -->
+            <div class="join border border-base-300 bg-base-100 rounded-lg p-0.5 shadow-xs">
+              <button type="button"
+                class="btn btn-sm join-item w-24 text-xs font-semibold uppercase tracking-wider transition-all"
+                [ngClass]="previewMode === 'document' ? 'btn-primary text-white shadow-xs' : 'btn-ghost text-secondary hover:bg-base-200'"
+                (click)="setPreviewMode('document')">
+                Formato
+              </button>
+              <button type="button"
+                class="btn btn-sm join-item w-24 text-xs font-semibold uppercase tracking-wider transition-all"
+                [ngClass]="previewMode === 'pdf' ? 'btn-primary text-white shadow-xs' : 'btn-ghost text-secondary hover:bg-base-200'"
+                (click)="setPreviewMode('pdf')">
+                PDF
+              </button>
+            </div>
+
+            <!-- BOTÓN ABRIR PESTAÑA -->
+            <button type="button" class="btn btn-sm btn-circle btn-ghost text-secondary hover:text-primary hover:bg-base-200"
+              title="Abrir PDF en pestaña nueva" (click)="openPdfInNewTab()">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- CONTENEDOR DE VISTA PREVIA -->
+        <div class="flex-1 rounded-2xl border border-base-300 bg-base-200/50 p-3 sm:p-4 overflow-y-auto max-h-[640px] shadow-inner">
+
+          <!-- ============================================== -->
+          <!-- MODO 1: HOJA DE TRÁMITE INSTITUCIONAL EN VIVO -->
+          <!-- ============================================== -->
+          <div *ngIf="previewMode === 'document'"
+            class="bg-white text-slate-800 p-5 sm:p-6 rounded-xl shadow-md border border-slate-300 text-xs font-sans space-y-4 max-w-2xl mx-auto transition-all">
+
+            <!-- ENCABEZADO INSTITUCIONAL DE LA HOJA -->
+            <div class="flex items-center justify-between border-b pb-3 border-slate-300 gap-3">
+              <div class="shrink-0 flex items-center justify-center p-1 bg-white rounded">
+                <img src="sisrec/assets/images/eeasa_icon.png" alt="EEASA" class="h-12 w-auto object-contain" />
+              </div>
+              <div class="text-center flex-1 px-1">
+                <h4 class="font-extrabold text-[10px] sm:text-[11px] tracking-wide text-slate-900 uppercase leading-tight">
+                  Empresa Eléctrica Ambato
+                </h4>
+                <h4 class="font-extrabold text-[10px] sm:text-[11px] tracking-wide text-slate-900 uppercase leading-tight">
+                  Regional Centro Norte S.A.
+                </h4>
+                <p class="font-bold text-[9px] sm:text-[10px] text-blue-900 mt-1 uppercase leading-tight">
+                  Solicitud de Ampliación de Plazo para Cumplimiento de Recomendaciones
+                </p>
+              </div>
+              <!-- TABLA LATERAL DE METADATOS -->
+              <div class="border border-slate-300 rounded text-[9px] overflow-hidden shrink-0 w-32 sm:w-36">
+                <div class="bg-slate-100 p-1 border-b border-slate-300">
+                  <span class="font-bold block text-slate-600 text-[8px]">No. SOLICITUD:</span>
+                  <span class="font-extrabold text-[10px] text-blue-900">{{ numeroSolicitud() }}</span>
+                </div>
+                <div class="p-1 border-b border-slate-200">
+                  <span class="font-bold block text-slate-600 text-[8px]">FECHA SOLICITUD:</span>
+                  <span class="font-medium text-[9px]">{{ fechaSolicitud() | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="p-1 border-b border-slate-200">
+                  <span class="font-bold block text-slate-600 text-[8px]">FECHA MÁX. ACTUAL:</span>
+                  <span class="font-medium text-[9px]">{{ (formSolicitud.get('areso_fecha_max_ant')?.value || getFechaMaxima()) | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="bg-amber-50 p-1">
+                  <span class="font-bold block text-amber-800 text-[8px]">FECHA MÁX. NUEVA:</span>
+                  <span class="font-extrabold text-[9px] text-amber-900">
+                    {{ formSolicitud.get('areso_fecha_max_nue')?.value ? (formSolicitud.get('areso_fecha_max_nue')?.value | date:'dd/MM/yyyy') : '---' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- FILAS DE: / PARA: -->
+            <div class="border border-slate-300 rounded-lg p-2.5 space-y-1.5 bg-slate-50/70 text-[11px]">
+              <div>
+                <strong class="text-slate-600">DE:</strong>
+                <span class="font-bold text-slate-900 ml-1">{{ user?.nombre_completo || 'Solicitante' }}</span>
+                <span *ngIf="cargoResponsable()" class="text-slate-500 ml-1">({{ cargoResponsable() }})</span>
+              </div>
+              <div class="border-t border-slate-200 pt-1">
+                <strong class="text-slate-600">PARA:</strong>
+                <span class="font-bold text-slate-900 ml-1">{{ nombreDirector() }}</span>
+              </div>
+            </div>
+
+            <!-- CUADRO DE DETALLE (TEXTO PROTEGIDO + JUSTIFICACIÓN RESALTADA) -->
+            <div class="border border-slate-300 rounded-xl overflow-hidden shadow-xs">
+              <div class="bg-slate-100 px-3 py-1.5 font-bold text-[10px] text-slate-700 uppercase tracking-wider border-b border-slate-300 flex items-center justify-between">
+                <span>DETALLE</span>
+                <span class="text-[9px] font-normal text-slate-500">Vista previa del contenido </span>
+              </div>
+              <div class="p-4 leading-relaxed text-justify text-[11px] space-y-2 bg-white">
+                <!-- TEXTO PREDETERMINADO -->
+                <span class="text-slate-700 font-normal">
+                  {{ getDefaultDetalleText() }}
+                </span>
+                
+                <!-- TEXTO DE LA JUSTIFICACIÓN DEL USUARIO RESALTADO EN TIEMPO REAL -->
+                <span *ngIf="formSolicitud.get('justificacion')?.value"
+                  class="bg-amber-100 text-amber-950 px-1.5 py-0.5 rounded font-semibold border border-amber-300 inline transition-all duration-200"
+                  title="Su justificación se ubica aquí">
+                  {{ formSolicitud.get('justificacion')?.value }}
+                </span>
+
+                <!-- TEXTO INDICATIVO SI AÚN ESTÁ VACÍO -->
+                <span *ngIf="!formSolicitud.get('justificacion')?.value"
+                  class="text-amber-700 italic bg-amber-50 px-2 py-0.5 rounded border border-dashed border-amber-300 inline-block font-normal">
+                  ... [Su justificación aparecerá exactamente aquí en tiempo real mientras la escribe en el formulario]
+                </span>
+              </div>
+            </div>
+
+            <!-- BLOQUE DE FIRMAS -->
+            <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-200 text-center text-[10px]">
+              <div class="border border-slate-300 rounded-lg p-2.5 bg-slate-50/50">
+                <span class="font-bold block text-slate-600 uppercase text-[9px] mb-7">SOLICITADO POR:</span>
+                <span class="font-bold block text-slate-900 leading-tight">{{ user?.nombre_completo }}</span>
+                <span class="text-slate-500 block text-[9px] mt-0.5">{{ cargoResponsable() || user?.departamento }}</span>
+              </div>
+              <div class="border border-slate-300 rounded-lg p-2.5 bg-slate-50/50">
+                <span class="font-bold block text-slate-600 uppercase text-[9px] mb-7">APROBADO POR:</span>
+                <span class="font-bold block text-slate-900 leading-tight">{{ nombreDirector() }}</span>
+                <span class="text-slate-500 block text-[9px] mt-0.5">Director / Auditor</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============================================== -->
+          <!-- MODO 2: VISOR DEL ARCHIVO PDF OFICIAL EMBEBIDO -->
+          <!-- ============================================== -->
+          <div *ngIf="previewMode === 'pdf'" class="h-full min-h-[480px] flex flex-col items-center justify-center">
+            <div *ngIf="isGeneratingPdf" class="flex flex-col items-center gap-3 my-auto">
+              <span class="loading loading-spinner loading-md text-secondary"></span>
+              <span class="text-xs text-secondary/70 font-medium">Compilando documento PDF oficial...</span>
+            </div>
+            <iframe *ngIf="!isGeneratingPdf && safePdfUrl" [src]="safePdfUrl"
+              class="w-full h-[560px] rounded-xl border border-base-300 shadow-sm bg-white"
+              title="Vista previa PDF oficial"></iframe>
+            <div *ngIf="!isGeneratingPdf && !safePdfUrl" class="text-center text-xs text-secondary/70 my-auto">
+              <p>Presione "Ver PDF" para compilar la vista previa del archivo.</p>
+              <button type="button" class="btn btn-sm btn-primary mt-3" (click)="updatePdfPreview()">
+                Generar Vista Previa PDF
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- BOTÓN DEBAJO DEL CONTENEDOR DE VISTA PREVIA (VER PDF) -->
+        <div class="flex justify-end pt-1">
+          <button type="button"
+            class="btn btn-outline btn-primary btn-sm sm:btn-md flex items-center gap-2 font-bold uppercase tracking-wider shadow-xs"
+            (click)="openPdfInNewTab()"
+            [disabled]="isGeneratingPdf"
+            title="Abrir documento PDF en una nueva pestaña del navegador">
+            <span *ngIf="isGeneratingPdf" class="loading loading-spinner loading-xs text-secondary"></span>
+            <svg *ngIf="!isGeneratingPdf" class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
+            </svg>
+            <span>VER PDF</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>

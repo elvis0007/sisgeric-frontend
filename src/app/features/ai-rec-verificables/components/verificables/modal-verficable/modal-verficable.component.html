@@ -1,0 +1,211 @@
+<dialog id="modalFormVerificable"
+  class="fixed inset-0 w-full h-full z-50 overflow-auto bg-black bg-opacity-50 text-secondary flex items-center justify-center"
+  [ngClass]="{ hidden: !modalFormSrv.isModalOpen() }" (click)="closeModal($event)">
+  <div class="modal-box max-w-4xl rounded-lg shadow-lg relative" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between">
+      <h2 class="text-2xl font-bold mb-4">
+        {{ isEditMode ? "Editar Verificable" : isAdicionalMode ? "Ingresar Verificable Adicional" : "Ingresar
+        Verificable" }}
+      </h2>
+      <button class="btn btn-sm btn-circle btn-ghost text-lg" (click)="closeModal($event)">
+        ✕
+      </button>
+    </div>
+
+    <section class="grid grid-cols-1 gap-2 rounded-2xl">
+      <!-- Columna 1: Informe -->
+      <details class="collapse collapse-plus bg-base-200 rounded-xl hover:bg-base-300 transition-colors">
+        <summary class="collapse-title font-semibold text-secondary">
+          Memorando {{ detalleRecomendacion?.ainin_memorando || detalleRecomendacion?.ainin_orden_trabajo }}
+        </summary>
+        <div class="collapse-content">
+          <div>
+            <p class="mt-1 text-base font-normal text-secondary">
+              {{detalleRecomendacion?.ainin_titulo }}
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <!-- Columna 2: Recomendación -->
+      <details class="collapse collapse-plus bg-base-200 rounded-xl hover:bg-base-300 transition-colors">
+        <summary class="collapse-title font-semibold text-secondary">
+          Recomendación
+        </summary>
+        <div class="collapse-content">
+          <div>
+            <p class="mt-1 text-base font-normal text-secondary">
+              {{detalleRecomendacion?.recomendaciones?.arere_descripcion }}
+            </p>
+          </div>
+          <div class="flex flex-row gap-6">
+            <div>
+              <span class="block text-base font-semibold text-secondary">Fecha máxima de cumplimiento:</span>
+              <p class="mt-1 text-base font-normal text-secondary">
+                {{detalleRecomendacion?.recomendaciones?.arere_fecha_maxima}}
+              </p>
+            </div>
+            <div>
+              <span class="block text-base font-semibold text-secondary">Plazo:</span>
+              <p class="mt-1 text-base font-normal text-secondary">
+                <span class="text-sm text-secondary mt-1 font-semibold">{{detalleRecomendacion?.recomendaciones?.plazo
+                  || 0 | abs }}</span>
+                <span class="text-sm text-secondary font-semibold">
+                  {{ (detalleRecomendacion?.recomendaciones?.plazo || 0) < 0 ? 'días vencidos' : 'días vigentes' }}
+                </span>
+
+              </p>
+            </div>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- Estado de loading -->
+    <div *ngIf="isLoading" class="absolute inset-0 flex items-center justify-center bg-base-100 bg-opacity-80 z-10">
+      <div class="flex flex-col items-center gap-4">
+        <span class="loading loading-spinner loading-lg text-secondary"></span>
+      </div>
+    </div>
+
+    <!-- Banner de Advertencia (Servidor FTP/NAS fuera de línea) -->
+    <div *ngIf="data?.advertencia"
+      class="alert alert-warning shadow-md my-3 flex items-center gap-2 text-sm font-medium">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      <span>{{ data.advertencia }}</span>
+    </div>
+
+    <form class="space-y-4" [formGroup]="formVerificable" (ngSubmit)="toSend()" [ngClass]="{'opacity-80': isLoading }">
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-medium">Responsables*</span>
+        </label>
+        <select class="select select-bordered w-full" [ngClass]="{
+                'select-primary': !isFieldInvalid('arers_codigo_per'),
+                'select-error': isFieldInvalid('arers_codigo_per')
+              }" formControlName="arers_codigo_per">
+          <option disabled value="" selected>Seleccionar responsable</option>
+          <option *ngFor="let respons of responsables" [value]="respons.arers_codigo_per">
+            {{respons.nombre_completo}}
+          </option>
+        </select>
+        <label class="label" *ngIf="isFieldInvalid('arers_codigo_per')">
+          <span class="label-text-alt text-error">Este campo es requerido</span>
+        </label>
+        <!-- Panel de Estado Individual del Responsable (solo visible al seleccionar) -->
+        <div *ngIf="selectedResponsable" 
+             class="mt-3 p-3.5 bg-base-200/60 rounded-xl border border-base-300 shadow-sm transition-all duration-300">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            
+            <!-- Columna izquierda: Plazo y estado del verificable -->
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-xs font-bold uppercase tracking-wider text-secondary/70">
+                Plazo individual:
+              </span>
+              <div class="badge gap-1.5 py-3 px-3 font-semibold text-xs shadow-sm"
+                [ngClass]="badgeClass">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <polyline points="12 7 12 12 15 15"></polyline>
+                </svg>
+                <ng-container *ngIf="isResponsableCumplido; else plazoNormal">
+                  Cumplido (Verificable justificado)
+                </ng-container>
+                <ng-template #plazoNormal>
+                  {{ currentPlazo | abs }} {{ getEstadoPlazo() }}
+                </ng-template>
+              </div>
+
+              <span *ngIf="selectedResponsable.areev_descripcion" 
+                    class="badge badge-outline py-3 px-3 font-semibold text-xs shadow-sm"
+                    [ngClass]="isResponsableCumplido ? 'badge-success text-success border-success' : 'badge-ghost border-base-300'">
+                {{ selectedResponsable.areev_descripcion }}
+              </span>
+            </div>
+
+            <!-- Columna derecha: Fecha límite individual -->
+            <div *ngIf="currentFechaMaxima" class="flex items-center gap-1.5 text-xs text-secondary/80 sm:text-right">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span>Fecha límite:</span>
+              <strong class="text-primary font-bold text-sm tracking-wide">{{ currentFechaMaxima }}</strong>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-medium">Descripción*</span>
+          </label>
+          <textarea class="textarea textarea-bordered min-h-[130px] w-full" [ngClass]="{
+                'textarea-primary': !isFieldInvalid('areve_descripcion'),
+                'textarea-error': isFieldInvalid('areve_descripcion')
+              }" placeholder="Ingrese la descripcion del verificable" formControlName="areve_descripcion"></textarea>
+          <label class="label" *ngIf="isFieldInvalid('areve_descripcion')">
+            <span class="label-text-alt text-error">Este campo es requerido</span>
+          </label>
+        </div>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-medium">Verificable* (.docx, .xlsx, .pdf)</span>
+          </label>
+          <input type="file" #fileInput class="file-input file-input-bordered w-full" [ngClass]="{
+                'file-input-primary': !isFieldInvalid('areve_adjunto'),
+                'file-input-error': isFieldInvalid('areve_adjunto')
+              }" (change)="this.captureFile($event)" accept=".doc,.docx,.xls,.xlsx,.pdf" />
+          <label class="label" *ngIf="isFieldInvalid('areve_adjunto')">
+            <span class="label-text-alt text-error">{{getErrorMessage('areve_adjunto')}}</span>
+          </label>
+
+          <div class="mt-2 flex flex-row items-center justify-between border rounded-md border-primary px-4 py-1"
+            *ngIf="this.fileName || this.formVerificable.get('nombreArchivo')?.value">
+            <div class="flex flex-row items-center">
+              <button class="btn btn-circle btn-sm bg-cyan-900" (click)="this.openFile($event)">
+                <svg class="w-5 h-5 text-slate-300 transition-colors" xmlns="http://www.w3.org/2000/svg" width="24"
+                  height="24" viewBox="0 0 24 24">
+                  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    color="currentColor">
+                    <path
+                      d="M21 11v-1c0-3.771 0-5.657-1.24-6.828C18.519 2 16.522 2 12.53 2h-1.06C7.479 2 5.482 2 4.24 3.172C3 4.343 3 6.229 3 10v4c0 3.771 0 5.657 1.24 6.828C5.481 22 7.478 22 11.47 22H12M8 7h8m-8 5h5" />
+                    <path
+                      d="M21 20.647V17c0-1.43-1.343-3-3-3s-3 1.57-3 3v3.5c0 .78.733 1.5 1.636 1.5c.904 0 1.637-.72 1.637-1.5v-2.735" />
+                  </g>
+                </svg>
+              </button>
+              <p class="mx-2">
+                {{
+                formatFileName(
+                fileName || formVerificable.get("nombreArchivo")?.value
+                )
+                }}
+              </p>
+            </div>
+            <button class="btn btn-sm btn-circle btn-ghost text-md" (click)="this.cleanInputFile($event, fileInput)"
+              *ngIf="!isEditMode">
+              ✕
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-4 justify-center items-center mt-4">
+        <button type="button" class="btn btn-error text-white flex-1 w-full" (click)="closeModal($event)">
+          CANCELAR
+        </button>
+        <button class="btn btn-primary flex-1 w-full text-white" [disabled]="isLoadingSubmint">
+          <span *ngIf="isLoadingSubmint" class="loading loading-spinner text-secondary"></span>
+          {{isLoadingSubmint ? 'CARGANDO...' : isEditMode ? 'CONFIRMAR' : 'REGISTRAR' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>

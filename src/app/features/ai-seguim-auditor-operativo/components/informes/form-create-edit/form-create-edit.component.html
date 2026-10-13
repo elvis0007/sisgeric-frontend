@@ -1,0 +1,236 @@
+<form class="space-y-4" [formGroup]="formInforme" (ngSubmit)="toSend()">
+  <div class="flex w-full">
+    <div class="grid flex-grow w-full">
+
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-medium">Título del informe*</span>
+        </label>
+        <textarea class="textarea textarea-bordered w-full min-h-[180px] uppercase" [ngClass]="{
+          'textarea-primary': !isFieldInvalid('ainin_titulo'),
+          'textarea-error': isFieldInvalid('ainin_titulo')
+        }" placeholder="Ingrese título del informe" formControlName="ainin_titulo" (input)="onTextInput($event, 'ainin_titulo')"></textarea>
+        <label class="label" *ngIf="isFieldInvalid('ainin_titulo')">
+          <span class="label-text-alt text-error">Este campo es requerido</span>
+        </label>
+      </div>
+
+      <div class="flex gap-2">
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text font-medium">Memorando Aprobación* Ej: PE</span>
+          </label>
+          <input type="text" class="input input-bordered w-full uppercase" placeholder="Ingrese número de memorando"
+            formControlName="ainin_memoAprobacion" (input)="onTextInput($event, 'ainin_memoAprobacion')" [ngClass]="{
+            'input-primary': !isFieldInvalid('ainin_memoAprobacion'),
+            'input-error': isFieldInvalid('ainin_memoAprobacion')
+          }">
+          <label class="label" *ngIf="isFieldInvalid('ainin_memoAprobacion')">
+            <span class="label-text-alt text-error">Este campo es requerido</span>
+          </label>
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text font-medium">Fecha aprobación*</span>
+          </label>
+          <div class="relative w-full">
+            <input type="date" class="input input-bordered w-full pr-10 custom-calendar-picker" [ngClass]="{
+                'input-primary': !isFieldInvalid('ainin_fechaAprobacion'),
+                'input-error': isFieldInvalid('ainin_fechaAprobacion'),
+                'input-disabled': formInforme.get('ainin_fechaAprobacion')?.disabled
+              }" formControlName="ainin_fechaAprobacion">
+            <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"
+                class="h-5 w-5 text-secondary">
+                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M18 2v2M6 2v2m5.996 9h.008m-.008 4h.008m3.987-4H16m-8 0h.009M8 17h.009M3.5 8h17m-18 4.243c0-4.357 0-6.536 1.252-7.89C5.004 3 7.02 3 11.05 3h1.9c4.03 0 6.046 0 7.298 1.354C21.5 5.707 21.5 7.886 21.5 12.244v.513c0 4.357 0 6.536-1.252 7.89C18.996 22 16.98 22 12.95 22h-1.9c-4.03 0-6.046 0-7.298-1.354C2.5 19.293 2.5 17.114 2.5 12.756zM3 8h18" />
+              </svg>
+            </span>
+          </div>
+          <label class="label" *ngIf="isFieldInvalid('ainin_fechaAprobacion')">
+            <span class="label-text-alt text-error">Este campo es requerido</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text font-medium">Número de Memorando Ej: AI*</span>
+          </label>
+          <input type="text" class="input input-bordered w-full uppercase" [ngClass]="{
+            'input-primary': !isFieldInvalid('ainin_memorando'),
+            'input-error': isFieldInvalid('ainin_memorando')
+          }" placeholder="Ingrese número de memorando" formControlName="ainin_memorando" (input)="onTextInput($event, 'ainin_memorando')">
+          <label class="label" *ngIf="isFieldInvalid('ainin_memorando')">
+            <span class="label-text-alt text-error">Este campo es requerido</span>
+          </label>
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text font-medium">Fecha Memorando*</span>
+          </label>
+          <div class="relative w-full">
+            <input type="date" class="input input-bordered w-full pr-10 custom-calendar-picker"
+              formControlName="ainin_fechaMemo" [ngClass]="{
+            'input-primary': !isFieldInvalid('ainin_fechaMemo'),
+            'input-error': isFieldInvalid('ainin_fechaMemo')
+          }">
+            <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"
+                class="h-5 w-5 text-secondary">
+                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M18 2v2M6 2v2m5.996 9h.008m-.008 4h.008m3.987-4H16m-8 0h.009M8 17h.009M3.5 8h17m-18 4.243c0-4.357 0-6.536 1.252-7.89C5.004 3 7.02 3 11.05 3h1.9c4.03 0 6.046 0 7.298 1.354C21.5 5.707 21.5 7.886 21.5 12.244v.513c0 4.357 0 6.536-1.252 7.89C18.996 22 16.98 22 12.95 22h-1.9c-4.03 0-6.046 0-7.298-1.354C2.5 19.293 2.5 17.114 2.5 12.756zM3 8h18" />
+              </svg>
+            </span>
+          </div>
+          <label class="label" *ngIf="isFieldInvalid('ainin_fechaMemo')">
+            <span class="label-text-alt text-error">Este campo es requerido</span>
+          </label>
+        </div>
+
+      </div>
+
+    </div>
+    <div class="divider divider-horizontal"></div>
+    <div class="grid flex-grow w-full">
+
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-medium">Orden de trabajo*</span>
+        </label>
+        <div class="flex gap-2 items-center">
+          <div class="bg-base-200 rounded-lg px-4 py-2.5">
+            OT-
+          </div>
+          <input type="number" class="input input-bordered w-full uppercase" [ngClass]="{
+              'input-primary': !isFieldOTInvalid('ainin_otnum'),
+              'input-error': isFieldOTInvalid('ainin_otnum')
+            }" min="0" max="9999" step="1" placeholder="Número	de orden de trabajo" formControlName="ainin_otnum" (input)="onTextInput($event, 'ainin_otnum')">
+          <input type="number" class="input input-bordered w-32" min="2010" max="3000" step="1"
+            formControlName="ainin_otanio">
+        </div>
+        <label class="label" *ngIf="isFieldOTInvalid('ainin_otnum')">
+          <span class="label-text-alt text-error">Este campo es requerido</span>
+        </label>
+      </div>
+
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-medium">Ente de control*</span>
+        </label>
+        <select class="select select-bordered w-full" [ngClass]="{
+          'select-primary': !isFieldInvalid('ainoc_organismoControl'),
+          'select-error': isFieldInvalid('ainoc_organismoControl')
+        }" formControlName="ainoc_organismoControl">
+          <option disabled value="" selected>Seleccionar ente de control</option>
+          <option *ngFor="let organismo of organismoControl" [value]="organismo.ainoc_codigo">
+            {{organismo.ainoc_descripcion}}
+          </option>
+        </select>
+        <label class="label" *ngIf="isFieldInvalid('ainoc_organismoControl')">
+          <span class="label-text-alt text-error">Este campo es requerido</span>
+        </label>
+      </div>
+
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-medium">Tipo de informe*</span>
+        </label>
+        <select class="select select-bordered w-full" [ngClass]="{
+          'select-primary': !isFieldInvalid('ainti_tipoInf'),
+          'select-error': isFieldInvalid('ainti_tipoInf')
+        }" formControlName="ainti_tipoInf">
+          <option disabled value="" selected>Seleccionar tipo de informe</option>
+          <option *ngFor="let tipo of tipoInforme" [value]="tipo.ainti_codigo">{{tipo.ainti_descripcion}}</option>
+        </select>
+        <label class="label" *ngIf="isFieldInvalid('ainin_tipoInf')">
+          <span class="label-text-alt text-error">Este campo es requerido</span>
+        </label>
+      </div>
+
+      <div class="form-control" [ngClass]="{
+        'hidden': isEditMode
+      }">
+        <label class="label">
+          <span class="label-text font-medium">Fecha de registro*</span>
+        </label>
+        <div class="relative w-full">
+          <input type="date" class="input input-bordered w-full pr-10 custom-calendar-picker" [ngClass]="{
+              'input-primary': !isFieldInvalid('ainin_fechaEmision'),
+              'input-error': isFieldInvalid('ainin_fechaEmision')
+            }" placeholder="Seleccione fecha de emisión" formControlName="ainin_fechaEmision">
+          <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"
+              class="h-5 w-5 text-secondary">
+              <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M18 2v2M6 2v2m5.996 9h.008m-.008 4h.008m3.987-4H16m-8 0h.009M8 17h.009M3.5 8h17m-18 4.243c0-4.357 0-6.536 1.252-7.89C5.004 3 7.02 3 11.05 3h1.9c4.03 0 6.046 0 7.298 1.354C21.5 5.707 21.5 7.886 21.5 12.244v.513c0 4.357 0 6.536-1.252 7.89C18.996 22 16.98 22 12.95 22h-1.9c-4.03 0-6.046 0-7.298-1.354C2.5 19.293 2.5 17.114 2.5 12.756zM3 8h18" />
+            </svg>
+          </span>
+        </div>
+        <label class="label" *ngIf="isFieldInvalid('ainin_fechaEmision')">
+          <span class="label-text-alt text-error">Este campo es requerido</span>
+        </label>
+      </div>
+
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-medium">Informe* (.pdf)</span>
+        </label>
+        <input type="file" #fileInput class="file-input file-input-bordered w-full" [ngClass]="{
+          'file-input-primary': !isFieldInvalid('ainin_infAdjunto'),
+          'file-input-error': isFieldInvalid('ainin_infAdjunto')
+        }" (change)="this.captureFile($event)">
+        <label class="label" *ngIf="isFieldInvalid('ainin_infAdjunto')">
+          <span class="label-text-alt text-error">Este campo es requerido</span>
+        </label>
+
+        <div class="mt-2 flex flex-row items-center justify-between border rounded-md border-primary px-4 py-1 "
+          *ngIf="this.fileName || this.formInforme.get('nombreArchivo')?.value">
+          <div class="flex flex-row items-center ">
+            <button class="btn btn-circle btn-sm bg-cyan-900 " (click)="this.openFile($event)">
+              <svg class="w-5 h-5 text-slate-300 transition-colors" xmlns="http://www.w3.org/2000/svg" width="24"
+                height="24" viewBox="0 0 24 24">
+                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                  color="currentColor">
+                  <path
+                    d="M21 11v-1c0-3.771 0-5.657-1.24-6.828C18.519 2 16.522 2 12.53 2h-1.06C7.479 2 5.482 2 4.24 3.172C3 4.343 3 6.229 3 10v4c0 3.771 0 5.657 1.24 6.828C5.481 22 7.478 22 11.47 22H12M8 7h8m-8 5h5" />
+                  <path
+                    d="M21 20.647V17c0-1.43-1.343-3-3-3s-3 1.57-3 3v3.5c0 .78.733 1.5 1.636 1.5c.904 0 1.637-.72 1.637-1.5v-2.735" />
+                </g>
+              </svg>
+            </button>
+            <p class="mx-2">
+              {{ formatFileName( fileName || formInforme.get("nombreArchivo")?.value) }}
+            </p>
+          </div>
+          <button class="btn btn-sm btn-circle btn-ghost text-md" (click)="this.cleanInputFile($event, fileInput)"
+            *ngIf="isEditMode === false">
+            ✕
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flex">
+
+    <div class="w-full">
+      <button type="button" class="btn btn-error w-full text-white" (click)="closeModal($event)">
+        CANCELAR
+      </button>
+    </div>
+    <div class="divider divider-horizontal opacity-0"></div>
+    <div class="w-full">
+      <button class="btn btn-primary w-full text-white" [disabled]="isLoadingSubmint">
+
+        <span *ngIf="isLoadingSubmint" class="loading loading-spinner text-secondary"></span>
+        {{isLoadingSubmint ? 'CARGANDO...' : isEditMode ? 'CONFIRMAR' : 'REGISTRAR' }}
+      </button>
+    </div>
+  </div>
+
+</form>

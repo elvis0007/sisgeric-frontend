@@ -1,0 +1,84 @@
+<div
+  class="flex flex-col sm:flex-row items-center justify-between gap-3
+         border border-base-200 rounded-xl bg-base-100 px-4 py-3 mt-2">
+
+  <!-- Cantidad de registros y selector -->
+  <div class="flex flex-wrap items-center justify-center gap-3 text-xs text-base-content/70">
+    <span aria-live="polite">
+      Mostrando
+      <strong class="font-semibold">
+        {{ totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1 }}–{{ min(currentPage * itemsPerPage, totalItems) }}
+      </strong>
+      de
+      <strong class="font-semibold">{{ totalItems }}</strong>
+      registros
+    </span>
+
+    <label class="flex items-center gap-2">
+      <span>Por página:</span>
+
+      <select
+        class="select select-bordered select-xs w-16 rounded-lg
+               bg-base-100 text-base-content font-semibold"
+        [value]="itemsPerPage"
+        (change)="changeItemsPerPage($event)">
+        <option
+          *ngFor="let option of rowsPerPageOptions"
+          [value]="option">
+          {{ option }}
+        </option>
+      </select>
+    </label>
+  </div>
+
+  <!-- Navegación -->
+  <nav
+    aria-label="Paginación de registros"
+    class="flex flex-wrap items-center justify-center gap-2">
+
+    <button
+      type="button"
+      class="btn btn-ghost btn-xs rounded-lg"
+      aria-label="Primera página"
+      title="Primera página"
+      [disabled]="currentPage <= 1 || totalItems === 0"
+      (click)="changePage(1)">
+      «
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-outline btn-xs rounded-lg font-semibold"
+      [disabled]="currentPage <= 1 || totalItems === 0"
+      (click)="goToPreviousPage()">
+      Anterior
+    </button>
+
+    <span
+      class="px-2 text-xs font-semibold text-base-content tabular-nums"
+      aria-live="polite">
+      {{ totalItems === 0 ? 0 : currentPage }}
+      /
+      {{ totalItems === 0 ? 0 : totalPages }}
+    </span>
+
+    <button
+      type="button"
+      class="btn btn-outline btn-xs rounded-lg font-semibold"
+      [disabled]="currentPage >= totalPages || totalItems === 0"
+      (click)="goToNextPage()">
+      Siguiente
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-ghost btn-xs rounded-lg"
+      aria-label="Última página"
+      title="Última página"
+      [disabled]="currentPage >= totalPages || totalItems === 0"
+      (click)="changePage(totalPages)">
+      »
+    </button>
+
+  </nav>
+</div>

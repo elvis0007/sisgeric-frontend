@@ -1,0 +1,109 @@
+<div class="w-full space-y-4">
+  <div class="overflow-x-auto rounded-lg shadow-sm border border-base-200">
+    <table class="table table-sm md:table-md w-full min-w-[800px]">
+
+      <thead>
+        <tr class="bg-primary text-primary-content">
+          <th class="text-sm w-12">N</th>
+          <th class="text-sm text-start w-24 md:w-36 lg:w-80">Recomendación</th>
+          <th class="text-sm text-center flex-grow">Fecha inicio</th>
+          <th class="text-sm text-center flex-grow">Fecha máxima</th>
+          <th class="text-sm text-center flex-grow">Plazo</th>
+          <th class="text-sm text-center flex-grow">Estado</th>
+          <th class="text-sm text-center flex-grow">Motivo estado</th>
+          <th class="text-sm text-center flex-grow">Responsables</th>
+          <th class="text-sm text-center">Riesgo</th>
+        </tr>
+      </thead>
+
+      <tbody class="bg-base-200">
+        <tr class="hover" *ngFor="let recomendacion of displayedRecomendaciones">
+          <th class="text-sm">{{recomendacion.arere_num_rec}}</th>
+          <td class="text-sm text-start">{{recomendacion.arere_descripcion}}</td>
+          <td class="text-sm text-center">{{recomendacion.arere_fecha_inicio_control | date:'dd/MM/yyyy'}}</td>
+          <td class="text-sm text-center">{{recomendacion.arere_fecha_maxima | date:'dd/MM/yyyy'}}</td>
+          <td class="text-sm text-center">
+            <div class="flex flex-col justify-center items-center">
+              <div *ngIf="['CUMPLIDA', 'NO APLICA'].includes(recomendacion.estado_seguimiento.arees_descripcion)" class="bg-success rounded-full p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-slate-300 transition-colors" viewBox="0 0 48 48">
+                  <defs>
+                    <mask id="ipTCheckOne0">
+                      <g fill="none" stroke="#fff" stroke-linejoin="round" stroke-width="4">
+                        <path fill="#555555" d="M24 44a19.94 19.94 0 0 0 14.142-5.858A19.94 19.94 0 0 0 44 24a19.94 19.94 0 0 0-5.858-14.142A19.94 19.94 0 0 0 24 4A19.94 19.94 0 0 0 9.858 9.858A19.94 19.94 0 0 0 4 24a19.94 19.94 0 0 0 5.858 14.142A19.94 19.94 0 0 0 24 44Z"/>
+                        <path stroke-linecap="round" d="m16 24l6 6l12-12"/>
+                      </g>
+                    </mask>
+                  </defs>
+                  <path fill="currentColor" d="M0 0h48v48H0z" mask="url(#ipTCheckOne0)"/>
+                </svg>
+              </div>
+              <div *ngIf="!['CUMPLIDA', 'NO APLICA'].includes(recomendacion.estado_seguimiento.arees_descripcion)" [ngClass]="{
+                'bg-red-600 hover:bg-red-700': recomendacion.plazo < 0,
+                'bg-primary hover:bg-primary-dark': recomendacion.plazo >= 0
+              }" class="rounded-full p-1">
+                <svg class="w-7 h-7 text-slate-300 transition-colors" xmlns="http://www.w3.org/2000/svg" width="1em"
+                  height="2em" viewBox="0 0 24 24">
+                  <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0m9 0h3.5M12 7v5" />
+                </svg>
+              </div>
+              <span *ngIf="!['CUMPLIDA', 'NO APLICA'].includes(recomendacion.estado_seguimiento.arees_descripcion)" class="text-sm text-secondary mt-1 font-semibold">
+                {{ recomendacion.plazo | abs }}
+              </span>
+              <span *ngIf="!['CUMPLIDA', 'NO APLICA'].includes(recomendacion.estado_seguimiento.arees_descripcion)" class="text-sm text-secondary font-semibold">
+                {{ recomendacion.plazo < 0 ? 'días vencidos' : 'días vigentes' }}
+              </span>
+            </div>
+          </td>
+          <td class="text-sm text-center">
+            <div class="badge badge-lg px-4 py-4 font-sm truncate"
+              [ngClass]="recomendacion.estado_seguimiento.arees_descripcion | statusColor">
+              {{recomendacion.estado_seguimiento.arees_descripcion}}
+            </div>
+          </td>
+          <td class="text-sm text-center">{{recomendacion.motivo_estado}}</td>
+          <td class="text-sm text-center">
+            <div class="indicator">
+              <span class="indicator-item badge badge-warning text-sm text-secondary font-semibold">{{recomendacion.responsables}}</span>
+              <button class="btn btn-circle btn-sm bg-cyan-600 hover:bg-cyan-700" title="ver"
+                (click)="openModal(recomendacion)">
+                <svg class="w-5 h-5 transition-colors text-slate-300" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.774 18c.75 0 1.345-.471 1.88-1.13c1.096-1.35-.703-2.43-1.389-2.957c-.697-.537-1.476-.842-2.265-.913m-1-2a2.5 2.5 0 0 0 0-5M3.226 18c-.75 0-1.345-.471-1.88-1.13c-1.096-1.35.703-2.43 1.389-2.957C3.432 13.376 4.21 13.07 5 13m.5-2a2.5 2.5 0 0 1 0-5m2.584 9.111c-1.022.632-3.701 1.922-2.07 3.536C6.813 19.436 7.7 20 8.817 20h6.368c1.117 0 2.004-.564 2.801-1.353c1.632-1.614-1.047-2.904-2.069-3.536a7.46 7.46 0 0 0-7.832 0M15.5 7.5a3.5 3.5 0 1 1-7 0a3.5 3.5 0 0 1 7 0" color="currentColor"/></svg>
+              </button>
+            </div>
+          </td>
+          <td class="text-center">
+            <button type="button" class="btn btn-circle btn-sm bg-emerald-700 hover:bg-emerald-800"
+              title="Ver riesgo y evidencia requerida" aria-label="Ver riesgo y evidencia requerida"
+              (click)="verRiesgo(recomendacion)">
+                <svg class="w-5 h-5 text-slate-300 transition-colors" xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24">
+                  <path fill="currentColor"
+                    d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75s-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12m9.03-4.03a.75.75 0 1 0-1.06 1.06L13.19 12l-2.97 2.97a.75.75 0 1 0 1.06 1.06l3.5-3.5a.75.75 0 0 0 0-1.06z" />
+                </svg>
+              </button>
+          </td>
+        </tr>
+        <!-- Empty State -->
+        <tr *ngIf="filteredRecomendaciones.length === 0">
+          <td colspan="9" class="text-center py-4">
+            <div class="flex flex-col items-center gap-2">
+              <span class="text-base-content/70" *ngIf="searchTerm">No se encontraron resultados para "{{searchTerm}}"</span>
+              <span class="text-base-content/70" *ngIf="!searchTerm">No se encontraron registros</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <!-- Paginación reutilizable -->
+  <app-pagination 
+    [totalItems]="filteredRecomendaciones.length"
+    [itemsPerPage]="itemsPerPage"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)"
+    (itemsPerPageChange)="onItemsPerPageChange($event)">
+  </app-pagination>
+</div>

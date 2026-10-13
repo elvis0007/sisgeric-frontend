@@ -1,0 +1,91 @@
+<div class="container w-full mx-auto px-4">
+  <app-breadcrumbs />
+  <app-modal-verificables />
+  <app-modal-form-verificables  />
+  <app-modal-form-fecha-max [reloadCards]="reloadCards.bind(this)" /> 
+  <app-modal-solicitudes [reloadCards]="reloadCards.bind(this)" />
+  <app-modal-matriz-plan-accion />
+
+  <div class="mb-8">
+    <h1 class="text-2xl md:text-3xl font-bold mb-6">Evidencias</h1>
+
+    <!-- Banner informativo de solicitudes en espera -->
+    <div *ngIf="soloSolicitudesPendientes" class="alert alert-info shadow-sm mb-6 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+      <div class="flex items-center gap-2 text-sm font-semibold">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <span>Filtrado: Mostrando únicamente recomendaciones con solicitudes de prórroga pendientes de aprobación.</span>
+      </div>
+      <button class="btn btn-xs btn-primary normal-case font-bold" (click)="quitarFiltroSolicitudes()">Mostrar todas</button>
+    </div>
+
+    <!-- Contenedor principal con flexbox responsive -->
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
+      
+      <!-- Filtros en la izquierda -->
+      <div class="flex items-center bg-base-200 rounded-lg p-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="text-secondary">
+          <path fill="currentColor"
+            d="M19 3H5c-1.414 0-2.121 0-2.56.412S2 4.488 2 5.815v.69c0 1.037 0 1.556.26 1.986s.733.698 1.682 1.232l2.913 1.64c.636.358.955.537 1.183.735c.474.411.766.895.898 1.49c.064.284.064.618.064 1.285v2.67c0 .909 0 1.364.252 1.718c.252.355.7.53 1.594.88c1.879.734 2.818 1.101 3.486.683S15 19.452 15 17.542v-2.67c0-.666 0-1 .064-1.285a2.68 2.68 0 0 1 .899-1.49c.227-.197.546-.376 1.182-.735l2.913-1.64c.948-.533 1.423-.8 1.682-1.23c.26-.43.26-.95.26-1.988v-.69c0-1.326 0-1.99-.44-2.402C21.122 3 20.415 3 19 3" />
+        </svg>
+
+        <div class="flex flex-wrap gap-2 ml-3">
+          <button class="btn btn-sm btn-secondary transition-all duration-200"
+            [ngClass]="selectedState === 1 ? 'btn-primary shadow-lg' : 'btn-outline hover:bg-primary/10'"
+            (click)="setFilter(1)">
+            PENDIENTES
+          </button>
+          <button class="btn btn-sm btn-secondary transition-all duration-200"
+            [ngClass]="selectedState === 2 ? 'btn-primary shadow-lg' : 'btn-outline hover:bg-primary/10'"
+            (click)="setFilter(2)">
+            CUMPLIDAS
+          </button>
+
+          <button class="btn btn-sm btn-secondary transition-all duration-200"
+            [ngClass]="selectedState === 3 ? 'btn-primary shadow-lg' : 'btn-outline hover:bg-primary/10'"
+            (click)="setFilter(3)">
+            NO CUMPLIDAS
+          </button>
+
+          <div *ngIf="selectedState === 1 || selectedState === 3" class="flex items-center ml-2 mr-2">
+            <label class="label cursor-pointer flex items-center gap-2 select-none">
+              <input type="checkbox" class="checkbox checkbox-primary checkbox-sm" 
+                     [(ngModel)]="ocultarJustificadas" 
+                     (change)="aplicarFiltroOcultarJustificadas()">
+              <span class="label-text font-semibold text-xs md:text-sm">Ocultar justificadas</span>
+            </label>
+          </div>
+
+          <div class="indicator w-full sm:w-auto">
+            <span class="indicator-item indicator-top indicator-center badge badge-primary badge-xs">Año</span>
+            <input type="number" class="input input-bordered input-sm w-20" min="2010" max="3000" step="1"
+              [(ngModel)]="selectedYear" placeholder="Todos" (change)="fetchRecomendaciones()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Buscador en la derecha -->
+      <div class="flex-shrink-0 w-full lg:w-auto">
+        <app-search-filter-respon 
+          [originalData]="allRecomendaciones" 
+          (filterChange)="onFilterChange($event)" 
+          (loadingChange)="onLoadingChange($event)"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estado de loading -->
+  <div *ngIf="isLoading" class="absolute inset-0 flex items-center justify-center bg-base-100 bg-opacity-80 z-10">
+    <div class="flex flex-col items-center gap-4">
+      <span class="loading loading-spinner loading-lg text-secondary"></span>
+    </div>
+  </div>
+
+  <!-- Estado vacío -->
+  <div *ngIf="isEmpty && !isLoading" class="flex flex-col items-center justify-center gap-4 py-10">
+    <img src="sisrec/assets/images/empty_folder.png" alt="No data" class="w-24 h-24">
+    <p class="text-lg font-semibold text-secondary">No hay recomendaciones disponibles.</p>
+  </div>
+
+  <app-card-recomendacion *ngIf="!isEmpty && !isLoading" [recomendaciones]="recomendaciones" />
+
+</div>

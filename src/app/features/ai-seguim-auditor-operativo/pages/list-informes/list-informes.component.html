@@ -1,0 +1,25 @@
+<div class="w-full">
+  <app-breadcrumbs />
+  <app-modal-form [reloadTable]="reloadTable.bind(this)" />
+
+  <div [hidden]="rutaHijaActiva">
+    <h1 class="text-2xl font-bold pb-5 pt-3">Informes</h1>
+
+    <div class="flex flex-col w-full mb-5">
+      <app-search-filter class="w-full" (filterChange)="onFilterChange($event)"
+        (loadingChange)="onLoadingChange($event)" />
+
+      <!-- Add button -->
+      <button class="btn btn-primary w-full lg:w-36 mt-4 self-end" (click)="openModal()">AGREGAR</button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center my-8">
+      <span class="loading loading-spinner loading-lg text-secondary"></span>
+    </div>
+    <app-table-informes *ngIf="!isLoading" [informes]="informes" [reloadTable]="reloadTable.bind(this)" />
+  </div>
+
+  <router-outlet (activate)="this.enActivacionRutaHija()" (deactivate)="this.enDesactivacionRutaHija()"></router-outlet>
+
+</div>

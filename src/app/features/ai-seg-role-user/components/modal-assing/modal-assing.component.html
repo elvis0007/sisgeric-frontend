@@ -1,0 +1,12 @@
+<dialog id="modalAsingRolesUser"
+  class="fixed inset-0 w-full h-full z-50 overflow-auto bg-black bg-opacity-50 backdrop-blur-sm text-secondary flex items-center justify-center"
+  [ngClass]="{ 'hidden': !modalAssingSrv.isModalOpen() }" (click)="closeModal()">
+  <div class="modal-box max-w-4xl rounded-lg shadow-lg relative" (click)="$event.stopPropagation()"> <!-- Evita que los clicks dentro del modal lo cierren -->
+    
+    <button class="btn btn-sm btn-circle btn-ghost text-lg absolute right-2" (click)="this.closeModal()">
+      ✕
+    </button>
+    <h2 class="text-2xl font-bold">Asignar Usuarios</h2>
+    <app-table-users></app-table-users>
+  </div>
+</dialog>

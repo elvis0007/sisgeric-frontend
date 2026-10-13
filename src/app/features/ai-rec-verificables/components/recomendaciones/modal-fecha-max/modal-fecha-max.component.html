@@ -1,0 +1,124 @@
+<dialog id="modalFormRecomendacionFechaMax"
+  class="fixed inset-0 w-full h-full z-50 overflow-auto bg-black bg-opacity-50 text-secondary flex items-center justify-center"
+  [ngClass]="{ 'hidden': !modalFormSrv.isModalOpen() }" (click)="closeModal($event)">
+  <div class="modal-box max-w-4xl rounded-lg shadow-lg relative" (click)="$event.stopPropagation()">
+    <!-- Estado de loading -->
+    <div *ngIf="isLoading" class="absolute inset-0 flex items-center justify-center bg-base-100 bg-opacity-80 z-10">
+      <div class="flex flex-col items-center gap-4">
+        <span class="loading loading-spinner loading-lg text-secondary"></span>
+      </div>
+    </div>
+    
+    <div class="flex items-center justify-between">
+      <h2 class="text-2xl font-bold mb-4">{{ isEditMode ? 'Actualizar Fecha Máxima de Recomendación' : '' }}
+      </h2>
+      <button class="btn btn-sm btn-circle btn-ghost text-lg" (click)="closeModal($event)">
+        ✕
+      </button>
+    </div>
+
+    <section class="grid grid-cols-1 gap-2 rounded-2xl">
+      <!-- Columna 1: Informe -->
+      <details class="collapse collapse-plus bg-base-200 rounded-xl hover:bg-base-300 transition-colors">
+        <summary class="collapse-title font-semibold text-secondary">
+          Memorando {{detalleRecomendacion?.ainin_memorando}}
+        </summary>
+        <div class="collapse-content">
+          <div>
+            <p class="mt-1 text-base font-normal text-secondary">
+              {{detalleRecomendacion?.ainin_titulo }}
+            </p>
+            <div class="flex flex-row gap-2 mt-3">
+              <span class="text-base font-semibold text-secondary">Memo. aprobación:</span>
+              <p class="text-base font-normal text-secondary">{{detalleRecomendacion?.ainin_memo_aprobacion}}</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Columna 2: Recomendación -->
+      <details class="collapse collapse-plus bg-base-200 rounded-xl hover:bg-base-300 transition-colors">
+        <summary class="collapse-title font-semibold text-secondary">
+          Recomendación
+        </summary>
+        <div class="collapse-content ">
+          <div>
+            <p class="mt-1 text-base font-normal text-secondary">
+              {{detalleRecomendacion?.recomendaciones?.arere_descripcion }}
+            </p>
+          </div>
+          <div class="flex flex-row gap-6">
+            <div>
+              <span class="block text-base font-semibold text-secondary">Fecha máxima de cumplimiento:</span>
+              <p class="mt-1 text-lg font-normal text-secondary">
+                {{ getFechaActualFormateada() || data?.arere_fecha_maxima || detalleRecomendacion?.recomendaciones?.arere_fecha_maxima }}
+              </p>
+            </div>
+            <div>
+              <span class="block text-base font-semibold text-secondary" *ngIf="!isEstadoCumplida()">Plazo:</span>
+              <span class="block text-base font-semibold text-secondary" *ngIf="isEstadoCumplida()">Estado:</span>
+              <p class="mt-1 text-base font-normal text-secondary" *ngIf="!isEstadoCumplida()">
+                <span class="text-sm text-secondary mt-1 font-semibold">{{detalleRecomendacion?.recomendaciones?.plazo
+                  || 0 | abs }}</span>
+                <span class="text-sm text-secondary font-semibold">
+                  {{ getEstadoPlazo() }}
+                </span>
+              </p>
+              <div class="mt-1" *ngIf="isEstadoCumplida()">
+                <span class="badge badge-success text-white font-semibold">
+                  {{ detalleRecomendacion?.recomendaciones?.estado_seguimiento?.arees_descripcion }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+    </section>
+    <!-- Estado de loading -->
+    <form class="space-y-4" [formGroup]="formVerificable" (ngSubmit)="toSend()">
+
+      <div class="form-control ">
+        <label class="label">
+          <span class="label-text font-medium">Fecha máxima de cumplimiento*</span>
+        </label>
+        <div class="relative w-full">
+          <input type="date" class="input input-bordered w-full pr-10 custom-calendar-picker"
+            formControlName="arere_fecha_maxima" placeholder="Seleccione fecha de emisión"
+            [min]="getMinDate()"
+            [ngClass]="{
+              'input-primary': !isFieldInvalid('arere_fecha_maxima') && !isFechaMenorOActual(),
+              'input-error': isFieldInvalid('arere_fecha_maxima') || isFechaMenorOActual()
+            }">
+          <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"
+              class="h-5 w-5 text-secondary">
+              <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M18 2v2M6 2v2m5.996 9h.008m-.008 4h.008m3.987-4H16m-8 0h.009M8 17h.009M3.5 8h17m-18 4.243c0-4.357 0-6.536 1.252-7.89C5.004 3 7.02 3 11.05 3h1.9c4.03 0 6.046 0 7.298 1.354C21.5 5.707 21.5 7.886 21.5 12.244v.513c0 4.357 0 6.536-1.252 7.89C18.996 22 16.98 22 12.95 22h-1.9c-4.03 0-6.046 0-7.298-1.354C2.5 19.293 2.5 17.114 2.5 12.756zM3 8h18" />
+            </svg>
+          </span>
+        </div>
+        <label class="label" *ngIf="isFieldInvalid('arere_fecha_maxima')">
+          <span class="label-text-alt text-error">Este campo es requerido</span>
+        </label>
+        <label class="label" *ngIf="isFechaMenorOActual()">
+          <span class="label-text-alt text-error font-medium flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-error inline" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            La fecha no puede ser anterior a la fecha máxima actual ({{ getFechaActualFormateada() }}). Debe ser posterior.
+          </span>
+        </label>
+      </div>
+
+      <div class="flex gap-4 justify-center items-center mt-4">
+        <button type="button" class="btn btn-error text-white flex-1 w-full"
+        (click)="closeModal($event)">CANCELAR</button>
+        <button class="btn btn-primary flex-1 w-full text-white" [disabled]="isLoadingSubmint">
+          <span *ngIf="isLoadingSubmint" class="loading loading-spinner text-secondary"></span>
+          {{isLoadingSubmint ? 'CARGANDO...' : isEditMode ? 'CONFIRMAR' : 'REGISTRAR' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</dialog>

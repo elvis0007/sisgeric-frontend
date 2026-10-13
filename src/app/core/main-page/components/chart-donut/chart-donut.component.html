@@ -1,0 +1,99 @@
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+  <!-- Tarjeta Gráfico Donut -->
+  <div class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 md:col-span-2 flex flex-col justify-between">
+    <div class="card-body p-6 flex-1 flex flex-col justify-between" [ngClass]="{'skeleton min-h-[380px]': isLoading}">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4" [ngClass]="{'hidden': isLoading}">
+        <div class="flex flex-col">
+          <h2 *ngIf="hasRole([ROL_AUDITOR_JEFE, ROL_AUDITOR_OPERATIVO])" class="card-title text-lg sm:text-xl font-bold text-base-content">Recomendaciones por departamento</h2>
+          <h2 *ngIf="hasRole([ROL_DIRECTOR])" class="card-title text-lg sm:text-xl font-bold text-base-content">Recomendaciones en las que participa el {{ auxiliarySrv.getUserInfo().departamento }}</h2>
+          <span class="text-sm text-base-content/60 mt-1">Distribución general y estado de solicitudes</span>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <div *ngIf="hasRole([ROL_AUDITOR_JEFE, ROL_AUDITOR_OPERATIVO])" class="mr-auto sm:mr-0">
+            <select 
+              class="select select-bordered select-sm select-primary w-full max-w-xs text-sm" 
+              [(ngModel)]="dptoSeleccionado"
+              (change)="actualizarGrafico()">
+              <option value="">Seleccione departamento</option>
+              <option *ngFor="let depto of chartDonut?.departamentos" [value]="depto.departamento">
+                {{ depto.departamento }}
+              </option>
+            </select>
+          </div>
+          <button 
+            class="btn btn-xs sm:btn-sm btn-outline gap-2" 
+            [class.btn-primary]="mostrarPorcentajes"
+            [class.btn-ghost]="!mostrarPorcentajes"
+            (click)="togglePorcentajes()"
+            title="{{ mostrarPorcentajes ? 'Ocultar porcentajes' : 'Mostrar porcentajes' }}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather">
+              <path d="M5 12H19"></path>
+              <path d="M5 12L9 8"></path>
+              <path d="M5 12L9 16"></path>
+              <path d="M19 6V18"></path>
+            </svg>
+            <span class="text-sm">{{ mostrarPorcentajes ? 'Ocultar %' : 'Mostrar %' }}</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Agrupación para centrar el gráfico y sus etiquetas -->
+      <div class="flex flex-col items-center mt-2 flex-1 justify-center" [ngClass]="{'hidden': isLoading}">
+        <!-- Contenedor del gráfico Donut -->
+        <div class="w-64 h-64 relative flex items-center justify-center">
+          <canvas #donutChart></canvas>
+          <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none z-10 select-none -translate-y-7">
+            <span class="text-3xl sm:text-4xl font-black text-base-content">{{ totalRecomendaciones }}</span>
+            <span class="text-[10px] font-bold text-base-content/50 uppercase tracking-widest mt-0.5">Total</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Contenedor para las tarjetas verticales -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-8 items-stretch">
+    <!-- Tarjeta Recomendaciones pendientes (vertical) -->
+    <div 
+      class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 flex flex-col justify-center min-h-[140px] sm:min-h-0 relative select-none group"
+      [class.cursor-pointer]="hasRole([ROL_AUDITOR_OPERATIVO, ROL_DIRECTOR])"
+      [class.hover:-translate-y-1]="hasRole([ROL_AUDITOR_OPERATIVO, ROL_DIRECTOR])"
+      [class.active:scale-[0.98]]="hasRole([ROL_AUDITOR_OPERATIVO, ROL_DIRECTOR])"
+      (click)="hasRole([ROL_AUDITOR_OPERATIVO, ROL_DIRECTOR]) ? navigateToPendientesAprob() : null">
+      <div class="card-body p-6 flex flex-row items-center justify-between w-full relative" [ngClass]="{'skeleton': isLoading}">
+        <div class="flex-1 flex flex-col items-center text-center justify-center min-w-0">
+          <h1 class="text-4xl sm:text-5xl font-black text-base-content tracking-tight leading-none mb-1.5">{{ chartDonut?.cantRecPendientesAprobacion || 0 }}</h1>
+          <p class="text-sm font-bold text-base-content/70 leading-snug break-words">Solicitudes pendientes de aprobación</p>
+        </div>
+        <div class="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 ml-2 group-hover:scale-110" [ngClass]="{'hidden': isLoading}">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tarjeta Recomendaciones último mes (vertical) -->
+    <div 
+      class="card bg-base-200/50 backdrop-blur-md border border-base-content/10 shadow-md hover:shadow-lg rounded-2xl transition-all duration-300 flex flex-col justify-center min-h-[140px] sm:min-h-0 relative cursor-pointer hover:-translate-y-1 active:scale-[0.98] select-none group"
+      (click)="navigateToUltimoMes()">
+      <div class="card-body p-6 flex flex-row items-center justify-between w-full relative" [ngClass]="{'skeleton': isLoading}">
+        <div class="flex-1 flex flex-col items-center text-center justify-center min-w-0">
+          <h1 class="text-4xl sm:text-5xl font-black text-base-content tracking-tight leading-none mb-1.5">{{ chartDonut?.cantRecIngreUltimoMes || 0 }}</h1>
+          <p class="text-sm font-bold text-base-content/70 leading-snug break-words">Recomendaciones en el último mes</p>
+        </div>
+        <div class="w-14 h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 ml-2 group-hover:scale-110" [ngClass]="{'hidden': isLoading}">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

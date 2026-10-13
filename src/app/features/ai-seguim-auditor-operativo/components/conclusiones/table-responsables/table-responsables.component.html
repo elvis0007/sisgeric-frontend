@@ -1,0 +1,59 @@
+<div class="w-full space-y-4 mx-2">
+  <div class="flex justify-between mt-4 mb-3">
+    <app-filter-responsables [users]="responsables" (filterChanged)="onFilterChanged($event)"/>
+    <button [ngClass]="{
+      'btn-error text-white': operationType === 'replace',
+    }" class="btn btn-primary" [disabled]="isSubmitting" (click)="toSendResponsables()">
+      <span *ngIf="isSubmitting" class="loading loading-spinner text-secondary"></span>
+      {{ isSubmitting ? 'PROCESANDO...' : (operationType === 'assing' ? 'ASIGNAR' : 'REASIGNAR') }}
+    </button>
+  </div>
+
+  <!-- Table wrapper with horizontal scroll -->
+  <div class="overflow-x-auto rounded-lg shadow-sm border border-base-200">
+    <table class="table table-sm md:table-md w-full min-w-[600px]">
+      <!-- Table Header -->
+      <thead>
+        <tr class="bg-primary text-primary-content">
+          <th class="text-sm w-24 text-center">Selección</th>
+          <th class="text-sm text-center">Nombres y Apellidos</th>
+          <th class="text-sm text-center">Cargo</th>
+          <th class="text-sm text-center">Departamento</th>
+          <th class="text-sm text-center">Sección</th>
+        </tr>
+      </thead>
+
+      <!-- Table Body -->
+      <tbody class="bg-base-200">
+        <tr class="hover" *ngFor="let resp of displayedResponsables; let i = index">
+          <td class="text-center">
+            <input id="checkbox-{{ i }}" type="checkbox" class="checkbox checkbox-primary" [(ngModel)]="resp.selected"
+              [disabled]="resp.isAssigned ? true : false" />
+          </td>
+          <td class="text-sm text-center">{{resp.NOMBRES}} {{resp.APELLIDOS}}</td>
+          <td class="text-sm text-center">{{resp.CARGO}}</td>
+          <td class="text-sm text-center">{{ resp.DEPARTAMENTO}} </td>
+          <td class="text-sm text-center">{{resp.SECCION}} </td>
+        </tr>
+
+        <!-- Empty State -->
+        <tr *ngIf="!displayedResponsables?.length">
+          <td colspan="4" class="text-center py-4">
+            <div class="flex flex-col items-center gap-2">
+              <span class="text-base-content/70">No se encontraron registros</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación reutilizable -->
+  <app-pagination 
+    [totalItems]="filteredResponsables.length"
+    [itemsPerPage]="itemsPerPage"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)"
+    (itemsPerPageChange)="onItemsPerPageChange($event)">
+  </app-pagination>
+</div>

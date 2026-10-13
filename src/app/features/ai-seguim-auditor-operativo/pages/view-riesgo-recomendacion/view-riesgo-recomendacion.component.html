@@ -1,0 +1,34 @@
+<div class="w-full">
+  <div *ngIf="isLoading" class="flex justify-center items-center my-8" role="status" aria-label="Cargando recomendación">
+    <span class="loading loading-spinner loading-lg text-secondary"></span>
+  </div>
+
+  <ng-container *ngIf="!isLoading && datos">
+    <h2 class="text-lg md:text-xl font-bold">Orden de Trabajo:</h2>
+    <p class="text-base-content mb-4">{{ datos.ainin_orden_trabajo }}</p>
+
+    <h3 class="text-base font-bold">Aprobación Informe:</h3>
+    <p class="text-base-content mb-4">{{ fechaAprobacion ? (fechaAprobacion | date:'dd/MM/yyyy') : 'Pendiente' }}</p>
+
+    <h3 class="text-base font-bold">Conclusión:</h3>
+    <p class="text-base-content mb-4 whitespace-pre-wrap break-words">{{ datos.areco_conclusion }}</p>
+
+    <ng-container *ngIf="recomendacion">
+      <h3 class="text-base font-bold">Recomendación:</h3>
+      <p class="text-base-content mb-4 whitespace-pre-wrap break-words">{{ recomendacion.arere_descripcion }}</p>
+    </ng-container>
+  </ng-container>
+
+  <div class="mb-4" *ngIf="!isLoading">
+    <h1 class="text-xl md:text-2xl font-bold">Riesgo y Evidencia Requerida</h1>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-error" role="alert">{{ errorMessage }}</div>
+
+  <ng-container *ngIf="!isLoading && recomendacion && !errorMessage">
+    <app-modal-form-riesgos #modalRiesgo [recomendacion]="recomendacion"
+      (riesgoActualizado)="recomendacion = $event" />
+    <app-table-riesgos [recomendacion]="recomendacion" (editarRiesgo)="modalRiesgo.editar($event)" />
+  </ng-container>
+  
+</div>

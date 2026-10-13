@@ -1,0 +1,68 @@
+<div class="w-full space-y-4 mx-2">
+  <!-- Header Controls -->
+  <div class="flex flex-col lg:flex-row items-center justify-between mb-5 mt-5 space-y-4 lg:space-y-0">
+    <app-search-filter *ngIf="!isLoading" [users]="users" (filterChanged)="onFilterChanged($event)" />
+
+    <!-- Divider solo visible en pantallas grandes -->
+    <div class="hidden lg:block divider divider-horizontal divider-primary"></div>
+    <!-- Botón se mueve debajo del filtro en pantallas pequeñas -->
+    <button class="btn btn-primary w-full lg:w-auto" (click)="asignarUsuarios()" [disabled]="isLoadingAssign">
+      <span *ngIf="isLoadingAssign" class="loading loading-spinner text-secondary"></span>
+      {{isLoadingAssign ? 'ASIGNANDO...' : 'ASIGNAR'}}
+    </button>
+  </div>
+
+   <!-- Estado de loading -->
+   <div *ngIf="isLoading" class="absolute inset-0 flex items-center justify-center bg-base-100 bg-opacity-80 z-10">
+    <span class="loading loading-spinner loading-lg text-secondary"></span>
+  </div>
+
+  <!-- Table wrapper with horizontal scroll -->
+  <div *ngIf="!isLoading" class="overflow-x-auto rounded-lg shadow-sm border border-base-200 relative">
+
+    <table class="table table-sm md:table-md w-full min-w-[600px]">
+      <!-- Table Header -->
+      <thead>
+        <tr class="bg-primary text-primary-content">
+          <th class="text-sm w-24 text-center">Selección</th>
+          <th class="text-sm">Usuario</th>
+          <th class="text-sm">Cargo</th>
+          <th class="text-sm">Departamento</th>
+        </tr>
+      </thead>
+
+      <!-- Table Body -->
+      <tbody class="bg-base-200">
+        <tr class="hover" *ngFor="let user of displayedUsers; let i = index">
+          <td class="text-center">
+            <input id="checkbox-{{ i }}" type="checkbox" class="checkbox checkbox-primary" [(ngModel)]="user.selected"
+              [disabled]="user.isAssigned ? true : false" />
+          </td>
+          <td class="text-sm">{{ user.NOMBRES }} {{ user.APELLIDOS }}</td>
+          <td class="text-sm">{{ user.CARGO }}</td>
+          <td class="text-sm">{{ user.DEPARTAMENTO }}</td>
+        </tr>
+
+        <!-- Empty State -->
+        <tr *ngIf="!displayedUsers?.length && !isLoading">
+          <td colspan="4" class="text-center py-4">
+            <div class="flex flex-col items-center gap-2">
+              <span class="text-base-content/70">No se encontraron registros</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación reutilizable -->
+  <div *ngIf="!isLoading">
+    <app-pagination 
+      [totalItems]="filteredUsers.length"
+      [itemsPerPage]="itemsPerPage"
+      [currentPage]="currentPage"
+      (pageChange)="onPageChange($event)"
+      (itemsPerPageChange)="onItemsPerPageChange($event)">
+    </app-pagination>
+  </div>
+</div>

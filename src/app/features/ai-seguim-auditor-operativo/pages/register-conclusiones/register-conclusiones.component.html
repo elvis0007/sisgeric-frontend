@@ -1,0 +1,434 @@
+<div class="flex items-center justify-center w-full h-full p-4 bg-base-100">
+    <app-modal-add-responsables [responsables]="responsablesFilter"
+        (responsablesSelected)="onResponsablesSelected($event)" />
+    <div class="max-w-full w-full space-y-4">
+        <!-- Header with steps -->
+        <div class="mb-8">
+            <ul class="steps steps-vertical sm:steps-horizontal w-full">
+                <li class="step" [class.step-primary]="currentStep >= 1">
+                    <span class="step-label text-sm font-semibold">Ingresar Conclusión</span>
+                </li>
+                <li class="step" [class.step-primary]="currentStep >= 2">
+                    <span class="step-label text-sm font-semibold">Ingresar Recomendaciones</span>
+                </li>
+                <li class="step" [class.step-primary]="currentStep >= 3">
+                    <span class="step-label text-sm font-semibold">Riesgo y Evidencia</span>
+                </li>
+                <li class="step" [class.step-primary]="currentStep === 4">
+                    <span class="step-label text-sm font-semibold">Verificar</span>
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            <!-- Título del Informe -->
+             <div class="flex items-start gap-2 mb-2">
+                 <h3 class="text-base font-semibold text-secondary flex items-center"> <span class="mr-2">Orden de Trabajo:</span> </h3>
+                 <p *ngIf="!isLoadingTitles" class="text-base-content"> {{ordenTrabajo}}</p>
+            </div>
+            <div class="flex items-start gap-2 mb-2">
+                <h3 class="text-base font-semibold text-secondary shrink-0">Informe:</h3>
+                <p *ngIf="!isLoadingTitles" class="min-w-0 flex-1 text-base-content whitespace-pre-wrap break-words">
+                    {{ informeTitle }}
+                </p>
+            </div>
+
+            <div class="flex items-start gap-2 mb-2">
+                <h3 class="text-base font-semibold text-secondary flex items-center"><span class="mr-2">Fecha de Aprobación:</span></h3>
+                <p *ngIf="!isLoadingTitles" class="text-base-content">{{ informeFechaAprob ? (informeFechaAprob | date:'dd/MM/yyyy') : 'Pendiente' }}</p>
+            </div>
+            <span *ngIf="isLoadingTitles" class="loading loading-spinner text-secondary"></span>
+
+            <div class="flex flex-wrap items-start gap-x-2 gap-y-1 mb-2">
+                <h3 class="text-base font-semibold text-secondary shrink-0">
+                    Hallazgo:
+                </h3>
+                <p *ngIf="!isLoadingTitles" class="min-w-0 flex-1 text-base-content whitespace-pre-wrap break-words">
+                    {{ hallazgoTitle }}
+                </p>
+            </div>
+        </div>
+
+        <form>
+            <!-- Step 1: Ingresar hallazgos -->
+            <div class="flex items-center justify-center w-full">
+                <div class="w-full">
+                    <div class="grid gap-6" *ngIf="currentStep === 1" aria-label="Formulario paso 1: Conclusión">
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text font-medium">Conclusión*</span>
+                            </label>
+                            <textarea [(ngModel)]="conclusionText"
+                                class="textarea textarea-bordered textarea-primary min-h-[150px]"
+                                placeholder="Ingrese la conclusión del hallazgo" aria-required="true"
+                                name="conclusionText" [ngClass]="{
+                  'textarea-error': showError
+                }" (input)="onConclusionInput()"></textarea>
+                            <label class="label" *ngIf="showError">
+                                <span class="label-text-alt text-error">Este campo es requerido</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            <!-- Step 2: Ingresar Recomendaciones -->
+
+            <div class="grid gap-6 md:grid-cols-12 w-full" *ngIf="currentStep === 2"
+                aria-label="Formulario paso 2: Recomendaciones">
+                <!-- Recommendation Input Section -->
+                <div class="md:col-span-6 space-y-6 w-full">
+                    <div class="flex gap-2">
+                        <div class="form-control w-full">
+                            <label class="label">
+                                <span class="label-text font-medium">N° Rec.</span>
+                            </label>
+                            <input type="number" min="1" class="input input-bordered input-primary w-full"
+                                placeholder="Ingrese el número de recomendación" [(ngModel)]="numRecomendacion"
+                                name="numRecomendacion" [ngClass]="{
+                  'input-error': showNumRecError
+                }" (input)="onNumRecomendacionInput()" />
+                            <label class="label" *ngIf="showNumRecError">
+                                <span class="label-text-alt">Este campo es requerido</span>
+                            </label>
+                        </div>
+
+                        <div class="form-control w-full">
+                            <label class="label">
+                                <span class="label-text font-medium">Fecha máxima de cumplimiento*</span>
+                            </label>
+                            <div class="relative w-full">
+                                <input type="date"
+                                    class="input input-bordered input-primary w-full pr-10 custom-calendar-picker"
+                                    placeholder="Seleccione fecha de emisión" name="recommendationDate"
+                                    [(ngModel)]="recommendationDate" (change)="onDateChange($event)" 
+                                    [disabled]="!informeFechaAprob" />
+                                <span
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"
+                                        class="h-5 w-5 text-secondary">
+                                        <path fill="none" stroke="currentColor" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="1.5"
+                                            d="M18 2v2M6 2v2m5.996 9h.008m-.008 4h.008m3.987-4H16m-8 0h.009M8 17h.009M3.5 8h17m-18 4.243c0-4.357 0-6.536 1.252-7.89C5.004 3 7.02 3 11.05 3h1.9c4.03 0 6.046 0 7.298 1.354C21.5 5.707 21.5 7.886 21.5 12.244v.513c0 4.357 0 6.536-1.252 7.89C18.996 22 16.98 22 12.95 22h-1.9c-4.03 0-6.046 0-7.298-1.354C2.5 19.293 2.5 17.114 2.5 12.756zM3 8h18" />
+                                    </svg>
+                                </span>
+                            </div>
+                            <div *ngIf="!informeFechaAprob" class="text-xs text-error mt-1">
+                                Se requiere fecha de aprobación del informe
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text font-medium">Recomendación*</span>
+                        </label>
+                        <textarea [(ngModel)]="recommendationText"
+                            class="textarea textarea-bordered textarea-primary w-full min-h-[170px]"
+                            placeholder="Ingrese la recomendación" aria-required="true" name="recomendacionText"
+                            [ngClass]="{
+                'textarea-error': showRecommendationError
+              }" (input)="onRecomendacionInput()"></textarea>
+                        <label class="label" *ngIf="showRecommendationError">
+                            <span class="label-text-alt text-error">Este campo es requerido</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Responsables Section -->
+                <div class="md:col-span-6 bg-base-200 rounded-lg p-4 space-y-4">
+                    <h3 class="text-base font-semibold">Responsables Asignados</h3>
+
+                    <div class="flex w-full items-center justify-center">
+                        <span class="text-base-content text-center"
+                            *ngIf="selectedResponsables.length === 0">Responsables sin asignar</span>
+                    </div>
+
+                    <div class="overflow-y-auto max-h-96 space-y-4">
+                        <div class="collapse collapse-arrow bg-base-100 rounded-lg"
+                            *ngFor="let responsable of selectedResponsables">
+                            <input type="checkbox" #responsableDesplegable
+                                [attr.aria-label]="'Mostrar u ocultar responsable ' + responsable.NOMBRES + ' ' + responsable.APELLIDOS"
+                                [attr.aria-expanded]="responsableDesplegable.checked" />
+                            <div class="collapse-title text-sm font-semibold">
+                                <h4>{{ responsable.NOMBRES }} {{ responsable.APELLIDOS }}</h4>
+                                <p class="text-xs text-base-content/70">
+                                    {{ responsable.CARGO }}
+                                </p>
+                            </div>
+                            <div class="collapse-content text-sm relative flex flex-col">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="flex gap-2 justify-start">
+                                            <span class="font-semibold text-base-content/80">Departamento:
+                                            </span>
+                                            <span class="text-base-content">{{
+                                                responsable.DEPARTAMENTO
+                                                }}</span>
+                                        </div>
+                                        <div class="flex gap-2 justify-start">
+                                            <span class="font-semibold text-base-content/80">Sección:
+                                            </span>
+                                            <span class="text-base-content">{{
+                                                responsable.SECCION
+                                                }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-center mt-2">
+                                        <button class="btn btn-circle btn-sm bg-red-600 hover:bg-red-700"
+                                            (click)="openModalForDeletionResp(responsable)" title="Eliminar">
+                                            <svg class="w-5 h-5 text-slate-300 transition-colors"
+                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                <path fill="currentColor"
+                                                    d="M14.28 2a2 0 0 1 1.897 1.368L16.72 5H20a1 1 0 1 1 0 2l-.003.071l-.867 12.143A3 3 0 0 1 16.138 22H7.862a3 3 0 0 1-2.992-2.786L4.003 7.07L4 7a1 1 0 0 1 0-2h3.28l.543-1.632A2 2 0 0 1 9.721 2zM9 10a1 1 0 0 0-.993.883L8 11v6a1 1 0 0 0 1.993.117L10 17v-6a1 1 0 0 0-1-1m6 0a1 1 0 0 0-1 1v6a1 1 0 1 0 2 0v-6a1 1 0 0 0-1-1m-.72-6H9.72l-.333 1h5.226z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary w-full" (click)="openModalAddResponsable()"
+                        [disabled]="isLoading">
+                        <span *ngIf="isLoading" class="loading loading-spinner text-secondary"></span>
+                        {{ isLoading ? "CARGANDO..." : "ASIGNAR RESPONSABLES" }}
+                    </button>
+                </div>
+
+                <div class="flex w-full md:col-span-12">
+                    <div class="w-full relative group">
+                        <button type="button" class="btn btn-success text-slate-200 w-full" 
+                            (click)="openModalForCreation()" 
+                            [disabled]="!informeFechaAprob">
+                            CREAR RECOMENDACIÓN
+                        </button>
+                        <div *ngIf="!informeFechaAprob" 
+                            class="absolute left-1/2 bottom-full transform -translate-x-1/2 -translate-y-2 bg-base-200 text-secondary shadow-lg rounded-lg p-3 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-300 w-80 z-50">
+                            <p class="text-sm font-normal text-center">
+                                Se requiere fecha de aprobación del informe
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                  
+                <!-- Recommendations List Section -->
+                <div class="md:col-span-12 bg-base-200 rounded-lg p-4 space-y-4" #targetElement id="target">
+                    <h3 class="text-base font-bold">Recomendaciones Emitidas</h3>
+                    <div class="flex w-full items-center justify-center">
+                        <span class="text-base-content text-center" *ngIf="recomendaciones.length === 0">Recomendaciones
+                            sin emitir
+                        </span>
+                    </div>
+                    <div class="overflow-y-auto max-h-96 space-y-4">
+                        <div class="collapse collapse-arrow bg-base-100 rounded-lg"
+                            *ngFor="let recom of recomendaciones; let i = index">
+                            <input type="checkbox" #recomendacionDesplegable
+                                [attr.aria-label]="'Mostrar u ocultar recomendaci?n ' + recom.arere_num_rec"
+                                [attr.aria-expanded]="recomendacionDesplegable.checked" />
+                            <div class="collapse-title items-center">
+                                <h4 class="text-sm font-semibold text-base-content">
+                                    Recomendación {{ recom.arere_num_rec }}
+                                </h4>
+                            </div>
+                            <div class="collapse-content">
+                                <div class="grid grid-cols-12 gap-3 relative">
+                                    <div class="col-span-7 space-y-1">
+                                        <span
+                                            class="text-sm font-semibold text-base-content/80 mb-1">Descripción:</span>
+                                        <span class="text-sm text-base-content ml-2">{{
+                                            recom.arere_descripcion
+                                            }}</span>
+                                    </div>
+                                    <div class="col-span-4 space-y-1">
+                                        <span class="text-sm font-semibold text-base-content/80 mb-1">Fecha
+                                            Máxima:</span>
+                                        <span class="text-sm text-base-content ml-2">{{
+                                            recom.arere_fecha_maxima
+                                            }}</span>
+
+                                        <h5 class="text-sm font-semibold text-base-content/80 mb-1">
+                                            Responsables:
+                                        </h5>
+                                        <p *ngFor="let resp of recom.responsables" class="space-y-1">
+                                            {{ resp.arers_nombre }} {{ resp.arers_apellido }}
+                                            <span class="text-base-content/70 text-xs block">
+                                                ({{ resp.arers_departamento }} - {{ resp.arers_cargo }})
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div class="absolute right-0 top-1/2 -translate-y-1/2">
+                                        <button class="btn btn-circle btn-sm bg-red-600 hover:bg-red-700"
+                                            title="Eliminar"
+                                            (click)="openModalForDeletion(i)" >
+                                            <svg class="w-5 h-5 text-slate-300 transition-colors"
+                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                <path fill="currentColor"
+                                                    d="M14.28 2a2 0 0 1 1.897 1.368L16.72 5H20a1 1 0 1 1 0 2l-.003.071l-.867 12.143A3 3 0 0 1 16.138 22H7.862a3 3 0 0 1-2.992-2.786L4.003 7.07L4 7a1 1 0 0 1 0-2h3.28l.543-1.632A2 2 0 0 1 9.721 2zM9 10a1 1 0 0 0-.993.883L8 11v6a1 1 0 0 0 1.993.117L10 17v-6a1 1 0 0 0-1-1m6 0a1 1 0 0 0-1 1v6a1 1 0 1 0 2 0v-6a1 1 0 0 0-1-1m-.72-6H9.72l-.333 1h5.226z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Riesgo y evidencia requerida -->
+            <div class="space-y-6" *ngIf="currentStep === 3" aria-label="Formulario paso 3: Riesgo y evidencia">
+                <section *ngFor="let recom of recomendaciones; let i = index"
+                    class="space-y-4 border-b border-base-200 pb-6">
+                    <div class="flex items-start gap-2">
+                        <h3 class="text-base font-semibold text-secondary shrink-0">Recomendación:</h3>
+                        <p class="min-w-0 flex-1 text-base text-base-content whitespace-pre-wrap break-words">{{ recom.arere_descripcion }}</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                        <div class="form-control">
+                            <label class="label px-0" [for]="'riesgo-' + i">
+                                <span class="label-text font-medium">Nivel de riesgo*</span>
+                            </label>
+                            <select [id]="'riesgo-' + i" [name]="'riesgo-' + i"
+                                [(ngModel)]="recom.arere_riesgo_verificado" required
+                                class="select select-bordered select-primary w-full"
+                                [class.select-error]="showRiskError && !recom.arere_riesgo_verificado">
+                                <option [ngValue]="undefined" disabled>Seleccione el riesgo</option>
+                                <option value="ALTO">Alto</option>
+                                <option value="MODERADO">Moderado</option>
+                                <option value="BAJO">Bajo</option>
+                            </select>
+                            <p *ngIf="showRiskError && !recom.arere_riesgo_verificado" class="text-xs text-error mt-1">
+                                Seleccione el nivel de riesgo.
+                            </p>
+                        </div>
+                        <div class="form-control md:col-span-2">
+                            <div class="flex items-center justify-between gap-2 mb-2">
+                                <span class="label-text font-medium">Evidencias requeridas*</span>
+                                <button type="button" class="btn btn-circle btn-sm btn-primary"
+                                    (click)="agregarEvidencia(recom)" title="Agregar evidencia" aria-label="Agregar evidencia">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                        <path d="M12 5v14M5 12h14" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <ol class="space-y-3">
+                                <li *ngFor="let evidencia of evidencias(recom); let j = index" class="flex items-start gap-2">
+                                    <label class="pt-3 text-sm font-semibold" [for]="'evidencia-' + i + '-' + j">{{ j + 1 }}.</label>
+                                    <div class="flex-1 min-w-0">
+                                        <input type="text" [id]="'evidencia-' + i + '-' + j" [name]="'evidencia-' + i + '-' + j"
+                                            [(ngModel)]="evidencia.texto" (ngModelChange)="actualizarEvidencias(recom)"
+                                            required maxlength="500" class="input input-bordered input-primary w-full"
+                                            [attr.aria-label]="'Evidencia requerida ' + (j + 1)"
+                                            [class.input-error]="showRiskError && !evidencia.texto.trim()"
+                                            placeholder="Ingrese un documento o respaldo requerido" />
+                                        <p *ngIf="showRiskError && !evidencia.texto.trim()" class="text-xs text-error mt-1">
+                                            Complete esta evidencia o elim?nela.
+                                        </p>
+                                    </div>
+                                    <button type="button" class="btn btn-circle btn-sm btn-ghost text-error mt-2"
+                                        [disabled]="evidencias(recom).length === 1" (click)="quitarEvidencia(recom, j)"
+                                        title="Eliminar evidencia" [attr.aria-label]="'Eliminar evidencia ' + (j + 1)">
+                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                            <path d="m6 6 12 12M6 18 18 6" />
+                                        </svg>
+                                    </button>
+                                </li>
+                            </ol>
+                            <p class="text-xs mt-2" [class.text-error]="(recom.arere_evidencia_requerida?.length || 0) > 2000">
+                                {{ recom.arere_evidencia_requerida?.length || 0 }}/2000 caracteres
+                            </p>
+                            <p *ngIf="showRiskError && (recom.arere_evidencia_requerida?.length || 0) > 2000" class="text-xs text-error mt-1">
+                                Las evidencias no deben superar los 2000 caracteres en total.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Step 4: Verificar -->
+            <div class="space-y-6" *ngIf="currentStep === 4" aria-label="Verificar">
+                <div class="grid gap-6 grid-cols-1 md:grid-cols-2">
+                    <div class="bg-base-200 rounded-lg p-6 space-y-4">
+                        <div>
+                            <label class="text-sm font-medium text-base-content/70">
+                                Conclusión:
+                            </label>
+                            <p class="mt-1 text-base-content">{{ conclusionText }}</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-base-200 rounded-lg p-4 space-y-4">
+                        <h3 class="text-base font-bold">Recomendaciones</h3>
+                        <!-- Collapsibles for recommendations -->
+                        <div class="collapse collapse-arrow bg-base-100 rounded-lg"
+                            *ngFor="let recom of recomendaciones; let i = index">
+                            <input type="checkbox" #recomendacionDesplegable
+                                [attr.aria-label]="'Mostrar u ocultar recomendaci?n ' + recom.arere_num_rec"
+                                [attr.aria-expanded]="recomendacionDesplegable.checked" />
+                            <div class="collapse-title text-sm font-semibold flex items-center justify-between pr-10">
+                                <span>Recomendación {{ recom.arere_num_rec }}</span>
+                            </div>
+                            <div class="collapse-content text-sm relative flex flex-col space-y-4">
+                                <div class="space-y-1">
+                                    <span class="text-sm font-semibold text-base-content/80">Descripción:</span>
+                                    <span class="text-sm text-base-content block">{{
+                                        recom.arere_descripcion
+                                        }}</span>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <span class="text-sm font-semibold text-base-content/80">Fecha Máxima:</span>
+                                    <span class="text-sm text-base-content block">{{
+                                        recom.arere_fecha_maxima
+                                        }}</span>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <span class="text-sm font-semibold text-base-content/80">Nivel de riesgo:</span>
+                                    <span class="badge badge-outline" [ngClass]="{
+                                        'badge-error': recom.arere_riesgo_verificado === 'ALTO',
+                                        'badge-warning': recom.arere_riesgo_verificado === 'MODERADO',
+                                        'badge-success': recom.arere_riesgo_verificado === 'BAJO'
+                                    }">{{ recom.arere_riesgo_verificado | titlecase }}</span>
+                                </div>
+                                <div class="space-y-1">
+                                    <span class="text-sm font-semibold text-base-content/80">Evidencia requerida:</span>
+                                    <ol class="list-decimal pl-5 space-y-1">
+                                        <li *ngFor="let evidencia of evidencias(recom)" class="whitespace-pre-wrap break-words">{{ evidencia.texto }}</li>
+                                    </ol>
+                                </div>
+                                <div class="space-y-1">
+                                    <span class="text-sm font-semibold text-base-content/80">Responsables:</span>
+                                    <div class="space-y-1">
+                                        <p *ngFor="let resp of recom.responsables">
+                                            {{ resp.arers_nombre }} {{ resp.arers_apellido }}
+                                            <span class="text-base-content/70 text-xs block">
+                                                ({{ resp.arers_departamento }} - {{ resp.arers_cargo }})
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex gap-4 mt-8">
+                <button type="button" class="btn btn-error flex-1 text-white"
+                    [disabled]="isSubmitting"
+                    (click)="currentStep > 1 ? previousStep() : exit()">
+                    {{ currentStep === 1 ? "CANCELAR" : "REGRESAR" }}
+                </button>
+                <button type="button" class="btn btn-primary flex-1" 
+                    [disabled]="isSubmitting" 
+                    (click)="nextStep()">
+                    <span *ngIf="isSubmitting" class="loading loading-spinner text-secondary"></span>
+                    {{ isSubmitting ? "GUARDANDO..." : (currentStep < 4 ? "CONTINUAR" : "CONFIRMAR") }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

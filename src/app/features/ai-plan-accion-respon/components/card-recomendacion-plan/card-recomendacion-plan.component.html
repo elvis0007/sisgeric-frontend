@@ -1,0 +1,238 @@
+<app-modal-responsables />
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <ng-container *ngFor="let recomendacion of recomendaciones">
+    <div *ngIf="!esCumplida(recomendacion)"
+         class="card rec-card-container shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden mt-5">
+      <div class="card-body p-5">
+      
+      <!-- Memorando -->
+      <div class="collapse collapse-plus rec-card-block rounded-xl transition-colors">
+        <input type="checkbox" />
+        <div class="collapse-title font-semibold rec-card-title flex items-center gap-2">
+          <span>Memorando</span>
+          <span>{{ recomendacion.ainin_memorando }}</span>
+        </div>
+        <div class="flex flex-col gap-2 collapse-content prose max-w-none">
+          <p class="rec-card-body">{{ recomendacion.ainin_titulo }}</p>
+        
+          <div class="flex flex-row gap-2">
+            <span class="rec-card-body font-semibold">Memo. aprobación:</span>
+            <p class="rec-card-body">{{ recomendacion.ainin_memo_aprobacion }}</p>
+          </div>
+          <div class="flex flex-row gap-2">
+            <span class="rec-card-body font-semibold">Auditor:</span>
+            <p class="rec-card-body">{{ recomendacion.ainin_usuario }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conclusión -->
+      <div class="collapse collapse-plus rec-card-block rounded-xl transition-colors">
+        <input type="checkbox" />
+        <div class="collapse-title font-semibold rec-card-title">
+          Conclusión
+        </div>
+        <div class="collapse-content prose max-w-none">
+          <p class="rec-card-body">{{ recomendacion.ainoc_descripcion }}</p>
+        </div>
+      </div>
+
+      <!-- Recomendación -->
+      <div class="collapse collapse-plus rec-card-block rounded-xl transition-colors">
+        <input type="checkbox" />
+        <div class="collapse-title font-semibold rec-card-title flex items-center gap-2">
+          <span>Recomendación</span>
+          <span>{{ recomendacion.recomendaciones.arere_num_rec }}</span>
+        </div>
+        <div class="collapse-content prose max-w-none flex flex-col gap-2.5">
+          <p class="rec-card-body w-full leading-relaxed">{{ recomendacion.recomendaciones.arere_descripcion }}</p>
+
+          <!-- Detalle de Riesgo al darle + (desplegar) -->
+          <div *ngIf="getRiesgoRecomendacion(recomendacion)" 
+               class="flex items-center gap-2 pt-2 border-t border-base-200/80">
+            <span class="text-xs sm:text-sm font-semibold rec-card-title">Riesgo de la recomendación:</span>
+            <span class="badge badge-sm sm:badge-md font-bold tracking-wide shadow-xs"
+                  [ngClass]="getRiesgoBadgeClass(getRiesgoRecomendacion(recomendacion))">
+              {{ getRiesgoRecomendacion(recomendacion) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evidencia Requerida (Lista) -->
+      <div class="collapse collapse-plus rec-card-block rounded-xl transition-colors">
+        <input type="checkbox" />
+        <div class="collapse-title font-semibold rec-card-title flex items-center justify-between pr-8">
+          <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>Evidencia Requerida</span>
+          </div>
+          <span *ngIf="getEvidenciasList(recomendacion).length > 0" class="badge badge-sm bg-primary/10 text-primary border border-primary/20 text-xs font-bold">
+            {{ getEvidenciasList(recomendacion).length }} {{ getEvidenciasList(recomendacion).length === 1 ? 'evidencia' : 'evidencias' }}
+          </span>
+        </div>
+        <div class="collapse-content prose max-w-none flex flex-col gap-2">
+          <div *ngIf="getEvidenciasList(recomendacion).length > 0; else singleEvidenciaCard" class="space-y-2 py-1">
+            <div *ngFor="let ev of getEvidenciasList(recomendacion); let i = index" 
+                 class="flex items-start gap-3 p-2.5 rounded-xl bg-base-200/50 dark:bg-base-800/40 border border-base-300/60 dark:border-base-700/60 text-xs md:text-sm rec-card-body transition-colors">
+              <span class="inline-flex items-center justify-center w-6 h-6 min-w-[1.5rem] rounded-full bg-[#475D9D] text-white text-xs font-bold shrink-0 mt-0.5 shadow-xs ring-2 ring-[#475D9D]/20">
+                {{ i + 1 }}
+              </span>
+              <span class="leading-relaxed font-medium flex-1 pt-0.5 text-slate-800 dark:text-slate-100">{{ ev }}</span>
+            </div>
+          </div>
+          <ng-template #singleEvidenciaCard>
+            <div class="p-2.5 rounded-xl bg-base-200/50 dark:bg-base-800/40 border border-base-300/60 dark:border-base-700/60 text-xs md:text-sm rec-card-body">
+              <p class="w-full leading-relaxed font-medium text-slate-800 dark:text-slate-100">
+                {{ recomendacion.recomendaciones.arere_evidencia_requerida || 'Definida en la recomendación de auditoría para su verificación previa a la remisión de verificables finales.' }}
+              </p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Meta información: ESTADO GENERAL Y SEGUIMIENTO -->
+      <div class="mt-4 space-y-3">
+        
+        <!-- Bloque 1: Estado General -->
+        <div class="rec-card-block rounded-xl border-l-4 border-l-primary p-4 space-y-3">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+              <span class="font-semibold rec-card-title text-sm md:text-base flex-shrink-0">Estado General:</span>
+              <span class="badge badge-sm md:badge-lg px-2 py-2 md:px-3 md:py-3 text-xs md:text-sm break-words w-fit inline-flex items-center justify-center min-h-[2rem]"
+                    [ngClass]="(recomendacion.recomendaciones.estado_general?.arees_descripcion || recomendacion.recomendaciones.estado_seguimiento.arees_descripcion) | statusColor">
+                <span class="text-center leading-tight font-medium">
+                  {{ recomendacion.recomendaciones.estado_general?.arees_descripcion || recomendacion.recomendaciones.estado_seguimiento.arees_descripcion }}
+                </span>
+              </span>
+            </div>
+            <!-- Botón Ver Responsables -->
+            <button class="btn btn-circle btn-sm bg-cyan-600 hover:bg-cyan-700 self-end md:self-auto shadow-sm"
+                    title="Ver Responsables Asignados"
+                    (click)="openModalResponsable(recomendacion)">
+              <svg class="w-4 h-4 text-slate-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.5 7.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0M8.817 20h6.368c1.117 0 2.004-.564 2.801-1.353c1.632-1.614-1.047-2.904-2.069-3.536a7.46 7.46 0 0 0-7.832 0" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Progreso global -->
+          <div class="flex flex-col gap-1.5 pt-1">
+            <div class="flex items-center justify-between text-xs sm:text-sm font-semibold">
+              <span class="rec-card-title flex items-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                Progreso recomendación:
+              </span>
+              <span class="text-primary font-bold">
+                {{ getProgresoGlobal(recomendacion) }}%
+              </span>
+            </div>
+            <div class="w-full bg-base-300 rounded-full h-2.5 overflow-hidden">
+              <div class="h-2.5 rounded-full transition-all duration-500 bg-primary"
+                   [style.width.%]="getProgresoGlobal(recomendacion)"></div>
+            </div>
+          </div>
+
+          <!-- Fecha máxima general -->
+          <div class="flex items-center gap-2 text-xs sm:text-sm pt-1">
+            <span class="font-semibold rec-card-title">Fecha máxima general:</span>
+            <span class="rec-card-body">{{ getFechaMaximaGeneral(recomendacion) | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+
+        <!-- Bloque 2: Mi Estado Individual -->
+        <div class="rec-card-block rounded-xl border-l-4 border-l-secondary p-4 space-y-3">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+              <span class="font-semibold rec-card-title text-sm md:text-base flex-shrink-0">Mi Estado:</span>
+              <span class="badge badge-sm md:badge-lg px-2 py-2 md:px-3 md:py-3 text-xs md:text-sm break-words w-fit inline-flex items-center justify-center min-h-[2rem]"
+                    [ngClass]="(recomendacion.recomendaciones.estado_individual?.arees_descripcion || recomendacion.recomendaciones.estado_seguimiento.arees_descripcion) | statusColor">
+                <span class="text-center leading-tight font-medium">
+                  {{ recomendacion.recomendaciones.estado_individual?.arees_descripcion || recomendacion.recomendaciones.estado_seguimiento.arees_descripcion }}
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+              <span class="font-semibold rec-card-title">Mi Fecha máxima:</span>
+              <span class="rec-card-body text-xs sm:text-sm">{{ getFechaMaximaIndividual(recomendacion) | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+              <span class="font-semibold rec-card-title">Plazo:</span>
+              <span class="font-bold text-xs sm:text-sm"
+                    [ngClass]="{ 'text-red-600 dark:text-red-400': getPlazoIndividual(recomendacion) < 0 }"
+                    [style.color]="getPlazoIndividual(recomendacion) >= 0 ? '#16A34A' : null">
+                {{ getPlazoIndividual(recomendacion) | abs }} {{ getEstadoPlazo(getPlazoIndividual(recomendacion)) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bloque 3: Resumen del Plan de Acción -->
+        <div class="rec-card-block rounded-xl border-l-4 border-l-primary p-4 space-y-3">
+          <!-- Fila 1: Título y Estado de Registro -->
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              <span class="font-semibold rec-card-title text-sm md:text-base">Plan de Acción (Previo a Verificables):</span>
+            </div>
+            <span class="badge badge-sm md:badge-lg px-2 py-2 md:px-3 md:py-3 text-xs md:text-sm break-words w-fit inline-flex items-center justify-center min-h-[2rem]"
+                  [ngClass]="getResumen(recomendacion).total > 0 ? 'bg-primary text-white' : 'bg-amber-500 text-white'">
+              <span class="text-center leading-tight font-medium">
+                {{ getResumen(recomendacion).total > 0 ? (getResumen(recomendacion).total + ' Actividades Planificadas') : 'Pendiente de Registro' }}
+              </span>
+            </span>
+          </div>
+
+          <!-- Fila 2: Indicadores clave -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs sm:text-sm pt-1">
+            <div class="flex items-center gap-1.5">
+              <span class="font-semibold rec-card-title">Actividades en cronograma:</span>
+              <span class="rec-card-body font-bold text-primary">{{ getResumen(recomendacion).total }}</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="font-semibold rec-card-title">Fecha Máxima:</span>
+              <span class="rec-card-body font-bold text-secondary">{{ (getFechaMaximaIndividual(recomendacion) | date:'dd/MM/yyyy') || 'Sin fecha' }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Botones de Acción: PLAN DE ACCIÓN y DESCARGA EXCEL -->
+      <div class="flex items-center gap-2 mt-4">
+        <button class="btn btn-primary flex-1 gap-2 shadow hover:shadow-md transition-all font-semibold"
+                (click)="openMatrizPlan(recomendacion)">
+          <svg *ngIf="getResumen(recomendacion).total > 0" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <svg *ngIf="getResumen(recomendacion).total === 0" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>{{ getResumen(recomendacion).total > 0 ? 'PLAN DE ACCIÓN' : 'REGISTRAR PLAN DE ACCIÓN' }}</span>
+        </button>
+
+        <button class="btn btn-outline btn-success gap-1.5 shadow-sm hover:shadow transition-all"
+                [disabled]="getResumen(recomendacion).total === 0"
+                (click)="exportarExcel(recomendacion, $event)"
+                title="Descargar Plan de Acción en Excel (.xlsx) como evidencia">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm1.8 14.5l-1.4-2.3l-1.4 2.3h-1.6l2.2-3.3l-2.1-3.2h1.6l1.3 2.2l1.3-2.2h1.6l-2.1 3.2l2.2 3.3h-1.7zM13 9V3.5L18.5 9H13z"/>
+          </svg>
+          <span class="text-xs font-bold">Excel</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+  </ng-container>
+</div>

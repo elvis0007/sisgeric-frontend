@@ -1,0 +1,66 @@
+.report-table-shell {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.report-table-shell table {
+  width: 100%;
+}
+
+/* Cabeceras de tabla estáticas (fijas) */
+.report-table-shell thead {
+  position: sticky;
+  top: 0;
+  z-index: 25;
+}
+
+.report-table-shell thead tr {
+  position: sticky;
+  top: 0;
+}
+
+.report-table-shell thead th {
+  position: sticky;
+  top: 0;
+  z-index: 25;
+}
+
+.report-table-shell th,
+.report-table-shell td {
+  vertical-align: middle;
+}
+
+/* Floating Portal Card: Flota encima de la tabla sin causar jamás desbordes */
+.floating-portal-card {
+  pointer-events: auto !important;
+  box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.25), 0 10px 15px -5px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Scrollbar estilizado y scroll contenido */
+.obs-list-container {
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.obs-list-container::-webkit-scrollbar {
+  width: 8px !important;
+}
+.obs-list-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.06) !important;
+  border-radius: 4px;
+}
+.obs-list-container::-webkit-scrollbar-thumb {
+  background: rgba(120, 120, 120, 0.5) !important;
+  border-radius: 4px;
+}
+.obs-list-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(80, 80, 80, 0.8) !important;
+}
+
+/* Permitir selección y copiado de texto en todo el contenido de los dialogs */
+.floating-portal-card,
+.floating-portal-card * {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}

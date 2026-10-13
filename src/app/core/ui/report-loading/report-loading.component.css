@@ -1,0 +1,63 @@
+@keyframes indeterminateBar {
+  0% {
+    transform: translateX(-100%) scaleX(0.2);
+  }
+  50% {
+    transform: translateX(20%) scaleX(0.7);
+  }
+  100% {
+    transform: translateX(100%) scaleX(0.2);
+  }
+}
+
+@keyframes progressGlow {
+  0% {
+    width: 15%;
+    transform: translateX(-10%);
+  }
+  50% {
+    width: 65%;
+    transform: translateX(60%);
+  }
+  100% {
+    width: 15%;
+    transform: translateX(260%);
+  }
+}
+
+@keyframes bounceSubtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-indeterminate-bar {
+  animation: indeterminateBar 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: left;
+}
+
+.animate-progress-glow {
+  animation: progressGlow 1.8s ease-in-out infinite;
+}
+
+.animate-bounce-subtle {
+  animation: bounceSubtle 2s ease-in-out infinite;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out forwards;
+}

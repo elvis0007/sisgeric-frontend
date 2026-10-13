@@ -1,0 +1,8 @@
+/* Dark mode overrides for dashboard metrics cards text readability */
+:host-context([data-theme="dark"]) .card span.text-base-content {
+  color: #ffffff !important;
+}
+
+:host-context([data-theme="dark"]) .card span.text-base-content\/60 {
+  color: rgba(255, 255, 255, 0.95) !important;
+}

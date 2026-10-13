@@ -1,0 +1,18 @@
+<div *ngIf="showAlert" role="alert" class="alert bg-base-100 shadow-2xl fixed top-24 right-4 w-96 z-50">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      class="stroke-info h-8 w-8 shrink-0">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <div class="pr-6">
+      <h3 class="font-bold">Nueva notificación</h3>
+      <div class="text-xs">{{ message }}</div>
+    </div>
+    <button class="btn btn-xs btn-circle btn-ghost absolute top-2 right-2" (click)="closeAlert()">✕</button>
+  </div>

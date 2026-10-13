@@ -1,0 +1,330 @@
+<dialog id="modalFormVerificable"
+  class="fixed inset-0 w-full h-full z-50 overflow-auto bg-black bg-opacity-50 text-secondary flex items-center justify-center"
+  [ngClass]="{ hidden: !modalFormSrv.isModalOpen() }" (click)="closeModal($event)">
+  <div class="modal-box max-w-4xl rounded-lg shadow-lg relative" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between">
+      <h2 class="text-2xl font-bold mb-4">
+        {{ isEditMode ? "Editar Verificable" : "Ingresar Verificable" }}
+      </h2>
+      <button class="btn btn-sm btn-circle btn-ghost text-lg" (click)="closeModal($event)">
+        ✕
+      </button>
+    </div>
+
+    <section class="grid grid-cols-1 gap-2 rounded-2xl">
+      <!-- Columna 1: Informe -->
+      <details class="collapse collapse-plus bg-base-200 rounded-xl hover:bg-base-300 transition-colors">
+        <summary class="collapse-title font-semibold text-secondary">
+          Memorando {{detalleRecomendacion?.ainin_memorando}}
+        </summary>
+        <div class="collapse-content prose max-w-none">
+          <div>
+            <p class="mt-1 text-lg font-normal text-secondary">
+              {{detalleRecomendacion?.ainin_titulo }}
+            </p>
+            <div class="flex flex-row gap-2 mt-3">
+              <span class="text-base font-semibold text-secondary">Memo. aprobación:</span>
+              <p class="text-base font-normal text-secondary">{{detalleRecomendacion?.ainin_memo_aprobacion}}</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Columna 2: Recomendación -->
+      <details class="collapse collapse-plus bg-base-200 rounded-xl hover:bg-base-300 transition-colors">
+        <summary class="collapse-title font-semibold text-secondary">
+          Recomendación
+        </summary>
+        <div class="collapse-content prose max-w-none">
+          <div>
+            <p class="mt-1 text-lg font-normal text-secondary">
+              {{detalleRecomendacion?.recomendaciones?.arere_descripcion }}
+            </p>
+          </div>
+          <div class="flex flex-row gap-6">
+            <div>
+              <span class="block text-base font-semibold text-secondary">Fecha máxima de cumplimiento:</span>
+              <p class="mt-1 text-lg font-normal text-secondary">
+                {{ getFechaMaxima() }}
+              </p>
+            </div>
+            <div>
+              <span class="block text-base font-semibold text-secondary">Plazo:</span>
+              <p class="mt-1 text-lg font-normal text-secondary">
+                <span class="text-sm text-secondary mt-1 font-semibold">{{detalleRecomendacion?.recomendaciones?.plazo
+                  || 0 | abs }}</span>
+                <span class="text-sm text-secondary font-semibold">
+                  {{ getEstadoPlazo() }}
+                </span>
+
+              </p>
+            </div>
+          </div>
+        </div>
+      </details>
+    </section>
+    <!-- Estado de loading -->
+    <div *ngIf="isLoading" class="absolute inset-0 flex items-center justify-center bg-base-100 bg-opacity-80 z-10">
+      <div class="flex flex-col items-center gap-4">
+        <span class="loading loading-spinner loading-lg text-secondary"></span>
+      </div>
+    </div>
+
+    <!-- Banner de Advertencia (Servidor FTP/NAS fuera de línea) -->
+    <div *ngIf="data?.advertencia" class="alert alert-warning shadow-md my-3 flex items-center gap-2 text-sm font-medium">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+      <span>{{ data.advertencia }}</span>
+    </div>
+
+    <form class="space-y-4" [formGroup]="formVerificable" (ngSubmit)="toSend()" [ngClass]="{'opacity-80': isLoading}">
+      <div class="flex w-full">
+        <div class="grid flex-grow w-full gap-3">
+
+          <!-- Campo Descripción -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">{{ isEditMode ? 'Descripción*' : 'Descripción de los verificables*' }}</span>
+            </label>
+            <textarea class="textarea textarea-bordered min-h-[100px] w-full" [ngClass]="{
+                  'textarea-primary': !isFieldInvalid('areve_descripcion'),
+                  'textarea-error': isFieldInvalid('areve_descripcion')
+                }" [placeholder]="isEditMode ? 'Ingrese la descripción del verificable' : 'Ingrese una descripción general para todos los verificables enviados'" formControlName="areve_descripcion"></textarea>
+            <label class="label" *ngIf="isFieldInvalid('areve_descripcion')">
+              <span class="label-text-alt text-error">Este campo es requerido</span>
+            </label>
+          </div>
+
+          <!-- MODO CREACIÓN: Subida múltiple de archivos -->
+          <div *ngIf="!isEditMode" class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">Archivos Verificables* (.docx, .xlsx, .pdf)</span>
+              <span class="label-text-alt text-xs text-base-content/70">Máx. 50 MB por archivo</span>
+            </label>
+
+            <!-- Zona Drag & Drop -->
+            <div 
+              class="border-2 border-dashed rounded-xl p-5 text-center transition-all duration-200 cursor-pointer select-none"
+              [ngClass]="{
+                'border-primary bg-primary/10 shadow-inner': isDragging,
+                'border-base-300 hover:border-primary/50 bg-base-200/50 hover:bg-base-200': !isDragging && (!formSubmitted || archivosAdjuntos.length > 0),
+                'border-error bg-error/5': formSubmitted && archivosAdjuntos.length === 0
+              }"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onFileDropped($event)"
+              (click)="fileInputMulti.click()">
+
+              <input 
+                type="file" 
+                #fileInputMulti 
+                class="hidden" 
+                multiple 
+                (change)="captureFiles($event)" 
+                accept=".doc,.docx,.xls,.xlsx,.pdf" />
+
+              <div class="flex flex-col items-center justify-center gap-2">
+                <div class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-medium text-sm text-secondary">
+                    <span class="text-primary font-semibold underline">Haga clic para seleccionar</span> o arrastre y suelte sus archivos aquí
+                  </p>
+                  <p class="text-xs text-base-content/60 mt-1">
+                    Puede seleccionar varios archivos a la vez para cargarlos en este mismo envío
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <label class="label" *ngIf="formSubmitted && archivosAdjuntos.length === 0">
+              <span class="label-text-alt text-error font-medium">Debe adjuntar al menos un archivo verificable</span>
+            </label>
+
+            <!-- Lista de archivos seleccionados -->
+            <div *ngIf="archivosAdjuntos.length > 0" class="mt-3 space-y-2">
+              <div class="flex items-center justify-between px-1">
+                <span class="text-xs font-semibold text-secondary flex items-center gap-1.5">
+                  <span class="badge badge-primary badge-sm text-white">{{ archivosAdjuntos.length }}</span>
+                  {{ archivosAdjuntos.length === 1 ? 'archivo listo' : 'archivos listos' }} ({{ getTotalFilesSize() }})
+                </span>
+                <button type="button" class="btn btn-ghost btn-xs text-error" (click)="clearAllFiles($event)" [disabled]="isLoadingSubmint">
+                  Limpiar todos
+                </button>
+              </div>
+
+              <div class="max-h-56 overflow-y-auto space-y-1.5 pr-1">
+                <div 
+                  *ngFor="let file of archivosAdjuntos; let idx = index" 
+                  class="flex items-center justify-between p-2.5 rounded-lg bg-base-200 border border-base-300 hover:border-primary/40 transition-colors">
+                  
+                  <div class="flex items-center gap-2.5 overflow-hidden flex-1 min-w-0 pr-2">
+                    <!-- Icono según tipo -->
+                    <div class="shrink-0">
+                      <span *ngIf="getFileIconType(file.name) === 'pdf'" class="w-8 h-8 rounded-lg bg-red-500/10 text-red-600 flex items-center justify-center font-bold text-xs">
+                        PDF
+                      </span>
+                      <span *ngIf="getFileIconType(file.name) === 'excel'" class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                        XLS
+                      </span>
+                      <span *ngIf="getFileIconType(file.name) === 'word'" class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center font-bold text-xs">
+                        DOC
+                      </span>
+                      <span *ngIf="getFileIconType(file.name) === 'other'" class="w-8 h-8 rounded-lg bg-slate-500/10 text-slate-600 flex items-center justify-center font-bold text-xs">
+                        FILE
+                      </span>
+                    </div>
+
+                    <!-- Nombre y tamaño -->
+                    <div class="flex flex-col min-w-0">
+                      <span class="text-sm font-medium truncate text-secondary" [title]="file.name">
+                        {{ file.name }}
+                      </span>
+                      <span class="text-xs text-base-content/60">
+                        {{ formatFileSize(file.size) }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Acciones por archivo -->
+                  <div class="flex items-center gap-1 shrink-0">
+                    <button 
+                      type="button" 
+                      class="btn btn-circle btn-xs btn-ghost text-primary" 
+                      (click)="openSelectedFile($event, file)" 
+                      title="Vista previa / Abrir archivo">
+                      <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+                    <button 
+                      type="button" 
+                      class="btn btn-circle btn-xs btn-ghost text-error" 
+                      (click)="removeFile($event, idx)" 
+                      [disabled]="isLoadingSubmint"
+                      title="Quitar archivo de la lista">
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODO EDICIÓN: Subida de archivo único -->
+          <div *ngIf="isEditMode" class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">Verificable* (.docx, .xlsx, .pdf)</span>
+            </label>
+            <input type="file" #fileInput class="file-input file-input-bordered w-full" [ngClass]="{
+                  'file-input-primary': !isFieldInvalid('areve_adjunto'),
+                  'file-input-error': isFieldInvalid('areve_adjunto')
+                }" (change)="this.captureFile($event)" accept=".doc,.docx,.xls,.xlsx,.pdf" />
+            <label class="label" *ngIf="isFieldInvalid('areve_adjunto')">
+              <span class="label-text-alt text-error">{{getErrorMessage('areve_adjunto')}}</span>
+            </label>
+
+            <div class="mt-2 flex flex-row items-center justify-between border rounded-md border-primary px-4 py-1"
+              *ngIf="this.fileName || this.formVerificable.get('nombreArchivo')?.value">
+              <div class="flex flex-row items-center">
+                <button type="button" class="btn btn-circle btn-sm bg-cyan-900" (click)="this.openFile($event)">
+                  <svg class="w-5 h-5 text-slate-300 transition-colors" xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24">
+                    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                      stroke-width="1.5">
+                      <path
+                        d="M20.46 17.515c.36.416.54.624.54.985s-.18.57-.54.985C19.56 20.52 17.937 22 16 22s-3.561-1.48-4.46-2.515c-.36-.416-.54-.623-.54-.985c0-.361.18-.57.54-.985C12.44 16.48 14.063 15 16 15s3.561 1.48 4.46 2.515" />
+                      <path
+                        d="M20 13.003V7.82c0-1.694 0-2.54-.268-3.217c-.43-1.087-1.342-1.945-2.497-2.35C16.517 2 15.617 2 13.818 2c-3.148 0-4.722 0-5.98.441c-2.02.71-3.615 2.211-4.37 4.114C3 7.74 3 9.221 3 12.185v2.546c0 3.07 0 4.605.848 5.672c.243.305.53.576.855.805c.912.643 2.147.768 4.297.792" />
+                      <path
+                        d="M3 12a3.333 3.333 0 0 1 3.333-3.333c.666 0 1.451.116 2.098-.057A1.67 1.67 0 0 0 9.61 7.43c.173-.647.057-1.432.057-2.098A3.333 3.333 0 0 1 13 2m2.992 16.5h.01" />
+                    </g>
+                  </svg>
+                </button>
+
+                <p class="mx-2">
+                  {{
+                  formatFileName(
+                  fileName || formVerificable.get("nombreArchivo")?.value
+                  )
+                  }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de progreso durante la subida -->
+      <div *ngIf="isLoadingSubmint && uploadProgressText" class="p-3 bg-primary/10 border border-primary/20 rounded-xl space-y-2">
+        <div class="flex justify-between items-center text-xs font-semibold text-primary">
+          <span class="flex items-center gap-1.5">
+            <span class="loading loading-spinner loading-xs text-primary"></span>
+            {{ uploadProgressText }}
+          </span>
+          <span>{{ uploadProgressPercent }}%</span>
+        </div>
+        <progress class="progress progress-primary w-full" [value]="uploadProgressPercent" max="100"></progress>
+      </div>
+
+      <div class="flex gap-4 justify-center items-center mt-4">
+        <button type="button" class="btn btn-error text-white flex-1 w-full" (click)="closeModal($event)" [disabled]="isLoadingSubmint">
+          CANCELAR
+        </button>
+        <button class="btn btn-primary flex-1 w-full text-white" [disabled]="isLoadingSubmint">
+          <span *ngIf="isLoadingSubmint" class="loading loading-spinner text-secondary"></span>
+          {{ isLoadingSubmint ? 'SUBIENDO...' : isEditMode ? 'CONFIRMAR' : (archivosAdjuntos.length > 1 ? 'REGISTRAR (' + archivosAdjuntos.length + ' VERIFICABLES)' : 'REGISTRAR') }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal de Confirmación previo al envío a Auditoría -->
+  <div *ngIf="showConfirmModal" 
+    class="fixed inset-0 w-full h-full z-[100] overflow-auto bg-black bg-opacity-60 flex items-center justify-center p-4 backdrop-blur-sm"
+    (click)="cancelConfirmSend()">
+    <div class="modal-box max-w-md rounded-2xl shadow-2xl bg-white p-6 relative border border-slate-200 space-y-4" 
+      (click)="$event.stopPropagation()">
+      
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-full bg-blue-100 text-[#20315F] flex items-center justify-center shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#20315F]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 leading-snug">¿Confirmar envío a auditoría?</h3>
+          <p class="text-xs font-semibold text-slate-500">
+            {{ archivosAdjuntos.length }} {{ archivosAdjuntos.length === 1 ? 'archivo listo para remitir' : 'archivos listos para remitir' }}
+          </p>
+        </div>
+      </div>
+
+      <p class="text-base font-semibold text-slate-800 leading-relaxed">
+        ¿Está seguro de que los verificables adjuntos justifican el cumplimiento de esta recomendación?
+      </p>
+
+      <div class="p-3.5 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3 shadow-xs">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#20315F] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span class="text-xs sm:text-sm font-medium text-slate-800 leading-snug">
+          Al confirmar, se registrarán los verificables y se enviará la notificación por correo electrónico a la auditora con el detalle y número de verificables adjuntos para su revisión.
+        </span>
+      </div>
+
+      <div class="flex gap-3 justify-end pt-2">
+        <button type="button" class="btn btn-error text-white flex-1 font-bold shadow-sm" (click)="cancelConfirmSend()">
+          CANCELAR
+        </button>
+        <button type="button" class="btn text-white flex-1 shadow-md border-none font-bold hover:opacity-90 transition-opacity"
+          style="background-color: #20315F !important; color: #ffffff !important;" (click)="proceedSend()">
+          CONFIRMAR
+        </button>
+      </div>
+    </div>
+  </div>
+</dialog>

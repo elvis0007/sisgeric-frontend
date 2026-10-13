@@ -1,0 +1,186 @@
+<dialog id="modalResponsables"
+  class="fixed inset-0 w-full h-full z-40 overflow-auto bg-black bg-opacity-50 backdrop-blur-sm text-secondary flex items-center justify-center"
+  [ngClass]="{ 'hidden': !modalResponsableSrv.isModalOpen() }" (click)="closeModal()">
+  <div class="modal-box max-w-5xl rounded-lg shadow-lg relative bg-base-200 h-[90vh] flex flex-col"
+    (click)="$event.stopPropagation()">
+    <!-- Header del modal -->
+    <div class="flex items-center justify-between mb-4 shrink-0 sticky top-0 bg-base-200 z-50 pt-4">
+      <h2 class="text-2xl font-bold">Responsables</h2>
+      <!-- Botón para cerrar -->
+      <button class="btn btn-sm btn-circle btn-ghost text-lg" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="flex items-center bg-base-100 w-64 rounded-lg p-2 mb-3">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="text-secondary">
+        <path fill="currentColor"
+          d="M19 3H5c-1.414 0-2.121 0-2.56.412S2 4.488 2 5.815v.69c0 1.037 0 1.556.26 1.986s.733.698 1.682 1.232l2.913 1.64c.636.358.955.537 1.183.735c.474.411.766.895.898 1.49c.064.284.064.618.064 1.285v2.67c0 .909 0 1.364.252 1.718c.252.355.7.53 1.594.88c1.879.734 2.818 1.101 3.486.683S15 19.452 15 17.542v-2.67c0-.666 0-1 .064-1.285a2.68 2.68 0 0 1 .899-1.49c.227-.197.546-.376 1.182-.735l2.913-1.64c.948-.533 1.423-.8 1.682-1.23c.26-.43.26-.95.26-1.988v-.69c0-1.326 0-1.99-.44-2.402C21.122 3 20.415 3 19 3" />
+      </svg>
+
+      <div class="flex gap-2 ml-3">
+        <button class="btn btn-sm transition-all duration-200 btn-secondary"
+          [ngClass]="selectedState === 1 ? 'btn-primary shadow-lg' : 'btn-outline hover:bg-primary/10'"
+          (click)="setFilter(1)">
+          ACTUALES
+        </button>
+        <button class="btn btn-sm transition-all duration-200 btn-secondary"
+          [ngClass]="selectedState === 2 ? 'btn-primary shadow-lg' : 'btn-outline hover:bg-primary/10'"
+          (click)="setFilter(2)">
+          ANTERIORES
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenido del modal con scroll -->
+    <div class="grow overflow-y-auto pr-2">
+
+      <div *ngIf="isLoadingCards" class="flex justify-center items-center h-full">
+        <span class="loading loading-spinner loading-lg text-secondary"></span>
+      </div>
+
+      <div *ngIf="responsables.length === 0 && !isLoadingCards" class="flex justify-center items-center h-full">
+        <span class="text-base-content/70 text-lg pb-5">No se encontraron responsables</span>
+      </div>
+
+      <div *ngIf="filteredResponsables.length === 0 && responsables.length > 0 && !isLoadingCards" class="flex justify-center items-center h-full">
+        <span class="text-base-content/70 text-lg pb-5">
+          {{ selectedState === 1 ? 'No existen responsables actuales' : 'No existen responsables anteriores' }}
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" *ngIf="filteredResponsables.length > 0">
+        <div class="card bg-base-100 shadow-md hover:shadow-xl transition-shadow duration-300"
+          *ngFor="let responsable of filteredResponsables">
+          <!-- Configuramos el card-body como flex-col -->
+          <div class="card-body flex flex-col  items-center text-center p-4" [ngClass]="{
+            'opacity-60': responsable.arers_estado === '0'
+          }">
+
+            <!-- Avatar -->
+            <div class="avatar">
+              <div [ngClass]="{'border-red-600': responsable.arers_estado === '0'}"
+                class="bg-gray-200 text-gray-700 rounded-full w-32 h-32 flex items-center justify-center border-2 border-primary shadow-md hover:scale-110 transition-transform duration-300">
+                <img [src]="responsable.fotografia" alt="photo" class="rounded-full w-full h-full object-cover" />
+              </div>
+            </div>
+
+            <!-- Nombre completo -->
+            <h2 class="card-title mt-4 text-lg font-semibold">
+              {{ responsable.nombre_completo }}
+            </h2>
+
+            <!-- Información detallada -->
+            <div class="grid grid-cols-1 gap-1 mt-2 text-sm w-full">
+              <div>
+                <span class="font-semibold">Número de Rol:</span>
+                {{ responsable.arers_num_rol }}
+              </div>
+              <div>
+                <span class="font-semibold">Cargo:</span>
+                {{ responsable.arers_cargo }}
+              </div>
+              <div>
+                <span class="font-semibold">Departamento:</span>
+                {{ responsable.arers_departamento }}
+              </div>
+              <div *ngIf="responsable.arers_seccion !== null">
+                <span class="font-semibold">Sección:</span>
+                {{ responsable.arers_seccion }}
+              </div>
+              <div>
+                <span class="font-semibold">Fecha Asignado:</span>
+                {{responsable.arers_fecha}}
+              </div>
+            </div>
+
+            <div *ngIf="responsable.arers_estado !== '0' && responsable.areev_descripcion" class="badge p-3 mt-3" [ngClass]="responsable.areev_descripcion | statusColor">
+              {{ responsable.areev_descripcion }}
+            </div>
+
+            <!-- Fecha Máxima Individual y Días Vigentes / Vencidos -->
+            <div *ngIf="responsable.arers_estado !== '0' && responsable.aredr_fecha_maxima" class="mt-3 text-xs w-full bg-base-200/60 p-2.5 rounded-xl border border-base-300/70 text-center shadow-inner">
+              <div class="flex items-center justify-between gap-1">
+                <span class="font-semibold text-secondary">Fecha Máxima:</span>
+                <span class="font-bold text-primary">{{ responsable.aredr_fecha_maxima }}</span>
+              </div>
+              <div *ngIf="esJustificado(responsable); else mostrarPlazoNormal" class="mt-1 flex items-center justify-between gap-1 text-[11px] font-medium">
+                <span class="font-semibold text-secondary">Plazo:</span>
+                <span class="font-bold flex items-center gap-1" style="color: #16A34A;">
+                  <svg class="w-3.5 h-3.5 inline-block" style="color: #16A34A;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                  </svg>
+                  Cumplido
+                </span>
+              </div>
+              <ng-template #mostrarPlazoNormal>
+                <div *ngIf="responsable.plazo !== undefined && responsable.plazo !== null" class="mt-1 flex items-center justify-between gap-1 text-[11px]"
+                     [ngClass]="{ 'text-error font-bold': (responsable.plazo || 0) < 0, 'font-semibold': (responsable.plazo || 0) >= 0 }"
+                     [style.color]="(responsable.plazo || 0) >= 0 ? '#16A34A' : null">
+                  <span>{{ (responsable.plazo || 0) < 0 ? 'Plazo Vencido' : 'Plazo Vigente' }}:</span>
+                  <span>{{ (responsable.plazo || 0) < 0 ? '-' : '+' }}{{ Math.abs(responsable.plazo || 0) }} d</span>
+                </div>
+              </ng-template>
+            </div>
+
+            <!-- Separador y botón empujado al fondo -->
+            <div *ngIf="responsable.arers_estado !== '0'" class="divider mt-auto"></div>
+
+            <div class="text-sm flex flex-col justify-center items-center gap-2 w-full mt-2"
+              *ngIf="responsable.arers_estado === '0'">
+              <div class="badge badge-error text-white">
+                {{responsable.arers_estado === '0' ? 'REASIGNADO': ''}}
+              </div>
+              <div>
+                <span class="font-semibold">Fecha de Reemplazo:</span>
+                {{responsable.arers_fecha_reempl}}
+              </div>
+              <div>
+                <span class="font-semibold">Reemplazado por:</span>
+                {{responsable.arers_reemp_por}}
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row w-full gap-2" *ngIf="responsable.arers_estado !== '0'">
+              <button type="button" class="btn btn-info text-white w-auto"
+                (click)="openModalReplaceResponsable(responsable.arers_codigo.toString())"
+                [disabled]="isCumplida() || isLoadingBotonReplace[responsable.arers_codigo]">
+                <svg *ngIf="!isLoadingBotonReplace[responsable.arers_codigo]" xmlns="http://www.w3.org/2000/svg"
+                  width="22" height="22" viewBox="0 0 24 24">
+                  <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 11V8a2 2 0 0 0-2-2h-6m0 0l3 3m-3-3l3-3M3 13.013v3a2 2 0 0 0 2 2h6m0 0l-3-3m3 3l-3 3m8-4.511a2 2 0 1 0 4.001-.001a2 2 0 0 0-4.001.001m-12-12a2 2 0 1 0 4.001-.001A2 2 0 0 0 4 4.502m17 16.997a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2m-6-12a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2" />
+                </svg>
+
+                <span *ngIf="isLoadingBotonReplace[responsable.arers_codigo]" class="loading loading-spinner text-secondary"></span>
+                {{ isLoadingBotonReplace[responsable.arers_codigo] ? 'CARGANDO...' : 'REASIGNAR' }}
+              </button>
+
+              <button type="button" class="btn btn-error text-white w-auto"
+                [disabled]="isCumplida()"
+                (click)="openModalDeleteResponsable(responsable)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 20 20"><path fill="currentColor" d="M8.5 4h3a1.5 1.5 0 0 0-3 0m-1 0a2.5 2.5 0 0 1 5 0h5a.5.5 0 0 1 0 1h-1.054l-1.194 10.344A3 3 0 0 1 12.272 18H7.728a3 3 0 0 1-2.98-2.656L3.554 5H2.5a.5.5 0 0 1 0-1zM9 8a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0zm2.5-.5a.5.5 0 0 0-.5.5v6a.5.5 0 0 0 1 0V8a.5.5 0 0 0-.5-.5"/></svg>
+                ELIMINAR
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botón flotante para asignar -->
+    <div class="shrink-0 absolute bottom-6 right-10 z-50">
+      <button type="button"
+        class="btn btn-primary btn-md shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 px-6 py-3"
+        (click)="openModalAddResponsables()" [disabled]="isCumplida() || isLoadingBotonAssing">
+        <svg *ngIf="!isLoadingBotonAssing" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+          viewBox="0 0 24 24">
+          <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M12.5 22H6.59c-1.545 0-2.774-.752-3.877-1.803c-2.26-2.153 1.45-3.873 2.865-4.715A10.65 10.65 0 0 1 15 14.78m1.5-8.28a4.5 4.5 0 1 1-9 0a4.5 4.5 0 0 1 9 0m2 15.5v-7M15 18.5h7"
+            color="currentColor" />
+        </svg>
+        <span *ngIf="isLoadingBotonAssing" class="loading loading-spinner text-secondary"></span>
+        {{isLoadingBotonAssing ? 'CARGANDO...' :'ASIGNAR' }}
+      </button>
+    </div>
+  </div>
+</dialog>

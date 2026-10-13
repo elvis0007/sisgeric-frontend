@@ -1,0 +1,106 @@
+:host {
+  --tw-shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+.modal-document {
+  background: var(--fallback-b1, oklch(var(--b1)));
+}
+
+.modal-header {
+  position: relative;
+}
+
+.preview-sheet {
+  background: var(--fallback-b1, oklch(var(--b1)));
+}
+
+.preview-content {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.74rem;
+  line-height: 1.6;
+  color: var(--fallback-bc, oklch(var(--bc)));
+  letter-spacing: 0.01em;
+}
+
+.modal-actions {
+  align-items: stretch;
+}
+
+/* Canvas para firma */
+canvas {
+  background-color: var(--fallback-b1, oklch(var(--b1)));
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+canvas:hover {
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Pre para preview */
+pre {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+
+/* Scrollbar personalizado */
+.h-96::-webkit-scrollbar {
+  width: 6px;
+}
+
+.h-96::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.h-96::-webkit-scrollbar-thumb {
+  background: var(--fallback-b3, oklch(var(--b3)));
+  border-radius: 3px;
+}
+
+.h-96::-webkit-scrollbar-thumb:hover {
+  background: var(--fallback-bc, oklch(var(--bc) / 0.3));
+}
+
+/* Títulos de etiqueta en mayúscula con color blanco/contraste */
+.label-text {
+  color: var(--fallback-bc, oklch(var(--bc))) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  font-size: 0.75rem !important; /* text-xs */
+  opacity: 0.95 !important;
+}
+
+/* Inputs y Textareas activos (editables) */
+.input:not([readonly]), .textarea:not([readonly]) {
+  color: var(--fallback-bc, oklch(var(--bc))) !important;
+  background-color: var(--fallback-b2, oklch(var(--b2))) !important; /* Fondo ligeramente diferenciado */
+  border-color: var(--fallback-b3, oklch(var(--b3))) !important;
+  opacity: 1 !important;
+}
+
+/* Estilos específicos para inputs de solo lectura (read-only) */
+input[readonly] {
+  color: var(--fallback-bc, oklch(var(--bc))) !important;
+  opacity: 0.85 !important;
+  background-color: oklch(var(--b3) / 0.4) !important;
+  border-color: oklch(var(--b3) / 0.8) !important;
+  border-style: dashed !important;
+  cursor: default;
+  font-weight: 500;
+  -webkit-text-fill-color: var(--fallback-bc, oklch(var(--bc))) !important;
+}
+
+/* Asegurar que el icono del calendario sea visible y blanco en modo oscuro */
+:host-context([data-theme="dark"]) input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) !important;
+}
+
+/* Placeholder de alta legibilidad para el campo de texto (textarea) */
+.textarea::placeholder {
+  color: var(--fallback-bc, oklch(var(--bc) / 0.45)) !important;
+  opacity: 1 !important;
+}

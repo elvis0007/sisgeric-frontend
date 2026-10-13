@@ -1,0 +1,15 @@
+
+
+.responsables-panel {
+  position: fixed;
+  z-index: 1000;
+  width: min(400px, calc(100vw - 24px));
+  max-height: min(300px, calc(100dvh - 24px));
+  display: flex;
+  flex-direction: column;
+}
+.responsables-panel-lista {
+  overflow-y: auto;
+  min-height: 0;
+  overscroll-behavior: contain;
+}
